@@ -1,0 +1,7 @@
+dist
+coverage
+etc
+reports
+.stryker-tmp
+src/generated
+package-lock.json

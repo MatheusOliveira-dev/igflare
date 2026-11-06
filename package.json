@@ -1,0 +1,77 @@
+{
+  "name": "instagram-sdk",
+  "version": "0.0.0",
+  "description": "TypeScript client for the Instagram mobile private API",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "npm@10.9.9",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prose": "node scripts/lint-prose.mjs",
+    "guard": "node scripts/check-no-bypass.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "dup": "jscpd src",
+    "deadcode": "knip",
+    "deps": "depcruise src",
+    "gen": "node scripts/generate.mjs",
+    "gen:check": "node scripts/generate.mjs && git diff --exit-code -- src/generated",
+    "api": "api-extractor run --local --verbose",
+    "mutation": "stryker run",
+    "prepare": "husky",
+    "ci": "npm run typecheck && npm run format:check && npm run lint && npm run prose && npm run guard && npm run deps && npm run dup && npm run deadcode && npm run gen:check && npm run coverage && npm run build && npm run api"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@commitlint/cli": "21.2.4",
+    "@commitlint/config-conventional": "21.2.4",
+    "@eslint/js": "9.39.5",
+    "@microsoft/api-extractor": "7.60.1",
+    "@stryker-mutator/core": "10.1.1",
+    "@stryker-mutator/vitest-runner": "10.1.1",
+    "@types/node": "26.6.6",
+    "@vitest/coverage-v8": "5.1.0",
+    "dependency-cruiser": "18.7.2",
+    "eslint": "9.39.5",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-import-resolver-typescript": "4.4.5",
+    "eslint-plugin-import-x": "4.18.0",
+    "eslint-plugin-sonarjs": "4.2.2",
+    "fast-check": "4.10.2",
+    "globals": "17.14.0",
+    "husky": "9.1.7",
+    "jscpd": "5.4.2",
+    "knip": "6.44.1",
+    "lint-staged": "17.6.0",
+    "prettier": "3.9.10",
+    "tsup": "9.0.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.72.1",
+    "vitest": "5.1.0"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
+  }
+}

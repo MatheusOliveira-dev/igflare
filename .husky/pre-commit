@@ -1,0 +1,5 @@
+npx lint-staged
+npm run guard
+
+# Optional machine-local checks, if present. Not tracked.
+[ -f .husky/local.sh ] && . .husky/local.sh

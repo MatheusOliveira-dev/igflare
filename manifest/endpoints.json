@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "endpoints": [
+    { "name": "accountsLogin", "method": "POST", "path": "/api/v1/accounts/login/" },
+    { "name": "feedTimeline", "method": "POST", "path": "/api/v1/feed/timeline/" }
+  ]
+}

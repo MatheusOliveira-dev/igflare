@@ -1,0 +1,13 @@
+# Replace @OWNER with the repo owner's GitHub handle once the repo is on GitHub.
+# Everything requires the owner's review by default.
+* @OWNER
+
+# The guard configuration gets its own review, separate from code, so the
+# guardrails cannot be loosened without the owner seeing it.
+/tsconfig.json @OWNER
+/eslint.config.js @OWNER
+/.dependency-cruiser.cjs @OWNER
+/vitest.config.ts @OWNER
+/stryker.config.json @OWNER
+/.github/ @OWNER
+/scripts/ @OWNER

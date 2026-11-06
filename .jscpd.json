@@ -1,0 +1,8 @@
+{
+  "threshold": 1,
+  "reporters": ["console"],
+  "absolute": true,
+  "gitignore": true,
+  "ignore": ["**/*.test.ts", "src/generated/**", "**/node_modules/**"],
+  "format": ["typescript", "javascript"]
+}
