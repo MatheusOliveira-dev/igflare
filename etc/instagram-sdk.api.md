@@ -4,11 +4,11 @@
 
 ```ts
 
-// @public
-export function buildSignedBody(key: string, payload: string): string;
+// @public (undocumented)
+export function buildSignedBody(payload: string): string;
 
 // @public (undocumented)
-export function createHmacSigner(key: string): Signer;
+export function createSigner(): Signer;
 
 // @public (undocumented)
 export interface EndpointDefinition {
@@ -25,9 +25,6 @@ export type EndpointName = 'accountsLogin' | 'feedTimeline';
 export const endpoints: Record<EndpointName, EndpointDefinition>;
 
 // @public
-export function hmacSignature(key: string, payload: string): string;
-
-// @public
 export class IgError extends Error {
     constructor(message: string, options?: ErrorOptions);
 }
@@ -38,6 +35,12 @@ export class IgResponseError extends IgError {
     // (undocumented)
     readonly statusCode: number;
 }
+
+// @public
+export function jazoest(value: string): string;
+
+// @public
+export function quotePlus(value: string): string;
 
 // @public
 export interface Signer {
