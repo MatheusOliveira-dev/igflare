@@ -2,7 +2,7 @@
 export class IgError extends Error {
   constructor(message: string, options?: ErrorOptions) {
     super(message, options);
-    this.name = 'IgError';
+    this.name = new.target.name;
   }
 }
 
@@ -12,7 +12,6 @@ export class IgResponseError extends IgError {
 
   constructor(message: string, statusCode: number, options?: ErrorOptions) {
     super(message, options);
-    this.name = 'IgResponseError';
     this.statusCode = statusCode;
   }
 }

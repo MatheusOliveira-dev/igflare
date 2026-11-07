@@ -5,7 +5,21 @@
 ```ts
 
 // @public (undocumented)
+export class AccountSuspendedError extends IgApiError {
+}
+
+// @public (undocumented)
 export const API_DOMAIN = "i.instagram.com";
+
+// @public (undocumented)
+export interface ApiErrorPayload {
+    // (undocumented)
+    readonly errorType?: string;
+    // (undocumented)
+    readonly message?: string;
+    // (undocumented)
+    readonly status?: string;
+}
 
 // @public
 export interface AuthState {
@@ -23,6 +37,10 @@ export interface AuthState {
     readonly userId?: string;
     // (undocumented)
     readonly wwwClaim?: string;
+}
+
+// @public (undocumented)
+export class BadPasswordError extends IgApiError {
 }
 
 // @public (undocumented)
@@ -58,6 +76,18 @@ export function buildSignedBody(payload: string): string;
 
 // @public (undocumented)
 export function buildUserAgent(profile: DeviceProfile, locale?: string): string;
+
+// @public (undocumented)
+export class ChallengeRequiredError extends IgApiError {
+}
+
+// @public (undocumented)
+export class ClientForbiddenError extends IgApiError {
+}
+
+// @public
+export class ClientJsonError extends IgError {
+}
 
 // @public
 export function createDeviceState(overrides?: Partial<DeviceState>): DeviceState;
@@ -162,6 +192,10 @@ export class FakeTransport implements HttpTransport {
     readonly requests: HttpRequest[];
 }
 
+// @public (undocumented)
+export class FeedbackRequiredError extends IgApiError {
+}
+
 // @public
 export class FetchTransport implements HttpTransport {
     // (undocumented)
@@ -215,6 +249,13 @@ export interface HttpTransport {
 }
 
 // @public
+export class IgApiError extends IgResponseError {
+    constructor(message: string, statusCode: number, payload?: ApiErrorPayload, options?: ErrorOptions);
+    // (undocumented)
+    readonly payload: ApiErrorPayload;
+}
+
+// @public
 export class IgError extends Error {
     constructor(message: string, options?: ErrorOptions);
 }
@@ -239,6 +280,10 @@ export interface LocationState {
     readonly timezoneOffset: number;
 }
 
+// @public (undocumented)
+export class LoginRequiredError extends IgApiError {
+}
+
 // @public
 export class MemorySessionStore implements SessionStore {
     constructor(initial?: SessionData | null);
@@ -249,7 +294,14 @@ export class MemorySessionStore implements SessionStore {
 }
 
 // @public
+export function parsePrivateResponse(response: HttpResponse): PrivateResponseJson;
+
+// @public
 export function parseSessionData(value: unknown): SessionData;
+
+// @public (undocumented)
+export class PleaseWaitError extends IgApiError {
+}
 
 // @public (undocumented)
 export interface PrivateRequestInput {
@@ -275,8 +327,34 @@ export interface PrivateRequestInput {
     readonly withSignature?: boolean;
 }
 
+// @public (undocumented)
+export interface PrivateResponseJson {
+    // (undocumented)
+    readonly [key: string]: unknown;
+    // (undocumented)
+    readonly challenge?: {
+        readonly url?: string;
+    } | null;
+    // (undocumented)
+    readonly error_type?: string;
+    // (undocumented)
+    readonly message?: string;
+    // (undocumented)
+    readonly status?: string;
+    // (undocumented)
+    readonly two_factor_info?: unknown;
+}
+
 // @public
 export function quotePlus(value: string): string;
+
+// @public (undocumented)
+export class RateLimitError extends IgApiError {
+}
+
+// @public (undocumented)
+export class SentryBlockError extends IgApiError {
+}
 
 // @public
 export interface SessionData {
@@ -302,6 +380,10 @@ export interface SessionStore {
 export interface Signer {
     // (undocumented)
     sign(payload: string): string;
+}
+
+// @public (undocumented)
+export class TwoFactorRequiredError extends IgApiError {
 }
 
 // (No @packageDocumentation comment for this package)

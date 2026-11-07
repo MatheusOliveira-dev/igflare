@@ -1,4 +1,21 @@
 export { IgError, IgResponseError } from './errors/ig-error';
+export {
+  IgApiError,
+  LoginRequiredError,
+  TwoFactorRequiredError,
+  ChallengeRequiredError,
+  AccountSuspendedError,
+  FeedbackRequiredError,
+  SentryBlockError,
+  RateLimitError,
+  BadPasswordError,
+  PleaseWaitError,
+  ClientForbiddenError,
+  ClientJsonError,
+} from './errors/api-errors';
+export type { ApiErrorPayload } from './errors/api-errors';
+export { parsePrivateResponse } from './core/http/response';
+export type { PrivateResponseJson } from './core/http/response';
 export { quotePlus, buildSignedBody, jazoest, createSigner } from './core/signing/signer';
 export type { Signer } from './core/signing/signer';
 export {
