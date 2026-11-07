@@ -9,6 +9,7 @@ mocked in tests.
 ```
 core/transport   HTTP port + adapter (undici/fetch), device state, header injection
 core/signing     signing port + adapter, isolated, pinned by golden vectors
+core/crypto      password encryption for login (#PWD_INSTAGRAM envelope)
 core/session     session/state port + adapters (memory, file)
 core/http        orchestrates transport + signing + session: retries, error mapping
 schemas          zod schemas for API responses, generated from the manifest

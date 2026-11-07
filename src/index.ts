@@ -18,6 +18,8 @@ export { parsePrivateResponse } from './core/http/response';
 export type { PrivateResponseJson } from './core/http/response';
 export { quotePlus, buildSignedBody, jazoest, createSigner } from './core/signing/signer';
 export type { Signer } from './core/signing/signer';
+export { encryptPassword } from './core/crypto/password';
+export type { PasswordPublicKey, EncryptPasswordOptions } from './core/crypto/password';
 export {
   DEFAULT_DEVICE_PROFILE,
   generateUuid,

@@ -169,6 +169,19 @@ export interface DeviceState {
     readonly uuid: string;
 }
 
+// @public
+export function encryptPassword(password: string, key: PasswordPublicKey, options?: EncryptPasswordOptions): string;
+
+// @public (undocumented)
+export interface EncryptPasswordOptions {
+    // (undocumented)
+    readonly iv?: Buffer;
+    // (undocumented)
+    readonly sessionKey?: Buffer;
+    // (undocumented)
+    readonly timestamp?: number;
+}
+
 // @public (undocumented)
 export interface EndpointDefinition {
     // (undocumented)
@@ -301,6 +314,13 @@ export function parsePrivateResponse(response: HttpResponse): PrivateResponseJso
 
 // @public
 export function parseSessionData(value: unknown): SessionData;
+
+// @public (undocumented)
+export interface PasswordPublicKey {
+    // (undocumented)
+    readonly keyId: number;
+    readonly publicKey: string;
+}
 
 // @public (undocumented)
 export class PleaseWaitError extends IgApiError {
