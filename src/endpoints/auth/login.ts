@@ -39,6 +39,19 @@ function extractUserId(json: PrivateResponseJson): string | undefined {
   return undefined;
 }
 
+/** Applies a successful login response to the session and persists it. */
+export async function finalizeLogin(
+  client: PrivateClient,
+  json: PrivateResponseJson,
+): Promise<PrivateResponseJson> {
+  const userId = extractUserId(json);
+  if (userId !== undefined) {
+    client.patchAuth({ userId, lastLogin: Date.now() });
+    await client.persist();
+  }
+  return json;
+}
+
 /**
  * Logs in with username and password. On success the session carries the user id
  * and the authorization token, and is persisted if the client has a store.
@@ -71,10 +84,5 @@ export async function login(
     withDefaultData: false,
   });
 
-  const userId = extractUserId(json);
-  if (userId !== undefined) {
-    client.patchAuth({ userId, lastLogin: Date.now() });
-    await client.persist();
-  }
-  return json;
+  return finalizeLogin(client, json);
 }

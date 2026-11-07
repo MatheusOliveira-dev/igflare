@@ -56,5 +56,7 @@ export { PrivateClient } from './core/http/private-client';
 export type { PrivateClientOptions, PrivateRequestOptions } from './core/http/private-client';
 export { login, fetchPasswordPublicKey } from './endpoints/auth/login';
 export type { LoginCredentials } from './endpoints/auth/login';
+export { twoFactorLogin } from './endpoints/auth/two-factor';
+export type { TwoFactorOptions } from './endpoints/auth/two-factor';
 export { endpoints } from './generated/endpoints';
 export type { EndpointName, EndpointDefinition } from './generated/endpoints';

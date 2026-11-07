@@ -4,6 +4,8 @@ export interface ApiErrorPayload {
   readonly message?: string;
   readonly errorType?: string;
   readonly status?: string;
+  /** The full parsed response, so resolution flows can read two_factor_info, challenge, etc. */
+  readonly raw?: Record<string, unknown>;
 }
 
 /** A failed private-API call, carrying the status and the parsed error payload. */

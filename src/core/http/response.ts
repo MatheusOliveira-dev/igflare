@@ -26,6 +26,7 @@ export interface PrivateResponseJson {
 
 function toPayload(json: PrivateResponseJson): ApiErrorPayload {
   return {
+    raw: json,
     ...(json.message !== undefined ? { message: json.message } : {}),
     ...(json.error_type !== undefined ? { errorType: json.error_type } : {}),
     ...(json.status !== undefined ? { status: json.status } : {}),

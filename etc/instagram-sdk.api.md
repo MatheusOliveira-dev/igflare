@@ -17,6 +17,7 @@ export interface ApiErrorPayload {
     readonly errorType?: string;
     // (undocumented)
     readonly message?: string;
+    readonly raw?: Record<string, unknown>;
     // (undocumented)
     readonly status?: string;
 }
@@ -447,6 +448,18 @@ export interface SessionStore {
 export interface Signer {
     // (undocumented)
     sign(payload: string): string;
+}
+
+// @public
+export function twoFactorLogin(client: PrivateClient, error: TwoFactorRequiredError, options: TwoFactorOptions): Promise<PrivateResponseJson>;
+
+// @public (undocumented)
+export interface TwoFactorOptions {
+    // (undocumented)
+    readonly code: string;
+    // (undocumented)
+    readonly username: string;
+    readonly verificationMethod?: string;
 }
 
 // @public (undocumented)
