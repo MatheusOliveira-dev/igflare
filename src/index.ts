@@ -11,5 +11,15 @@ export {
 export type { DeviceProfile, DeviceState } from './core/transport/device';
 export { buildBaseHeaders } from './core/transport/headers';
 export type { BaseHeadersInput } from './core/transport/headers';
+export { createSession, parseSessionData, DEFAULT_LOCATION } from './core/session/session';
+export type {
+  SessionData,
+  SessionStore,
+  AuthState,
+  LocationState,
+  CreateSessionOptions,
+} from './core/session/session';
+export { MemorySessionStore } from './core/session/adapters/memory';
+export { FileSessionStore } from './core/session/adapters/file';
 export { endpoints } from './generated/endpoints';
 export type { EndpointName, EndpointDefinition } from './generated/endpoints';

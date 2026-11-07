@@ -4,6 +4,24 @@
 
 ```ts
 
+// @public
+export interface AuthState {
+    // (undocumented)
+    readonly authorization?: string;
+    // (undocumented)
+    readonly cookies?: Record<string, string>;
+    // (undocumented)
+    readonly lastLogin?: number;
+    // (undocumented)
+    readonly mid?: string;
+    // (undocumented)
+    readonly rur?: string;
+    // (undocumented)
+    readonly userId?: string;
+    // (undocumented)
+    readonly wwwClaim?: string;
+}
+
 // @public (undocumented)
 export interface BaseHeadersInput {
     // (undocumented)
@@ -39,10 +57,28 @@ export function buildUserAgent(profile: DeviceProfile, locale?: string): string;
 export function createDeviceState(overrides?: Partial<DeviceState>): DeviceState;
 
 // @public (undocumented)
+export function createSession(options?: CreateSessionOptions): SessionData;
+
+// @public (undocumented)
+export interface CreateSessionOptions {
+    // (undocumented)
+    readonly auth?: AuthState;
+    // (undocumented)
+    readonly device?: Partial<DeviceState>;
+    // (undocumented)
+    readonly location?: Partial<LocationState>;
+    // (undocumented)
+    readonly profile?: DeviceProfile;
+}
+
+// @public (undocumented)
 export function createSigner(): Signer;
 
 // @public (undocumented)
 export const DEFAULT_DEVICE_PROFILE: DeviceProfile;
+
+// @public (undocumented)
+export const DEFAULT_LOCATION: LocationState;
 
 // @public
 export interface DeviceProfile {
@@ -108,6 +144,15 @@ export type EndpointName = 'accountsLogin' | 'feedTimeline';
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
 
+// @public
+export class FileSessionStore implements SessionStore {
+    constructor(path: string);
+    // (undocumented)
+    load(): Promise<SessionData | null>;
+    // (undocumented)
+    save(data: SessionData): Promise<void>;
+}
+
 // @public (undocumented)
 export function generateAndroidDeviceId(seed?: string): string;
 
@@ -130,7 +175,49 @@ export class IgResponseError extends IgError {
 export function jazoest(value: string): string;
 
 // @public
+export interface LocationState {
+    // (undocumented)
+    readonly country: string;
+    // (undocumented)
+    readonly locale: string;
+    // (undocumented)
+    readonly timezoneOffset: number;
+}
+
+// @public
+export class MemorySessionStore implements SessionStore {
+    constructor(initial?: SessionData | null);
+    // (undocumented)
+    load(): Promise<SessionData | null>;
+    // (undocumented)
+    save(data: SessionData): Promise<void>;
+}
+
+// @public
+export function parseSessionData(value: unknown): SessionData;
+
+// @public
 export function quotePlus(value: string): string;
+
+// @public
+export interface SessionData {
+    // (undocumented)
+    readonly auth: AuthState;
+    // (undocumented)
+    readonly device: DeviceState;
+    // (undocumented)
+    readonly location: LocationState;
+    // (undocumented)
+    readonly profile: DeviceProfile;
+}
+
+// @public
+export interface SessionStore {
+    // (undocumented)
+    load(): Promise<SessionData | null>;
+    // (undocumented)
+    save(data: SessionData): Promise<void>;
+}
 
 // @public
 export interface Signer {
