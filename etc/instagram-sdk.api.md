@@ -144,6 +144,24 @@ export type EndpointName = 'accountsLogin' | 'feedTimeline';
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
 
+// @public (undocumented)
+export type FakeHandler = (req: HttpRequest) => HttpResponse | Promise<HttpResponse>;
+
+// @public
+export class FakeTransport implements HttpTransport {
+    constructor(handler: FakeHandler);
+    // (undocumented)
+    request(req: HttpRequest): Promise<HttpResponse>;
+    // (undocumented)
+    readonly requests: HttpRequest[];
+}
+
+// @public
+export class FetchTransport implements HttpTransport {
+    // (undocumented)
+    request(req: HttpRequest): Promise<HttpResponse>;
+}
+
 // @public
 export class FileSessionStore implements SessionStore {
     constructor(path: string);
@@ -158,6 +176,37 @@ export function generateAndroidDeviceId(seed?: string): string;
 
 // @public (undocumented)
 export function generateUuid(): string;
+
+// @public (undocumented)
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+
+// @public (undocumented)
+export interface HttpRequest {
+    // (undocumented)
+    readonly body?: string;
+    // (undocumented)
+    readonly headers: Record<string, string>;
+    // (undocumented)
+    readonly method: HttpMethod;
+    // (undocumented)
+    readonly url: string;
+}
+
+// @public (undocumented)
+export interface HttpResponse {
+    // (undocumented)
+    readonly body: string;
+    // (undocumented)
+    readonly headers: Record<string, string>;
+    // (undocumented)
+    readonly status: number;
+}
+
+// @public
+export interface HttpTransport {
+    // (undocumented)
+    request(req: HttpRequest): Promise<HttpResponse>;
+}
 
 // @public
 export class IgError extends Error {

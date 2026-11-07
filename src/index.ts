@@ -11,6 +11,15 @@ export {
 export type { DeviceProfile, DeviceState } from './core/transport/device';
 export { buildBaseHeaders } from './core/transport/headers';
 export type { BaseHeadersInput } from './core/transport/headers';
+export type {
+  HttpTransport,
+  HttpRequest,
+  HttpResponse,
+  HttpMethod,
+} from './core/transport/http-transport';
+export { FetchTransport } from './core/transport/adapters/fetch';
+export { FakeTransport } from './core/transport/adapters/fake';
+export type { FakeHandler } from './core/transport/adapters/fake';
 export { createSession, parseSessionData, DEFAULT_LOCATION } from './core/session/session';
 export type {
   SessionData,
