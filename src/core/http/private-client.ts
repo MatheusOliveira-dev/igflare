@@ -1,5 +1,5 @@
 import type { HttpTransport, HttpResponse } from '../transport/http-transport';
-import { FetchTransport } from '../transport/adapters/fetch';
+import { HttpsTransport } from '../transport/adapters/https';
 import type { AuthState, SessionData, SessionStore } from '../session/session';
 import { createSession } from '../session/session';
 import { buildPrivateRequest } from './request-builder';
@@ -23,7 +23,7 @@ export class PrivateClient {
   #session: SessionData;
 
   constructor(options: PrivateClientOptions = {}) {
-    this.#transport = options.transport ?? new FetchTransport();
+    this.#transport = options.transport ?? new HttpsTransport();
     this.#store = options.store;
     this.#session = options.session ?? createSession();
   }

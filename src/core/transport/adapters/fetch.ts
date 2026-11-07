@@ -1,7 +1,11 @@
 import type { HttpRequest, HttpResponse, HttpTransport } from '../http-transport';
 import { IgError } from '../../../errors/ig-error';
 
-/** The default transport, backed by the runtime's global fetch (undici on Node). */
+/**
+ * A transport backed by the runtime's global fetch. Note: fetch injects browser
+ * `sec-fetch-*` headers that the private API rejects, so use HttpsTransport for
+ * Instagram. Kept for generic use and testing.
+ */
 export class FetchTransport implements HttpTransport {
   async request(req: HttpRequest): Promise<HttpResponse> {
     let response: Response;

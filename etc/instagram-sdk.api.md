@@ -276,6 +276,12 @@ export interface HttpResponse {
 }
 
 // @public
+export class HttpsTransport implements HttpTransport {
+    // (undocumented)
+    request(req: HttpRequest): Promise<HttpResponse>;
+}
+
+// @public
 export interface HttpTransport {
     // (undocumented)
     request(req: HttpRequest): Promise<HttpResponse>;
