@@ -10,9 +10,10 @@ module.exports = {
     },
     {
       name: 'endpoints-only-via-ports',
-      comment: 'Endpoints depend on core ports (interfaces), never on concrete adapters.',
+      comment:
+        'Endpoints depend on core ports (interfaces), never on concrete adapters. Tests may use fakes.',
       severity: 'error',
-      from: { path: '^src/endpoints' },
+      from: { path: '^src/endpoints', pathNot: '\\.test\\.ts$' },
       to: { path: '^src/core/[^/]+/adapters/' },
     },
     {

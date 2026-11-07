@@ -1,6 +1,6 @@
-import type { HttpTransport } from '../transport/http-transport';
+import type { HttpTransport, HttpResponse } from '../transport/http-transport';
 import { FetchTransport } from '../transport/adapters/fetch';
-import type { SessionData, SessionStore } from '../session/session';
+import type { AuthState, SessionData, SessionStore } from '../session/session';
 import { createSession } from '../session/session';
 import { buildPrivateRequest } from './request-builder';
 import type { PrivateRequestInput } from './request-builder';
@@ -40,14 +40,28 @@ export class PrivateClient {
     return this.#session;
   }
 
-  async request(input: PrivateRequestOptions): Promise<PrivateResponseJson> {
+  /** Sends a request and returns the raw response. Updates and persists the session. */
+  async send(input: PrivateRequestOptions): Promise<HttpResponse> {
     const request = buildPrivateRequest({ ...input, session: this.#session });
     const response = await this.#transport.request(request);
     this.#session = applyResponseToSession(this.#session, response);
-    const json = parsePrivateResponse(response);
+    await this.persist();
+    return response;
+  }
+
+  /** Sends a request and parses it, throwing a typed error on failure. */
+  async request(input: PrivateRequestOptions): Promise<PrivateResponseJson> {
+    return parsePrivateResponse(await this.send(input));
+  }
+
+  /** Merges fields into the session auth (e.g. the user id after login). */
+  patchAuth(auth: Partial<AuthState>): void {
+    this.#session = { ...this.#session, auth: { ...this.#session.auth, ...auth } };
+  }
+
+  async persist(): Promise<void> {
     if (this.#store !== undefined) {
       await this.#store.save(this.#session);
     }
-    return json;
   }
 }

@@ -213,6 +213,9 @@ export class FeedbackRequiredError extends IgApiError {
 }
 
 // @public
+export function fetchPasswordPublicKey(client: PrivateClient): Promise<PasswordPublicKey>;
+
+// @public
 export class FetchTransport implements HttpTransport {
     // (undocumented)
     request(req: HttpRequest): Promise<HttpResponse>;
@@ -296,6 +299,18 @@ export interface LocationState {
     readonly timezoneOffset: number;
 }
 
+// @public
+export function login(client: PrivateClient, credentials: LoginCredentials): Promise<PrivateResponseJson>;
+
+// @public (undocumented)
+export interface LoginCredentials {
+    readonly countryCode?: string;
+    // (undocumented)
+    readonly password: string;
+    // (undocumented)
+    readonly username: string;
+}
+
 // @public (undocumented)
 export class LoginRequiredError extends IgApiError {
 }
@@ -333,8 +348,11 @@ export class PrivateClient {
     static fromStore(store: SessionStore, options?: {
         readonly transport?: HttpTransport;
     }): Promise<PrivateClient>;
+    patchAuth(auth: Partial<AuthState>): void;
     // (undocumented)
+    persist(): Promise<void>;
     request(input: PrivateRequestOptions): Promise<PrivateResponseJson>;
+    send(input: PrivateRequestOptions): Promise<HttpResponse>;
     // (undocumented)
     get session(): SessionData;
 }

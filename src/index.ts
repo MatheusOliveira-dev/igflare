@@ -54,5 +54,7 @@ export type { PrivateRequestInput } from './core/http/request-builder';
 export { applyResponseToSession } from './core/http/session-update';
 export { PrivateClient } from './core/http/private-client';
 export type { PrivateClientOptions, PrivateRequestOptions } from './core/http/private-client';
+export { login, fetchPasswordPublicKey } from './endpoints/auth/login';
+export type { LoginCredentials } from './endpoints/auth/login';
 export { endpoints } from './generated/endpoints';
 export type { EndpointName, EndpointDefinition } from './generated/endpoints';
