@@ -82,6 +82,19 @@ export function buildSignedBody(payload: string): string;
 export function buildUserAgent(profile: DeviceProfile, locale?: string): string;
 
 // @public (undocumented)
+export interface Challenge {
+    // (undocumented)
+    readonly apiPath: string;
+    readonly data: PrivateResponseJson;
+}
+
+// @public (undocumented)
+export const CHALLENGE_EMAIL = 1;
+
+// @public
+export const CHALLENGE_SMS = 0;
+
+// @public (undocumented)
 export class ChallengeRequiredError extends IgApiError {
 }
 
@@ -420,6 +433,9 @@ export function quotePlus(value: string): string;
 export class RateLimitError extends IgApiError {
 }
 
+// @public
+export function selectChallengeMethod(client: PrivateClient, challenge: Challenge, choice: number): Promise<PrivateResponseJson>;
+
 // @public (undocumented)
 export class SentryBlockError extends IgApiError {
 }
@@ -449,6 +465,12 @@ export interface Signer {
     // (undocumented)
     sign(payload: string): string;
 }
+
+// @public
+export function startChallenge(client: PrivateClient, error: ChallengeRequiredError): Promise<Challenge>;
+
+// @public
+export function submitChallengeCode(client: PrivateClient, challenge: Challenge, code: string): Promise<PrivateResponseJson>;
 
 // @public
 export function twoFactorLogin(client: PrivateClient, error: TwoFactorRequiredError, options: TwoFactorOptions): Promise<PrivateResponseJson>;

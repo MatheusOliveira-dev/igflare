@@ -58,5 +58,13 @@ export { login, fetchPasswordPublicKey } from './endpoints/auth/login';
 export type { LoginCredentials } from './endpoints/auth/login';
 export { twoFactorLogin } from './endpoints/auth/two-factor';
 export type { TwoFactorOptions } from './endpoints/auth/two-factor';
+export {
+  startChallenge,
+  selectChallengeMethod,
+  submitChallengeCode,
+  CHALLENGE_SMS,
+  CHALLENGE_EMAIL,
+} from './endpoints/auth/challenge';
+export type { Challenge } from './endpoints/auth/challenge';
 export { endpoints } from './generated/endpoints';
 export type { EndpointName, EndpointDefinition } from './generated/endpoints';
