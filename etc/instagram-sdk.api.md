@@ -22,6 +22,9 @@ export interface ApiErrorPayload {
 }
 
 // @public
+export function applyResponseToSession(session: SessionData, response: HttpResponse): SessionData;
+
+// @public
 export interface AuthState {
     // (undocumented)
     readonly authorization?: string;
@@ -303,6 +306,29 @@ export function parseSessionData(value: unknown): SessionData;
 export class PleaseWaitError extends IgApiError {
 }
 
+// @public
+export class PrivateClient {
+    constructor(options?: PrivateClientOptions);
+    // (undocumented)
+    static fromStore(store: SessionStore, options?: {
+        readonly transport?: HttpTransport;
+    }): Promise<PrivateClient>;
+    // (undocumented)
+    request(input: PrivateRequestOptions): Promise<PrivateResponseJson>;
+    // (undocumented)
+    get session(): SessionData;
+}
+
+// @public (undocumented)
+export interface PrivateClientOptions {
+    // (undocumented)
+    readonly session?: SessionData;
+    // (undocumented)
+    readonly store?: SessionStore;
+    // (undocumented)
+    readonly transport?: HttpTransport;
+}
+
 // @public (undocumented)
 export interface PrivateRequestInput {
     // (undocumented)
@@ -326,6 +352,9 @@ export interface PrivateRequestInput {
     // (undocumented)
     readonly withSignature?: boolean;
 }
+
+// @public (undocumented)
+export type PrivateRequestOptions = Omit<PrivateRequestInput, 'session'>;
 
 // @public (undocumented)
 export interface PrivateResponseJson {

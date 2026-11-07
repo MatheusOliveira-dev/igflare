@@ -49,5 +49,8 @@ export { MemorySessionStore } from './core/session/adapters/memory';
 export { FileSessionStore } from './core/session/adapters/file';
 export { buildPrivateRequest, API_DOMAIN } from './core/http/request-builder';
 export type { PrivateRequestInput } from './core/http/request-builder';
+export { applyResponseToSession } from './core/http/session-update';
+export { PrivateClient } from './core/http/private-client';
+export type { PrivateClientOptions, PrivateRequestOptions } from './core/http/private-client';
 export { endpoints } from './generated/endpoints';
 export type { EndpointName, EndpointDefinition } from './generated/endpoints';
