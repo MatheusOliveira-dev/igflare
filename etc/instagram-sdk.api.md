@@ -5,10 +5,94 @@
 ```ts
 
 // @public (undocumented)
+export interface BaseHeadersInput {
+    // (undocumented)
+    readonly authorization?: string;
+    // (undocumented)
+    readonly country?: string;
+    // (undocumented)
+    readonly device: DeviceState;
+    // (undocumented)
+    readonly locale?: string;
+    // (undocumented)
+    readonly mid?: string;
+    // (undocumented)
+    readonly profile: DeviceProfile;
+    // (undocumented)
+    readonly timezoneOffset?: number;
+    // (undocumented)
+    readonly userId?: string;
+    // (undocumented)
+    readonly wwwClaim?: string;
+}
+
+// @public
+export function buildBaseHeaders(input: BaseHeadersInput): Record<string, string>;
+
+// @public (undocumented)
 export function buildSignedBody(payload: string): string;
 
 // @public (undocumented)
+export function buildUserAgent(profile: DeviceProfile, locale?: string): string;
+
+// @public
+export function createDeviceState(overrides?: Partial<DeviceState>): DeviceState;
+
+// @public (undocumented)
 export function createSigner(): Signer;
+
+// @public (undocumented)
+export const DEFAULT_DEVICE_PROFILE: DeviceProfile;
+
+// @public
+export interface DeviceProfile {
+    // (undocumented)
+    readonly androidRelease: string;
+    // (undocumented)
+    readonly androidVersion: number;
+    // (undocumented)
+    readonly appId: string;
+    // (undocumented)
+    readonly appVersion: string;
+    // (undocumented)
+    readonly bloksVersioningId: string;
+    // (undocumented)
+    readonly capabilities: string;
+    // (undocumented)
+    readonly cpu: string;
+    // (undocumented)
+    readonly device: string;
+    // (undocumented)
+    readonly dpi: string;
+    // (undocumented)
+    readonly manufacturer: string;
+    // (undocumented)
+    readonly model: string;
+    // (undocumented)
+    readonly resolution: string;
+    // (undocumented)
+    readonly versionCode: string;
+}
+
+// @public
+export interface DeviceState {
+    // (undocumented)
+    readonly advertisingId: string;
+    // (undocumented)
+    readonly androidDeviceId: string;
+    // (undocumented)
+    readonly clientSessionId: string;
+    // (undocumented)
+    readonly phoneId: string;
+    // (undocumented)
+    readonly pigeonSessionId: string;
+    // (undocumented)
+    readonly requestId: string;
+    // (undocumented)
+    readonly traySessionId: string;
+    // (undocumented)
+    readonly uuid: string;
+}
 
 // @public (undocumented)
 export interface EndpointDefinition {
@@ -23,6 +107,12 @@ export type EndpointName = 'accountsLogin' | 'feedTimeline';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
+
+// @public (undocumented)
+export function generateAndroidDeviceId(seed?: string): string;
+
+// @public (undocumented)
+export function generateUuid(): string;
 
 // @public
 export class IgError extends Error {
