@@ -4,6 +4,9 @@
 
 ```ts
 
+// @public (undocumented)
+export const API_DOMAIN = "i.instagram.com";
+
 // @public
 export interface AuthState {
     // (undocumented)
@@ -46,6 +49,9 @@ export interface BaseHeadersInput {
 
 // @public
 export function buildBaseHeaders(input: BaseHeadersInput): Record<string, string>;
+
+// @public
+export function buildPrivateRequest(input: PrivateRequestInput): HttpRequest;
 
 // @public (undocumented)
 export function buildSignedBody(payload: string): string;
@@ -244,6 +250,30 @@ export class MemorySessionStore implements SessionStore {
 
 // @public
 export function parseSessionData(value: unknown): SessionData;
+
+// @public (undocumented)
+export interface PrivateRequestInput {
+    // (undocumented)
+    readonly domain?: string;
+    // (undocumented)
+    readonly endpoint: string;
+    // (undocumented)
+    readonly headers?: Record<string, string>;
+    // (undocumented)
+    readonly method: HttpMethod;
+    // (undocumented)
+    readonly now?: number;
+    // (undocumented)
+    readonly payload?: Record<string, unknown>;
+    // (undocumented)
+    readonly query?: Record<string, string>;
+    // (undocumented)
+    readonly session: SessionData;
+    // (undocumented)
+    readonly withDefaultData?: boolean;
+    // (undocumented)
+    readonly withSignature?: boolean;
+}
 
 // @public
 export function quotePlus(value: string): string;

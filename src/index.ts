@@ -30,5 +30,7 @@ export type {
 } from './core/session/session';
 export { MemorySessionStore } from './core/session/adapters/memory';
 export { FileSessionStore } from './core/session/adapters/file';
+export { buildPrivateRequest, API_DOMAIN } from './core/http/request-builder';
+export type { PrivateRequestInput } from './core/http/request-builder';
 export { endpoints } from './generated/endpoints';
 export type { EndpointName, EndpointDefinition } from './generated/endpoints';
