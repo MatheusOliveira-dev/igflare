@@ -37,6 +37,29 @@ Enforced by `dependency-cruiser` (`.dependency-cruiser.cjs`), not by convention:
 committed generated code matches the manifest. Change endpoints in the manifest, never in
 the generated files.
 
+## Response and error contract
+
+Every endpoint follows one shape, so a caller learns it once:
+
+- **Success returns the model, not an envelope.** An endpoint returns the parsed,
+  typed domain model directly (`User`, `Media`, …). There is no `{ ok, data }`
+  wrapper; absence of a thrown error is success.
+- **Failure throws a typed error.** Everything that can go wrong surfaces as an
+  `IgError` subclass — the `IgApiError` taxonomy (`BadPasswordError`,
+  `ChallengeRequiredError`, `RateLimitError`, …) for API failures, mapped in one
+  place (`core/http/response.ts`, reused by the CAA flow). Endpoints never return
+  an error value.
+- **Responses are validated at the boundary with zod, leniently.** A schema types
+  and validates only the fields the SDK exposes; everything else passes through
+  (`.passthrough()`), and the API's own fields are `optional`/`nullable` so a
+  benign upstream change does not break callers. The types tell the truth about
+  nullability rather than overpromising.
+- **A response that fails its schema is a typed error too** (carrying the raw body),
+  never a leaked zod exception.
+
+Schemas are hand-written and co-located until enough endpoints justify generating
+them from the manifest (see `DEFERRED.md`).
+
 ## Finding things
 
 Before adding a file, check this document and grep the tree for an existing home. The
