@@ -13,6 +13,8 @@ export interface BaseHeadersInput {
   readonly authorization?: string;
   /** The signed `X-Meta-Usdid` value, when a USDID identity exists. */
   readonly usdidHeader?: string;
+  /** The serialized `Cookie` header (e.g. `sessionid=...`), when the session holds cookies. */
+  readonly cookie?: string;
 }
 
 /**
@@ -69,6 +71,9 @@ export function buildBaseHeaders(input: BaseHeadersInput): Record<string, string
   }
   if (input.usdidHeader !== undefined && input.usdidHeader !== '') {
     headers['X-Meta-Usdid'] = input.usdidHeader;
+  }
+  if (input.cookie !== undefined && input.cookie !== '') {
+    headers['Cookie'] = input.cookie;
   }
 
   return headers;

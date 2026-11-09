@@ -99,6 +99,19 @@ describe('buildPrivateRequest', () => {
     expect(req.headers['X-IG-Android-ID']).toBe('android-f749eebdc6474685');
   });
 
+  it('sends the session cookies as a Cookie header', () => {
+    const authed = createSession({
+      auth: { userId: '42', cookies: { sessionid: 'SESS9', ds_user_id: '42' } },
+    });
+    const req = buildPrivateRequest({ method: 'GET', endpoint: 'x/', session: authed });
+    expect(req.headers['Cookie']).toBe('sessionid=SESS9; ds_user_id=42');
+  });
+
+  it('omits the Cookie header when the session holds no cookies', () => {
+    const req = buildPrivateRequest({ method: 'GET', endpoint: 'x/', session });
+    expect(req.headers['Cookie']).toBeUndefined();
+  });
+
   it('adds authorization, mid and www-claim headers when authenticated', () => {
     const authed = createSession({
       auth: { userId: '42', authorization: 'Bearer t', mid: 'abc', wwwClaim: 'hmac.xyz' },

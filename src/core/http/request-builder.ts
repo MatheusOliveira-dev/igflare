@@ -72,6 +72,15 @@ function buildBody(input: PrivateRequestInput): string | undefined {
   return (input.withSignature ?? true) ? buildSignedBody(json) : json;
 }
 
+/** Serializes the session cookies into a `Cookie` header value, or undefined when none. */
+function serializeCookies(cookies: Record<string, string> | undefined): string | undefined {
+  if (cookies === undefined) {
+    return undefined;
+  }
+  const pairs = Object.entries(cookies);
+  return pairs.length > 0 ? pairs.map(([name, value]) => `${name}=${value}`).join('; ') : undefined;
+}
+
 /** Builds a signed private-API request from the session. Pure: no network. */
 export function buildPrivateRequest(input: PrivateRequestInput): HttpRequest {
   const { session } = input;
@@ -80,6 +89,7 @@ export function buildPrivateRequest(input: PrivateRequestInput): HttpRequest {
     session.usdid !== undefined
       ? buildUsdidHeader(session.usdid, { now: Math.floor(now / 1000) })
       : undefined;
+  const cookie = serializeCookies(session.auth.cookies);
 
   const headers: Record<string, string> = {
     ...buildBaseHeaders({
@@ -95,6 +105,7 @@ export function buildPrivateRequest(input: PrivateRequestInput): HttpRequest {
         ? { authorization: session.auth.authorization }
         : {}),
       ...(usdidHeader !== undefined ? { usdidHeader } : {}),
+      ...(cookie !== undefined ? { cookie } : {}),
     }),
     'X-Pigeon-Rawclienttime': (now / 1000).toFixed(3),
     ...input.headers,
