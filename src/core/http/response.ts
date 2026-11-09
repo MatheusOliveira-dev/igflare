@@ -33,7 +33,13 @@ function toPayload(json: PrivateResponseJson): ApiErrorPayload {
   };
 }
 
-function mapError(status: number, json: PrivateResponseJson): IgApiError {
+/**
+ * Maps a failed private-API response body to a typed error. Exported so the CAA
+ * flow can reuse the taxonomy on the login_response it embeds inside a Bloks
+ * bundle, which carries the same `message`/`error_type`/`two_factor_info`/
+ * `challenge` shape as the REST endpoints.
+ */
+export function mapError(status: number, json: PrivateResponseJson): IgApiError {
   const message = typeof json.message === 'string' ? json.message : '';
   const errorType = json.error_type;
   const payload = toPayload(json);

@@ -14,7 +14,8 @@ import { bloksAsyncAction } from './bloks';
 import { fetchPasswordPublicKey } from './login';
 import { endpoints } from '../../generated/endpoints';
 import { IgError } from '../../errors/ig-error';
-import { TwoFactorRequiredError } from '../../errors/api-errors';
+import { IgApiError, TwoFactorRequiredError } from '../../errors/api-errors';
+import { mapError } from '../../core/http/response';
 
 /** The domain the CAA/Bloks login flow talks to. */
 export const CAA_API_DOMAIN = 'b.i.instagram.com';
@@ -370,6 +371,27 @@ export async function caaLogin(
   return applyCaaResult(client, result);
 }
 
+/** Whether a decoded login_response is a successful login rather than an error payload. */
+function isSuccessLogin(loginResponse: Record<string, unknown>): boolean {
+  return isRecord(loginResponse['logged_in_user']);
+}
+
+/**
+ * Bloks error states that carry no login_response bundle are surfaced as action
+ * markers. Each entry maps a marker string to the typed error it raises. Only the
+ * markers with a captured response are listed; others await a real sample (the
+ * flow still fails with a typed IgApiError until then).
+ */
+const CAA_ERROR_MARKERS: readonly {
+  readonly marker: string;
+  readonly make: (raw: PrivateResponseJson) => IgApiError;
+}[] = [
+  {
+    marker: AP_2SV_ENTRYPOINT,
+    make: (raw) => new TwoFactorRequiredError('Two-factor verification required', 200, { raw }),
+  },
+];
+
 /** Applies a CAA send-login response: session on success, typed error otherwise. */
 async function applyCaaResult(
   client: PrivateClient,
@@ -377,10 +399,19 @@ async function applyCaaResult(
 ): Promise<PrivateResponseJson> {
   const bundle = extractLoginResponse(result);
   if (bundle === null) {
-    if (allText(result).includes(AP_2SV_ENTRYPOINT)) {
-      throw new TwoFactorRequiredError('Two-factor verification required', 200, { raw: result });
+    const text = allText(result);
+    for (const { marker, make } of CAA_ERROR_MARKERS) {
+      if (text.includes(marker)) {
+        throw make(result);
+      }
     }
-    throw new IgError('CAA login did not return a session');
+    throw new IgApiError('CAA login did not return a session', 200, { raw: result });
+  }
+
+  if (!isSuccessLogin(bundle.loginResponse)) {
+    // The embedded login_response is an error payload (bad password, challenge,
+    // rate limit, ...). It shares the REST error shape, so reuse that taxonomy.
+    throw mapError(200, bundle.loginResponse);
   }
 
   const authorization =

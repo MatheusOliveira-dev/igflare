@@ -6,7 +6,12 @@ import { FakeTransport } from '../../core/transport/adapters/fake';
 import type { HttpRequest, HttpResponse } from '../../core/transport/http-transport';
 import { createSession } from '../../core/session/session';
 import { generateUsdidIdentity } from '../../core/crypto/usdid';
-import { TwoFactorRequiredError } from '../../errors/api-errors';
+import {
+  TwoFactorRequiredError,
+  BadPasswordError,
+  ChallengeRequiredError,
+  IgApiError,
+} from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 
 const { publicKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
@@ -21,6 +26,16 @@ function loginBundleAction(pk: number, authorization: string, sessionid: string)
     login_response: JSON.stringify({ logged_in_user: { pk } }),
     headers: JSON.stringify({ 'IG-Set-Authorization': authorization }),
     cookies: `Set-Cookie: sessionid=${sessionid}; Path=/`,
+  });
+  return `(bk.action.caa.Login, ${JSON.stringify(value)})`;
+}
+
+/** Builds a send-login action whose embedded login_response is an error payload. */
+function errorBundleAction(loginResponse: Record<string, unknown>): string {
+  const value = JSON.stringify({
+    login_response: JSON.stringify(loginResponse),
+    headers: JSON.stringify({}),
+    cookies: '',
   });
   return `(bk.action.caa.Login, ${JSON.stringify(value)})`;
 }
@@ -180,6 +195,53 @@ describe('caaLogin', () => {
     );
     await expect(caaLogin(client(fake), { username: 'u', password: 'p' })).rejects.toBeInstanceOf(
       TwoFactorRequiredError,
+    );
+  });
+
+  it('maps an embedded bad_password login_response to a typed error', async () => {
+    const fake = caaTransport(() =>
+      json({
+        status: 'ok',
+        layout: {
+          bloks_payload: {
+            action: errorBundleAction({
+              status: 'fail',
+              error_type: 'bad_password',
+              message: 'The password you entered is incorrect.',
+            }),
+          },
+        },
+      }),
+    );
+    await expect(caaLogin(client(fake), { username: 'u', password: 'p' })).rejects.toBeInstanceOf(
+      BadPasswordError,
+    );
+  });
+
+  it('maps an embedded challenge_required login_response to a typed error', async () => {
+    const fake = caaTransport(() =>
+      json({
+        status: 'ok',
+        layout: {
+          bloks_payload: {
+            action: errorBundleAction({
+              status: 'fail',
+              message: 'challenge_required',
+              challenge: { url: 'https://i.instagram.com/challenge/x/' },
+            }),
+          },
+        },
+      }),
+    );
+    await expect(caaLogin(client(fake), { username: 'u', password: 'p' })).rejects.toBeInstanceOf(
+      ChallengeRequiredError,
+    );
+  });
+
+  it('raises a typed IgApiError when the result has neither a session nor a known marker', async () => {
+    const fake = caaTransport(() => json({ status: 'ok', layout: { bloks_payload: {} } }));
+    await expect(caaLogin(client(fake), { username: 'u', password: 'p' })).rejects.toBeInstanceOf(
+      IgApiError,
     );
   });
 });
