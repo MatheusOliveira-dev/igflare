@@ -26,6 +26,9 @@ export interface ApiErrorPayload {
 export function applyResponseToSession(session: SessionData, response: HttpResponse): SessionData;
 
 // @public
+export const ATTESTATION_KEYSTORE_ERROR = -1013;
+
+// @public
 export interface AuthState {
     // (undocumented)
     readonly authorization?: string;
@@ -47,6 +50,9 @@ export interface AuthState {
 export class BadPasswordError extends IgApiError {
 }
 
+// @public
+export function base64url(raw: Buffer): string;
+
 // @public (undocumented)
 export interface BaseHeadersInput {
     // (undocumented)
@@ -63,11 +69,28 @@ export interface BaseHeadersInput {
     readonly profile: DeviceProfile;
     // (undocumented)
     readonly timezoneOffset?: number;
+    readonly usdidHeader?: string;
     // (undocumented)
     readonly userId?: string;
     // (undocumented)
     readonly wwwClaim?: string;
 }
+
+// @public (undocumented)
+export interface BloksActionOptions {
+    readonly bloksVersioningId?: string;
+    readonly domain?: string;
+    readonly extraHeaders?: Record<string, string>;
+}
+
+// @public
+export function bloksAsyncAction(client: PrivateClient, action: string, params: Record<string, unknown>, options?: BloksActionOptions): Promise<PrivateResponseJson>;
+
+// @public
+export type BodyEncoding = 'signed' | 'form';
+
+// @public
+export function buildAttestationParams(challengeNonce: string): string;
 
 // @public
 export function buildBaseHeaders(input: BaseHeadersInput): Record<string, string>;
@@ -78,8 +101,28 @@ export function buildPrivateRequest(input: PrivateRequestInput): HttpRequest;
 // @public (undocumented)
 export function buildSignedBody(payload: string): string;
 
+// @public
+export function buildUsdidHeader(identity: UsdidIdentity, options?: UsdidHeaderOptions): string;
+
+// @public
+export function buildUsdidRegistrationToken(identity: UsdidIdentity, options: RegistrationTokenOptions): string;
+
 // @public (undocumented)
 export function buildUserAgent(profile: DeviceProfile, locale?: string): string;
+
+// @public
+export const CAA_API_DOMAIN = "b.i.instagram.com";
+
+// @public
+export function caaLogin(client: PrivateClient, credentials: CaaLoginCredentials): Promise<PrivateResponseJson>;
+
+// @public (undocumented)
+export interface CaaLoginCredentials {
+    // (undocumented)
+    readonly password: string;
+    // (undocumented)
+    readonly username: string;
+}
 
 // @public (undocumented)
 export interface Challenge {
@@ -205,7 +248,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsLogin' | 'feedTimeline';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'launcherSync';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -247,8 +290,24 @@ export class FileSessionStore implements SessionStore {
 // @public (undocumented)
 export function generateAndroidDeviceId(seed?: string): string;
 
+// @public
+export function generateUsdidIdentity(options?: GenerateUsdidOptions): UsdidIdentity;
+
+// @public (undocumented)
+export interface GenerateUsdidOptions {
+    // (undocumented)
+    readonly kid?: string;
+    // (undocumented)
+    readonly privateKeyPem?: string;
+    // (undocumented)
+    readonly usdid?: string;
+}
+
 // @public (undocumented)
 export function generateUuid(): string;
+
+// @public
+export function getCurrentUser(client: PrivateClient): Promise<Record<string, unknown>>;
 
 // @public (undocumented)
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -369,6 +428,7 @@ export class PrivateClient {
         readonly transport?: HttpTransport;
     }): Promise<PrivateClient>;
     patchAuth(auth: Partial<AuthState>): void;
+    patchSession(patch: Partial<SessionData>): void;
     // (undocumented)
     persist(): Promise<void>;
     request(input: PrivateRequestOptions): Promise<PrivateResponseJson>;
@@ -392,6 +452,8 @@ export interface PrivateRequestInput {
     // (undocumented)
     readonly domain?: string;
     // (undocumented)
+    readonly encoding?: BodyEncoding;
+    // (undocumented)
     readonly endpoint: string;
     // (undocumented)
     readonly headers?: Record<string, string>;
@@ -403,6 +465,7 @@ export interface PrivateRequestInput {
     readonly payload?: Record<string, unknown>;
     // (undocumented)
     readonly query?: Record<string, string>;
+    readonly rawUrl?: string;
     // (undocumented)
     readonly session: SessionData;
     // (undocumented)
@@ -439,6 +502,16 @@ export function quotePlus(value: string): string;
 export class RateLimitError extends IgApiError {
 }
 
+// @public (undocumented)
+export interface RegistrationTokenOptions {
+    // (undocumented)
+    readonly appId: string;
+    // (undocumented)
+    readonly now?: number;
+    // (undocumented)
+    readonly ttl?: number;
+}
+
 // @public
 export function selectChallengeMethod(client: PrivateClient, challenge: Challenge, choice: number): Promise<PrivateResponseJson>;
 
@@ -456,6 +529,8 @@ export interface SessionData {
     readonly location: LocationState;
     // (undocumented)
     readonly profile: DeviceProfile;
+    readonly usdid?: UsdidIdentity;
+    readonly usdidRegistered?: boolean;
 }
 
 // @public
@@ -471,6 +546,9 @@ export interface Signer {
     // (undocumented)
     sign(payload: string): string;
 }
+
+// @public
+export function signUsdid(identity: UsdidIdentity, message: string): Buffer;
 
 // @public
 export function startChallenge(client: PrivateClient, error: ChallengeRequiredError): Promise<Challenge>;
@@ -493,6 +571,27 @@ export interface TwoFactorOptions {
 // @public (undocumented)
 export class TwoFactorRequiredError extends IgApiError {
 }
+
+// @public
+export const USDID_TOKEN_TTL = 3600;
+
+// @public (undocumented)
+export interface UsdidHeaderOptions {
+    // (undocumented)
+    readonly now?: number;
+    // (undocumented)
+    readonly ttl?: number;
+}
+
+// @public
+export interface UsdidIdentity {
+    readonly kid: string;
+    readonly privateKeyPem: string;
+    readonly usdid: string;
+}
+
+// @public
+export function usdidPublicKeyDer(identity: UsdidIdentity): Buffer;
 
 // (No @packageDocumentation comment for this package)
 
