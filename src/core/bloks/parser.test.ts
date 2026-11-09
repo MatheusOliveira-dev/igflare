@@ -7,6 +7,7 @@ import {
   firstJsonString,
   extractContextData,
   extractAac,
+  extractLoginResponse,
 } from './parser';
 
 // Golden vectors captured from instagrapi's Bloks parser over crafted inputs.
@@ -153,5 +154,47 @@ describe('extractAac', () => {
       },
     };
     expect(extractAac(result)).toBe('');
+  });
+});
+
+describe('extractLoginResponse', () => {
+  function actionWith(raw: Record<string, string>): string {
+    // The bundle is doubly encoded: a JSON object, stringified, then embedded
+    // as a JSON string literal inside the Bloks action program.
+    const value = JSON.stringify(raw);
+    return `(bk.action.caa.Login, ${JSON.stringify(value)}, rest)`;
+  }
+
+  it('decodes the embedded login bundle: headers, cookies and response', () => {
+    const action = actionWith({
+      login_response: JSON.stringify({ logged_in_user: { pk: 42 } }),
+      headers: JSON.stringify({ 'IG-Set-Authorization': 'Bearer IGT:2:abc' }),
+      cookies: 'Set-Cookie: sessionid=SID123; Path=/\nSet-Cookie: ds_user_id=42; Path=/',
+    });
+    const bundle = extractLoginResponse({ layout: { bloks_payload: { action } } });
+    expect(bundle).not.toBeNull();
+    expect(bundle?.headers['IG-Set-Authorization']).toBe('Bearer IGT:2:abc');
+    expect(bundle?.cookies).toEqual({ sessionid: 'SID123', ds_user_id: '42' });
+    expect(bundle?.loginResponse).toEqual({ logged_in_user: { pk: 42 } });
+  });
+
+  it('returns null when no login bundle is embedded', () => {
+    expect(
+      extractLoginResponse({ layout: { bloks_payload: { action: '(noise "x")' } } }),
+    ).toBeNull();
+    expect(extractLoginResponse({})).toBeNull();
+    expect(extractLoginResponse({ layout: { bloks_payload: { action: 42 } } })).toBeNull();
+  });
+
+  it('skips a malformed bundle but keeps scanning for a valid one', () => {
+    const good = JSON.stringify({
+      login_response: JSON.stringify({ ok: 1 }),
+      headers: '{}',
+      cookies: '',
+    });
+    // First a decoy string mentioning login_response, then the real bundle.
+    const action = `("login_response is not json here") (${JSON.stringify(good)})`;
+    const bundle = extractLoginResponse({ layout: { bloks_payload: { action } } });
+    expect(bundle?.loginResponse).toEqual({ ok: 1 });
   });
 });

@@ -263,6 +263,91 @@ function aacFromNode(node: unknown): string {
   return '';
 }
 
+/** The login bundle a successful CAA/Bloks login embeds in its action payload. */
+export interface BloksLoginResponse {
+  readonly loginResponse: Record<string, unknown>;
+  readonly headers: Record<string, string>;
+  readonly cookies: Record<string, string>;
+  readonly rawCookies: string;
+}
+
+/** Parses the `name=value` of each Set-Cookie line, ignoring attributes. */
+function parseCookies(raw: string): Record<string, string> {
+  const cookies: Record<string, string> = {};
+  const cleaned = raw.replace(/Set-Cookie:\s?/gi, '');
+  for (const segment of cleaned.split(/\r?\n/)) {
+    const pair = (segment.split(';')[0] ?? '').trim();
+    const equals = pair.indexOf('=');
+    if (equals <= 0) {
+      continue;
+    }
+    cookies[pair.slice(0, equals).trim()] = pair.slice(equals + 1).trim();
+  }
+  return cookies;
+}
+
+function decodeLoginBundle(value: string): BloksLoginResponse | null {
+  let raw: Record<string, unknown>;
+  try {
+    raw = JSON.parse(value) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+  if (!isRecord(raw) || typeof raw['login_response'] !== 'string') {
+    return null;
+  }
+  try {
+    const loginResponse = JSON.parse(raw['login_response']) as Record<string, unknown>;
+    const headersText = typeof raw['headers'] === 'string' ? raw['headers'] : '{}';
+    const headers = JSON.parse(headersText) as Record<string, string>;
+    const rawCookies = typeof raw['cookies'] === 'string' ? raw['cookies'] : '';
+    return { loginResponse, headers, cookies: parseCookies(rawCookies), rawCookies };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Extracts the login bundle a CAA/Bloks login response embeds as a JSON string
+ * inside `layout.bloks_payload.action`. Returns the decoded response, headers
+ * (which carry `IG-Set-Authorization`), and cookies, or null when absent.
+ */
+export function extractLoginResponse(result: unknown): BloksLoginResponse | null {
+  if (!isRecord(result)) {
+    return null;
+  }
+  const layout = result['layout'];
+  const payload = isRecord(layout) ? layout['bloks_payload'] : undefined;
+  const action = isRecord(payload) ? payload['action'] : undefined;
+  if (typeof action !== 'string') {
+    return null;
+  }
+  for (let index = 0; index < action.length; index += 1) {
+    if (action[index] !== '"') {
+      continue;
+    }
+    const length = jsonStringLength(action, index);
+    if (length < 0) {
+      continue;
+    }
+    let value: unknown;
+    try {
+      value = JSON.parse(action.slice(index, index + length));
+    } catch {
+      continue;
+    }
+    index += length - 1;
+    if (typeof value !== 'string' || !value.includes('login_response')) {
+      continue;
+    }
+    const bundle = decodeLoginBundle(value);
+    if (bundle) {
+      return bundle;
+    }
+  }
+  return null;
+}
+
 /** Extracts the server-issued CAA account access context (`aac`). */
 export function extractAac(result: unknown): string {
   if (!isRecord(result)) {
