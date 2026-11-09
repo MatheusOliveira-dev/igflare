@@ -21,6 +21,22 @@ export type { Signer } from './core/signing/signer';
 export { encryptPassword } from './core/crypto/password';
 export type { PasswordPublicKey, EncryptPasswordOptions } from './core/crypto/password';
 export {
+  base64url,
+  generateUsdidIdentity,
+  usdidPublicKeyDer,
+  signUsdid,
+  buildUsdidHeader,
+  buildUsdidRegistrationToken,
+  USDID_TOKEN_TTL,
+} from './core/crypto/usdid';
+export type {
+  UsdidIdentity,
+  GenerateUsdidOptions,
+  UsdidHeaderOptions,
+  RegistrationTokenOptions,
+} from './core/crypto/usdid';
+export { buildAttestationParams, ATTESTATION_KEYSTORE_ERROR } from './core/crypto/attestation';
+export {
   DEFAULT_DEVICE_PROFILE,
   generateUuid,
   generateAndroidDeviceId,
