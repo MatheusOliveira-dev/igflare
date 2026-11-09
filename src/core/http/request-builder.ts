@@ -1,9 +1,16 @@
 import type { HttpMethod, HttpRequest } from '../transport/http-transport';
 import { buildBaseHeaders } from '../transport/headers';
-import { buildSignedBody } from '../signing/signer';
+import { buildSignedBody, quotePlus } from '../signing/signer';
 import type { SessionData } from '../session/session';
 
 export const API_DOMAIN = 'i.instagram.com';
+
+/**
+ * How the request body is encoded. `signed` is the default private-API body
+ * (`signed_body=SIGNATURE.<json>`); `form` url-encodes the payload as plain
+ * form fields, which the Bloks endpoints expect (they are sent unsigned).
+ */
+export type BodyEncoding = 'signed' | 'form';
 
 export interface PrivateRequestInput {
   readonly method: HttpMethod;
@@ -14,6 +21,7 @@ export interface PrivateRequestInput {
   readonly headers?: Record<string, string>;
   readonly withSignature?: boolean;
   readonly withDefaultData?: boolean;
+  readonly encoding?: BodyEncoding;
   readonly domain?: string;
   readonly now?: number;
 }
@@ -30,9 +38,18 @@ function resolveUrl(endpoint: string, domain: string, query?: Record<string, str
   return `${url}?${new URLSearchParams(query).toString()}`;
 }
 
+function formEncode(payload: Record<string, unknown>): string {
+  return Object.entries(payload)
+    .map(([key, value]) => `${quotePlus(key)}=${quotePlus(String(value))}`)
+    .join('&');
+}
+
 function buildBody(input: PrivateRequestInput): string | undefined {
   if (input.method === 'GET' || input.payload === undefined) {
     return undefined;
+  }
+  if (input.encoding === 'form') {
+    return formEncode(input.payload);
   }
   const withDefaultData = input.withDefaultData ?? true;
   const data = withDefaultData

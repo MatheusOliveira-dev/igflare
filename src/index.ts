@@ -67,7 +67,7 @@ export type {
 export { MemorySessionStore } from './core/session/adapters/memory';
 export { FileSessionStore } from './core/session/adapters/file';
 export { buildPrivateRequest, API_DOMAIN } from './core/http/request-builder';
-export type { PrivateRequestInput } from './core/http/request-builder';
+export type { PrivateRequestInput, BodyEncoding } from './core/http/request-builder';
 export { applyResponseToSession } from './core/http/session-update';
 export { PrivateClient } from './core/http/private-client';
 export type { PrivateClientOptions, PrivateRequestOptions } from './core/http/private-client';
