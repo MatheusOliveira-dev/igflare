@@ -1,6 +1,7 @@
 import type { PrivateClient } from '../../core/http/private-client';
 import type { PrivateResponseJson } from '../../core/http/response';
 import { buildBloksPayload } from '../../core/bloks/payload';
+import { endpoints } from '../../generated/endpoints';
 
 export interface BloksActionOptions {
   /** Bloks versioning id. Defaults to the session profile's value. */
@@ -29,8 +30,8 @@ export async function bloksAsyncAction(
   });
 
   return client.request({
-    method: 'POST',
-    endpoint: `bloks/async_action/${action}/`,
+    method: endpoints.bloksAsyncAction.method,
+    endpoint: `${endpoints.bloksAsyncAction.path}${action}/`,
     payload,
     encoding: 'form',
     withDefaultData: false,

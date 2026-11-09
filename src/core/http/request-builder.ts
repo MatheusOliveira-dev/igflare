@@ -33,8 +33,14 @@ function resolvePath(endpoint: string): string {
   return endpoint.startsWith('/') ? endpoint : `/v1/${endpoint}`;
 }
 
+/**
+ * Builds the request path under the API host. A value already starting with
+ * `/api/` (the full path a manifest endpoint carries) is used verbatim; anything
+ * else is treated as an under-`/api` endpoint and gets the `/api` prefix.
+ */
 function resolveUrl(endpoint: string, domain: string, query?: Record<string, string>): string {
-  const url = `https://${domain}/api${resolvePath(endpoint)}`;
+  const path = endpoint.startsWith('/api/') ? endpoint : `/api${resolvePath(endpoint)}`;
+  const url = `https://${domain}${path}`;
   if (query === undefined || Object.keys(query).length === 0) {
     return url;
   }

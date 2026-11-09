@@ -1,4 +1,5 @@
 import type { PrivateClient } from '../../core/http/private-client';
+import { endpoints } from '../../generated/endpoints';
 import { IgError } from '../../errors/ig-error';
 
 /**
@@ -7,8 +8,8 @@ import { IgError } from '../../errors/ig-error';
  */
 export async function getCurrentUser(client: PrivateClient): Promise<Record<string, unknown>> {
   const json = await client.request({
-    method: 'GET',
-    endpoint: 'accounts/current_user/',
+    method: endpoints.accountsCurrentUser.method,
+    endpoint: endpoints.accountsCurrentUser.path,
     query: { edit: 'true' },
   });
   const user = json['user'];

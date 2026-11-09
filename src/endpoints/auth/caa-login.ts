@@ -12,6 +12,7 @@ import { extractAac, extractLoginResponse, allText } from '../../core/bloks/pars
 import { encryptPassword } from '../../core/crypto/password';
 import { bloksAsyncAction } from './bloks';
 import { fetchPasswordPublicKey } from './login';
+import { endpoints } from '../../generated/endpoints';
 import { IgError } from '../../errors/ig-error';
 import { TwoFactorRequiredError } from '../../errors/api-errors';
 
@@ -79,6 +80,8 @@ async function registerUsdid(client: PrivateClient, identity: UsdidIdentity): Pr
   };
   const json = await client.request({
     method: 'POST',
+    // graphql_www is a pando GraphQL host endpoint, not an /api/v1 REST path, so
+    // it is driven by rawUrl and is intentionally absent from the manifest registry.
     endpoint: 'graphql_www',
     rawUrl: `https://${CAA_API_DOMAIN}/graphql_www`,
     encoding: 'form',
@@ -154,8 +157,8 @@ async function processClientData(client: PrivateClient, waterfallId: string): Pr
 /** Requests the keystore attestation challenge nonce for the login request. */
 async function createAndroidKeystore(client: PrivateClient): Promise<string> {
   const json = await client.request({
-    method: 'POST',
-    endpoint: 'attestation/create_android_keystore/',
+    method: endpoints.attestationCreateAndroidKeystore.method,
+    endpoint: endpoints.attestationCreateAndroidKeystore.path,
     payload: { app_scoped_device_id: client.session.device.uuid, key_hash: '' },
     encoding: 'form',
     withDefaultData: false,

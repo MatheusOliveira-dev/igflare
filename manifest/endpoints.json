@@ -2,6 +2,14 @@
   "version": 1,
   "endpoints": [
     { "name": "accountsLogin", "method": "POST", "path": "/api/v1/accounts/login/" },
-    { "name": "feedTimeline", "method": "POST", "path": "/api/v1/feed/timeline/" }
+    { "name": "accountsCurrentUser", "method": "GET", "path": "/api/v1/accounts/current_user/" },
+    {
+      "name": "attestationCreateAndroidKeystore",
+      "method": "POST",
+      "path": "/api/v1/attestation/create_android_keystore/"
+    },
+    { "name": "bloksAsyncAction", "method": "POST", "path": "/api/v1/bloks/async_action/" },
+    { "name": "feedTimeline", "method": "POST", "path": "/api/v1/feed/timeline/" },
+    { "name": "launcherSync", "method": "POST", "path": "/api/v1/launcher/sync/" }
   ]
 }

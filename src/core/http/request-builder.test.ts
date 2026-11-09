@@ -23,6 +23,25 @@ describe('buildPrivateRequest', () => {
     expect(req.url).toBe(`https://${API_DOMAIN}/api/challenge/`);
   });
 
+  it('uses a full /api/ path from the manifest registry verbatim', () => {
+    const req = buildPrivateRequest({
+      method: 'GET',
+      endpoint: '/api/v1/accounts/current_user/',
+      session,
+    });
+    expect(req.url).toBe(`https://${API_DOMAIN}/api/v1/accounts/current_user/`);
+  });
+
+  it('appends query params to a full /api/ path without doubling /api', () => {
+    const req = buildPrivateRequest({
+      method: 'GET',
+      endpoint: '/api/v1/accounts/current_user/',
+      session,
+      query: { edit: 'true' },
+    });
+    expect(req.url).toBe(`https://${API_DOMAIN}/api/v1/accounts/current_user/?edit=true`);
+  });
+
   it('appends query params', () => {
     const req = buildPrivateRequest({
       method: 'GET',

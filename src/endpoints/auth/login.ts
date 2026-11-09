@@ -4,6 +4,7 @@ import type { PasswordPublicKey } from '../../core/crypto/password';
 import { jazoest } from '../../core/signing/signer';
 import { IgError } from '../../errors/ig-error';
 import type { PrivateResponseJson } from '../../core/http/response';
+import { endpoints } from '../../generated/endpoints';
 
 export interface LoginCredentials {
   readonly username: string;
@@ -15,8 +16,8 @@ export interface LoginCredentials {
 /** Fetches the current password encryption key from the launcher/sync headers. */
 export async function fetchPasswordPublicKey(client: PrivateClient): Promise<PasswordPublicKey> {
   const response = await client.send({
-    method: 'POST',
-    endpoint: 'launcher/sync/',
+    method: endpoints.launcherSync.method,
+    endpoint: endpoints.launcherSync.path,
     payload: { id: client.session.device.uuid, server_config_retrieval: '1' },
     withDefaultData: false,
   });
@@ -78,8 +79,8 @@ export async function login(
   };
 
   const json = await client.request({
-    method: 'POST',
-    endpoint: 'accounts/login/',
+    method: endpoints.accountsLogin.method,
+    endpoint: endpoints.accountsLogin.path,
     payload,
     withDefaultData: false,
   });
