@@ -57,6 +57,7 @@ export function base64url(raw: Buffer): string;
 export interface BaseHeadersInput {
     // (undocumented)
     readonly authorization?: string;
+    readonly cookie?: string;
     // (undocumented)
     readonly country?: string;
     // (undocumented)
