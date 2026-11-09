@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { createDeviceState, DEFAULT_DEVICE_PROFILE } from '../transport/device';
 import type { DeviceProfile, DeviceState } from '../transport/device';
+import type { UsdidIdentity } from '../crypto/usdid';
 
 /** Auth material gained after login. Everything here is optional before login. */
 export interface AuthState {
@@ -26,6 +27,10 @@ export interface SessionData {
   readonly profile: DeviceProfile;
   readonly auth: AuthState;
   readonly location: LocationState;
+  /** The local USDID signing identity the CAA login flow presents, once created. */
+  readonly usdid?: UsdidIdentity;
+  /** Whether the USDID public key has been registered with Instagram. */
+  readonly usdidRegistered?: boolean;
 }
 
 export const DEFAULT_LOCATION: LocationState = {
@@ -99,11 +104,19 @@ const locationStateSchema = z.object({
   timezoneOffset: z.number(),
 });
 
+const usdidSchema = z.object({
+  usdid: z.string(),
+  kid: z.string(),
+  privateKeyPem: z.string(),
+});
+
 const sessionDataSchema = z.object({
   device: deviceStateSchema,
   profile: deviceProfileSchema,
   auth: authStateSchema,
   location: locationStateSchema,
+  usdid: usdidSchema.optional(),
+  usdidRegistered: z.boolean().optional(),
 });
 
 /** Parses untrusted JSON (a stored file) into a SessionData, or throws. */

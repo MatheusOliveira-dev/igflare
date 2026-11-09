@@ -11,6 +11,8 @@ export interface BaseHeadersInput {
   readonly mid?: string;
   readonly wwwClaim?: string;
   readonly authorization?: string;
+  /** The signed `X-Meta-Usdid` value, when a USDID identity exists. */
+  readonly usdidHeader?: string;
 }
 
 /**
@@ -64,6 +66,9 @@ export function buildBaseHeaders(input: BaseHeadersInput): Record<string, string
   }
   if (input.authorization !== undefined && input.authorization !== '') {
     headers['Authorization'] = input.authorization;
+  }
+  if (input.usdidHeader !== undefined && input.usdidHeader !== '') {
+    headers['X-Meta-Usdid'] = input.usdidHeader;
   }
 
   return headers;

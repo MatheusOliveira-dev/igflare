@@ -1,6 +1,7 @@
 import type { HttpMethod, HttpRequest } from '../transport/http-transport';
 import { buildBaseHeaders } from '../transport/headers';
 import { buildSignedBody, quotePlus } from '../signing/signer';
+import { buildUsdidHeader } from '../crypto/usdid';
 import type { SessionData } from '../session/session';
 
 export const API_DOMAIN = 'i.instagram.com';
@@ -23,6 +24,8 @@ export interface PrivateRequestInput {
   readonly withDefaultData?: boolean;
   readonly encoding?: BodyEncoding;
   readonly domain?: string;
+  /** A fully-formed URL, used as-is instead of building one under `/api/v1`. */
+  readonly rawUrl?: string;
   readonly now?: number;
 }
 
@@ -67,6 +70,10 @@ function buildBody(input: PrivateRequestInput): string | undefined {
 export function buildPrivateRequest(input: PrivateRequestInput): HttpRequest {
   const { session } = input;
   const now = input.now ?? Date.now();
+  const usdidHeader =
+    session.usdid !== undefined
+      ? buildUsdidHeader(session.usdid, { now: Math.floor(now / 1000) })
+      : undefined;
 
   const headers: Record<string, string> = {
     ...buildBaseHeaders({
@@ -81,6 +88,7 @@ export function buildPrivateRequest(input: PrivateRequestInput): HttpRequest {
       ...(session.auth.authorization !== undefined
         ? { authorization: session.auth.authorization }
         : {}),
+      ...(usdidHeader !== undefined ? { usdidHeader } : {}),
     }),
     'X-Pigeon-Rawclienttime': (now / 1000).toFixed(3),
     ...input.headers,
@@ -93,7 +101,7 @@ export function buildPrivateRequest(input: PrivateRequestInput): HttpRequest {
 
   return {
     method: input.method,
-    url: resolveUrl(input.endpoint, input.domain ?? API_DOMAIN, input.query),
+    url: input.rawUrl ?? resolveUrl(input.endpoint, input.domain ?? API_DOMAIN, input.query),
     headers,
     ...(body !== undefined ? { body } : {}),
   };

@@ -73,6 +73,10 @@ export { PrivateClient } from './core/http/private-client';
 export type { PrivateClientOptions, PrivateRequestOptions } from './core/http/private-client';
 export { login, fetchPasswordPublicKey } from './endpoints/auth/login';
 export type { LoginCredentials } from './endpoints/auth/login';
+export { bloksAsyncAction } from './endpoints/auth/bloks';
+export type { BloksActionOptions } from './endpoints/auth/bloks';
+export { caaLogin, CAA_API_DOMAIN } from './endpoints/auth/caa-login';
+export type { CaaLoginCredentials } from './endpoints/auth/caa-login';
 export { twoFactorLogin } from './endpoints/auth/two-factor';
 export type { TwoFactorOptions } from './endpoints/auth/two-factor';
 export {

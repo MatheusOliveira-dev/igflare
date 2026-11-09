@@ -59,6 +59,11 @@ export class PrivateClient {
     this.#session = { ...this.#session, auth: { ...this.#session.auth, ...auth } };
   }
 
+  /** Merges top-level fields into the session (e.g. the USDID identity). */
+  patchSession(patch: Partial<SessionData>): void {
+    this.#session = { ...this.#session, ...patch };
+  }
+
   async persist(): Promise<void> {
     if (this.#store !== undefined) {
       await this.#store.save(this.#session);
