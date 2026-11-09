@@ -16,11 +16,11 @@ describe('buildBaseHeaders', () => {
     expect(headers['X-IG-Family-Device-ID']).toBe(device.phoneId);
     expect(headers['X-IG-Android-ID']).toBe(device.androidDeviceId);
     expect(headers['X-IG-App-ID']).toBe('567067343352427');
-    expect(headers['X-IG-Capabilities']).toBe('3brTv10=');
+    expect(headers['X-IG-Capabilities']).toBe('3brTv10C');
     expect(headers['X-Bloks-Version-Id']).toBe(DEFAULT_DEVICE_PROFILE.bloksVersioningId);
     expect(headers['X-IG-WWW-Claim']).toBe('0');
     expect(headers['IG-INTENDED-USER-ID']).toBe('0');
-    expect(headers['User-Agent']).toContain('Instagram 449.0.0.52.84');
+    expect(headers['User-Agent']).toContain('Instagram 454.0.0.54.77');
   });
 
   it('defaults Accept-Language to en-US and prepends another locale', () => {

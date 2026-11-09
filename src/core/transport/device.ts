@@ -18,9 +18,9 @@ export interface DeviceProfile {
 }
 
 export const DEFAULT_DEVICE_PROFILE: DeviceProfile = {
-  appVersion: '449.0.0.52.84',
-  versionCode: '1079242191',
-  bloksVersioningId: '799db3e387d7a21a19c72918b8698b6cd28a1516ade363792c100ed45a0f9f0b',
+  appVersion: '454.0.0.54.77',
+  versionCode: '1105698528',
+  bloksVersioningId: '8e8a63073c08f2c7e6701e497d777db5d8d7ad32a5788ce6b1094f20cad0c9f1',
   androidVersion: 34,
   androidRelease: '14',
   dpi: '480dpi',
@@ -30,7 +30,7 @@ export const DEFAULT_DEVICE_PROFILE: DeviceProfile = {
   device: 'husky',
   cpu: 'husky',
   appId: '567067343352427',
-  capabilities: '3brTv10=',
+  capabilities: '3brTv10C',
 };
 
 /** The random per-install identifiers. Persist these to keep one logical device. */

@@ -48,7 +48,7 @@ describe('createDeviceState', () => {
 describe('buildUserAgent', () => {
   it('matches a golden vector for the default profile', () => {
     expect(buildUserAgent(DEFAULT_DEVICE_PROFILE)).toBe(
-      'Instagram 449.0.0.52.84 Android (34/14; 480dpi; 1344x2992; Google/google; Pixel 8 Pro; husky; husky; en_US; 1079242191)',
+      'Instagram 454.0.0.54.77 Android (34/14; 480dpi; 1344x2992; Google/google; Pixel 8 Pro; husky; husky; en_US; 1105698528)',
     );
   });
 });
