@@ -72,6 +72,8 @@ export type { PrivateRequestInput, BodyEncoding } from './core/http/request-buil
 export { applyResponseToSession } from './core/http/session-update';
 export { PrivateClient } from './core/http/private-client';
 export type { PrivateClientOptions, PrivateRequestOptions } from './core/http/private-client';
+export { IgClient } from './client/ig-client';
+export type { AccountApi, UserApi, FriendshipApi } from './client/ig-client';
 export { login, fetchPasswordPublicKey } from './endpoints/auth/login';
 export type { LoginCredentials } from './endpoints/auth/login';
 export { bloksAsyncAction } from './endpoints/auth/bloks';
