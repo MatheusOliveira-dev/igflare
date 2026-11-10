@@ -200,6 +200,9 @@ async function uploadMessengerImage(client: PrivateClient, jpeg: Uint8Array): Pr
     headers: {
       'Content-Type': 'application/octet-stream',
       Offset: '0',
+      // Both lengths are required together: without Content-Length Node falls back to
+      // chunked encoding and the upload host rejects the mix as an invalid header format.
+      'Content-Length': String(jpeg.length),
       'X-Entity-Length': String(jpeg.length),
       'X-Entity-Name': entity,
       'X-Entity-Type': 'image/jpeg',

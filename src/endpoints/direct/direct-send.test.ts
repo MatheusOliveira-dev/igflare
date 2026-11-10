@@ -162,6 +162,7 @@ describe('sendPhoto', () => {
     );
     expect(upload?.body).toBe(JPEG); // raw bytes
     expect(upload?.headers['X-Entity-Length']).toBe(String(JPEG.length));
+    expect(upload?.headers['Content-Length']).toBe(String(JPEG.length)); // sent with X-Entity-Length
     expect(upload?.headers['image_type']).toBe('FILE_ATTACHMENT');
 
     const attach = transport.requests[1];
