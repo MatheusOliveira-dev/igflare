@@ -79,9 +79,12 @@ export type { BloksActionOptions } from './endpoints/auth/bloks';
 export { caaLogin, CAA_API_DOMAIN } from './endpoints/auth/caa-login';
 export type { CaaLoginCredentials } from './endpoints/auth/caa-login';
 export { getCurrentUser } from './endpoints/user/current-user';
-export { getUserInfo } from './endpoints/user/user-info';
+export { getUserInfo, getUserInfoByUsername } from './endpoints/user/user-info';
 export { userSchema } from './schemas/user';
 export type { User } from './schemas/user';
+export { followUser, unfollowUser, getFriendshipStatus } from './endpoints/friendship/friendship';
+export { friendshipStatusSchema } from './schemas/friendship';
+export type { FriendshipStatus } from './schemas/friendship';
 export { twoFactorLogin } from './endpoints/auth/two-factor';
 export type { TwoFactorOptions } from './endpoints/auth/two-factor';
 export {

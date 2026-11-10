@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getUserInfo } from './user-info';
+import { getUserInfo, getUserInfoByUsername } from './user-info';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
 import { createSession } from '../../core/session/session';
@@ -65,6 +65,23 @@ describe('getUserInfo', () => {
 
     expect(user.follower_count).toBeNull();
     expect((user as Record<string, unknown>)['latest_reel_media']).toBe(42);
+  });
+
+  it('fetches by username against the usernameinfo endpoint', async () => {
+    const transport = new FakeTransport(() => ({
+      status: 200,
+      headers: {},
+      body: JSON.stringify({ status: 'ok', user: { pk: 5, username: 'carol' } }),
+    }));
+    const client = new PrivateClient({ transport, session: createSession() });
+
+    const user = await getUserInfoByUsername(client, 'carol');
+
+    expect(transport.requests[0]?.url).toBe(
+      'https://i.instagram.com/api/v1/users/carol/usernameinfo/',
+    );
+    expect(user.pk).toBe('5');
+    expect(user.username).toBe('carol');
   });
 
   it('throws when the response carries no user', async () => {

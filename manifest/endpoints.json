@@ -15,7 +15,15 @@
     },
     { "name": "bloksAsyncAction", "method": "POST", "path": "/api/v1/bloks/async_action/" },
     { "name": "feedTimeline", "method": "POST", "path": "/api/v1/feed/timeline/" },
+    { "name": "friendshipsCreate", "method": "POST", "path": "/api/v1/friendships/create/{pk}/" },
+    { "name": "friendshipsDestroy", "method": "POST", "path": "/api/v1/friendships/destroy/{pk}/" },
+    { "name": "friendshipsShow", "method": "GET", "path": "/api/v1/friendships/show/{pk}/" },
     { "name": "launcherSync", "method": "POST", "path": "/api/v1/launcher/sync/" },
-    { "name": "userInfo", "method": "GET", "path": "/api/v1/users/{pk}/info/" }
+    { "name": "userInfo", "method": "GET", "path": "/api/v1/users/{pk}/info/" },
+    {
+      "name": "userInfoByUsername",
+      "method": "GET",
+      "path": "/api/v1/users/{username}/usernameinfo/"
+    }
   ]
 }
