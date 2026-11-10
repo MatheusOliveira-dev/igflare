@@ -1,4 +1,5 @@
 import type { HttpResponse } from '../transport/http-transport';
+import { parseLosslessJson } from './lossless-json';
 import {
   IgApiError,
   LoginRequiredError,
@@ -86,7 +87,7 @@ export function mapError(status: number, json: PrivateResponseJson): IgApiError 
 export function parsePrivateResponse(response: HttpResponse): PrivateResponseJson {
   let json: PrivateResponseJson;
   try {
-    json = JSON.parse(response.body) as PrivateResponseJson;
+    json = parseLosslessJson(response.body) as PrivateResponseJson;
   } catch (error) {
     throw new ClientJsonError(`Response was not JSON (status ${String(response.status)})`, {
       cause: error,
