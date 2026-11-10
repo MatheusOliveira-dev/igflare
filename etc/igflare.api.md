@@ -43,6 +43,9 @@ export function approveRequest(client: PrivateClient, pk: string): Promise<Frien
 export function approveThread(client: PrivateClient, threadId: string): Promise<void>;
 
 // @public
+export function archiveMedia(client: PrivateClient, mediaId: string): Promise<void>;
+
+// @public
 export const ATTESTATION_KEYSTORE_ERROR = -1013;
 
 // @public
@@ -198,7 +201,12 @@ export interface CommentListOptions {
 }
 
 // @public
-export function commentMedia(client: PrivateClient, mediaId: string, text: string): Promise<Comment>;
+export function commentMedia(client: PrivateClient, mediaId: string, text: string, options?: CommentOptions): Promise<Comment>;
+
+// @public (undocumented)
+export interface CommentOptions {
+    readonly repliedToCommentId?: string;
+}
 
 // @public
 export const commentSchema: z.ZodObject<{
@@ -258,6 +266,9 @@ export const DEFAULT_LOCATION: LocationState;
 
 // @public
 export function deleteComment(client: PrivateClient, mediaId: string, commentId: string): Promise<void>;
+
+// @public
+export function deleteComments(client: PrivateClient, mediaId: string, commentIds: readonly string[]): Promise<void>;
 
 // @public
 export function deleteMedia(client: PrivateClient, mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL' | 'STORY'): Promise<void>;
@@ -395,6 +406,14 @@ export const directSendResultSchema: z.ZodObject<{
 }, z.core.$loose>;
 
 // @public
+export function editMedia(client: PrivateClient, mediaId: string, options: EditMediaOptions): Promise<Media>;
+
+// @public (undocumented)
+export interface EditMediaOptions {
+    readonly caption: string;
+}
+
+// @public
 export function encryptPassword(password: string, key: PasswordPublicKey, options?: EncryptPasswordOptions): string;
 
 // @public (undocumented)
@@ -416,7 +435,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastReaction' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastReaction' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -563,6 +582,9 @@ export interface GenerateUsdidOptions {
 
 // @public (undocumented)
 export function generateUuid(): string;
+
+// @public
+export function getCommentReplies(client: PrivateClient, mediaId: string, commentId: string, options?: ReplyListOptions): Promise<Page<Comment>>;
 
 // @public
 export function getComments(client: PrivateClient, mediaId: string, options?: CommentListOptions): Promise<Page<Comment>>;
@@ -757,6 +779,9 @@ export class InvalidVerificationCodeError extends IgApiError {
 export function jazoest(value: string): string;
 
 // @public
+export function likeComment(client: PrivateClient, commentId: string): Promise<void>;
+
+// @public
 export function likeMedia(client: PrivateClient, mediaId: string): Promise<void>;
 
 // @public (undocumented)
@@ -809,7 +834,9 @@ export type Media = z.infer<typeof mediaSchema>;
 // @public
 export interface MediaApi {
     // (undocumented)
-    comment(mediaId: string, text: string): Promise<Comment>;
+    archive(mediaId: string): Promise<void>;
+    // (undocumented)
+    comment(mediaId: string, text: string, options?: CommentOptions): Promise<Comment>;
     // (undocumented)
     comments(mediaId: string, options?: CommentListOptions): Promise<Page<Comment>>;
     // (undocumented)
@@ -817,21 +844,43 @@ export interface MediaApi {
     // (undocumented)
     deleteComment(mediaId: string, commentId: string): Promise<void>;
     // (undocumented)
+    deleteComments(mediaId: string, commentIds: readonly string[]): Promise<void>;
+    // (undocumented)
+    edit(mediaId: string, options: EditMediaOptions): Promise<Media>;
+    // (undocumented)
     info(mediaId: string): Promise<Media>;
     // (undocumented)
     like(mediaId: string): Promise<void>;
+    // (undocumented)
+    likeComment(commentId: string): Promise<void>;
     // (undocumented)
     likers(mediaId: string): Promise<User[]>;
     // (undocumented)
     paginateComments(mediaId: string): AsyncGenerator<Comment>;
     // (undocumented)
+    paginateReplies(mediaId: string, commentId: string): AsyncGenerator<Comment>;
+    // (undocumented)
     paginateSaved(): AsyncGenerator<Media>;
+    // (undocumented)
+    pin(mediaId: string): Promise<void>;
+    // (undocumented)
+    pinComment(mediaId: string, commentId: string): Promise<void>;
+    // (undocumented)
+    replies(mediaId: string, commentId: string, options?: ReplyListOptions): Promise<Page<Comment>>;
     // (undocumented)
     save(mediaId: string): Promise<void>;
     // (undocumented)
     saved(options?: CommentListOptions): Promise<Page<Media>>;
     // (undocumented)
+    unarchive(mediaId: string): Promise<void>;
+    // (undocumented)
     unlike(mediaId: string): Promise<void>;
+    // (undocumented)
+    unlikeComment(commentId: string): Promise<void>;
+    // (undocumented)
+    unpin(mediaId: string): Promise<void>;
+    // (undocumented)
+    unpinComment(mediaId: string, commentId: string): Promise<void>;
     // (undocumented)
     unsave(mediaId: string): Promise<void>;
 }
@@ -909,6 +958,9 @@ export interface Page<T> {
 export function paginate<T>(fetchPage: (cursor?: string) => Promise<Page<T>>): AsyncGenerator<T>;
 
 // @public
+export function paginateCommentReplies(client: PrivateClient, mediaId: string, commentId: string): AsyncGenerator<Comment>;
+
+// @public
 export function paginateComments(client: PrivateClient, mediaId: string): AsyncGenerator<Comment>;
 
 // @public
@@ -971,6 +1023,12 @@ export interface PhotoUploadOptions {
     // (undocumented)
     readonly caption?: string;
 }
+
+// @public
+export function pinComment(client: PrivateClient, mediaId: string, commentId: string): Promise<void>;
+
+// @public
+export function pinMedia(client: PrivateClient, mediaId: string): Promise<void>;
 
 // @public (undocumented)
 export class PleaseWaitError extends IgApiError {
@@ -1139,6 +1197,11 @@ export interface RegistrationTokenOptions {
     readonly now?: number;
     // (undocumented)
     readonly ttl?: number;
+}
+
+// @public (undocumented)
+export interface ReplyListOptions {
+    readonly cursor?: string;
 }
 
 // @public
@@ -1343,10 +1406,16 @@ export type TwoFactorSource = {
 };
 
 // @public
+export function unarchiveMedia(client: PrivateClient, mediaId: string): Promise<void>;
+
+// @public
 export function unblockUser(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
 
 // @public
 export function unfollowUser(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
+
+// @public
+export function unlikeComment(client: PrivateClient, commentId: string): Promise<void>;
 
 // @public
 export function unlikeMedia(client: PrivateClient, mediaId: string): Promise<void>;
@@ -1356,6 +1425,12 @@ export function unmuteThread(client: PrivateClient, threadId: string): Promise<v
 
 // @public
 export function unmuteUser(client: PrivateClient, pk: string, options?: MuteOptions): Promise<void>;
+
+// @public
+export function unpinComment(client: PrivateClient, mediaId: string, commentId: string): Promise<void>;
+
+// @public
+export function unpinMedia(client: PrivateClient, mediaId: string): Promise<void>;
 
 // @public
 export function unsaveMedia(client: PrivateClient, mediaId: string): Promise<void>;
