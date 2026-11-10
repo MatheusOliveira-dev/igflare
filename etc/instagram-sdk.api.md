@@ -4,6 +4,8 @@
 
 ```ts
 
+import { z } from 'zod';
+
 // @public (undocumented)
 export class AccountSuspendedError extends IgApiError {
 }
@@ -151,6 +153,13 @@ export class ClientJsonError extends IgError {
 }
 
 // @public
+export class ClientSchemaError extends IgError {
+    constructor(message: string, raw: unknown, options?: ErrorOptions);
+    // (undocumented)
+    readonly raw: unknown;
+}
+
+// @public
 export function createDeviceState(overrides?: Partial<DeviceState>): DeviceState;
 
 // @public (undocumented)
@@ -249,7 +258,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'launcherSync';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'launcherSync' | 'userInfo';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -309,6 +318,9 @@ export function generateUuid(): string;
 
 // @public
 export function getCurrentUser(client: PrivateClient): Promise<Record<string, unknown>>;
+
+// @public
+export function getUserInfo(client: PrivateClient, pk: string): Promise<User>;
 
 // @public (undocumented)
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -593,6 +605,23 @@ export interface UsdidIdentity {
 
 // @public
 export function usdidPublicKeyDer(identity: UsdidIdentity): Buffer;
+
+// @public (undocumented)
+export type User = z.infer<typeof userSchema>;
+
+// @public
+export const userSchema: z.ZodObject<{
+    pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+    username: z.ZodOptional<z.ZodString>;
+    full_name: z.ZodOptional<z.ZodString>;
+    is_private: z.ZodOptional<z.ZodBoolean>;
+    is_verified: z.ZodOptional<z.ZodBoolean>;
+    profile_pic_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    biography: z.ZodOptional<z.ZodString>;
+}, z.core.$loose>;
 
 // (No @packageDocumentation comment for this package)
 
