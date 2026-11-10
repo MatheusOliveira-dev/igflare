@@ -33,6 +33,9 @@ export interface ApiErrorPayload {
 export function applyResponseToSession(session: SessionData, response: HttpResponse): SessionData;
 
 // @public
+export function approveRequest(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
+
+// @public
 export const ATTESTATION_KEYSTORE_ERROR = -1013;
 
 // @public
@@ -83,6 +86,9 @@ export interface BaseHeadersInput {
     // (undocumented)
     readonly wwwClaim?: string;
 }
+
+// @public
+export function blockUser(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
 
 // @public (undocumented)
 export interface BloksActionOptions {
@@ -235,6 +241,9 @@ export function deleteComment(client: PrivateClient, mediaId: string, commentId:
 export function deleteMedia(client: PrivateClient, mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL'): Promise<void>;
 
 // @public
+export function denyRequest(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
+
+// @public
 export interface DeviceProfile {
     // (undocumented)
     readonly androidRelease: string;
@@ -342,7 +351,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'fbsearchPlaces' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaUnlike' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'fbsearchPlaces' | 'feedTimeline' | 'feedUser' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaUnlike' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -417,19 +426,35 @@ export function followUser(client: PrivateClient, pk: string): Promise<Friendshi
 // @public
 export interface FriendshipApi {
     // (undocumented)
+    approve(pk: string): Promise<FriendshipStatus>;
+    // (undocumented)
+    block(pk: string): Promise<FriendshipStatus>;
+    // (undocumented)
+    deny(pk: string): Promise<FriendshipStatus>;
+    // (undocumented)
     follow(pk: string): Promise<FriendshipStatus>;
     // (undocumented)
     followers(pk: string, options?: FollowListOptions): Promise<Page<User>>;
     // (undocumented)
     following(pk: string, options?: FollowListOptions): Promise<Page<User>>;
     // (undocumented)
+    mute(pk: string, options?: MuteOptions): Promise<void>;
+    // (undocumented)
     paginateFollowers(pk: string): AsyncGenerator<User>;
     // (undocumented)
     paginateFollowing(pk: string): AsyncGenerator<User>;
     // (undocumented)
+    paginatePending(): AsyncGenerator<User>;
+    // (undocumented)
+    pending(options?: FollowListOptions): Promise<Page<User>>;
+    // (undocumented)
     status(pk: string): Promise<FriendshipStatus>;
     // (undocumented)
+    unblock(pk: string): Promise<FriendshipStatus>;
+    // (undocumented)
     unfollow(pk: string): Promise<FriendshipStatus>;
+    // (undocumented)
+    unmute(pk: string, options?: MuteOptions): Promise<void>;
 }
 
 // @public (undocumented)
@@ -497,6 +522,9 @@ export function getLocationFeed(client: PrivateClient, locationId: string, optio
 
 // @public
 export function getMediaInfo(client: PrivateClient, mediaId: string): Promise<Media>;
+
+// @public
+export function getPendingRequests(client: PrivateClient, options?: FollowListOptions): Promise<Page<User>>;
 
 // @public
 export function getThread(client: PrivateClient, threadId: string, options?: CursorOptions): Promise<Page<DirectMessage>>;
@@ -738,6 +766,17 @@ export class MemorySessionStore implements SessionStore {
 }
 
 // @public
+export interface MuteOptions {
+    // (undocumented)
+    readonly posts?: boolean;
+    // (undocumented)
+    readonly stories?: boolean;
+}
+
+// @public
+export function muteUser(client: PrivateClient, pk: string, options?: MuteOptions): Promise<void>;
+
+// @public
 export interface Page<T> {
     // (undocumented)
     readonly items: readonly T[];
@@ -765,6 +804,9 @@ export function paginateInbox(client: PrivateClient): AsyncGenerator<Thread>;
 
 // @public
 export function paginateLocationFeed(client: PrivateClient, locationId: string): AsyncGenerator<Media>;
+
+// @public
+export function paginatePendingRequests(client: PrivateClient): AsyncGenerator<User>;
 
 // @public
 export function paginateThread(client: PrivateClient, threadId: string): AsyncGenerator<DirectMessage>;
@@ -1040,10 +1082,16 @@ export class TwoFactorRequiredError extends IgApiError {
 }
 
 // @public
+export function unblockUser(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
+
+// @public
 export function unfollowUser(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
 
 // @public
 export function unlikeMedia(client: PrivateClient, mediaId: string): Promise<void>;
+
+// @public
+export function unmuteUser(client: PrivateClient, pk: string, options?: MuteOptions): Promise<void>;
 
 // @public
 export interface UploadApi {
