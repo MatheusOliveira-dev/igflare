@@ -167,6 +167,11 @@ export class ClientSchemaError extends IgError {
 // @public (undocumented)
 export type Comment = z.infer<typeof commentSchema>;
 
+// @public (undocumented)
+export interface CommentListOptions {
+    readonly cursor?: string;
+}
+
 // @public
 export function commentMedia(client: PrivateClient, mediaId: string, text: string): Promise<Comment>;
 
@@ -337,7 +342,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaComment' | 'mediaCommentDelete' | 'mediaConfigure' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaUnlike' | 'userInfo' | 'userInfoByUsername';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'fbsearchPlaces' | 'feedLocation' | 'feedTag' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaUnlike' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -356,6 +361,14 @@ export class FakeTransport implements HttpTransport {
 
 // @public
 export interface FeedApi {
+    // (undocumented)
+    hashtag(tag: string, options?: FeedOptions): Promise<Page<Media>>;
+    // (undocumented)
+    location(locationId: string, options?: FeedOptions): Promise<Page<Media>>;
+    // (undocumented)
+    paginateHashtag(tag: string): AsyncGenerator<Media>;
+    // (undocumented)
+    paginateLocation(locationId: string): AsyncGenerator<Media>;
     // (undocumented)
     paginateTimeline(): AsyncGenerator<Media>;
     // (undocumented)
@@ -456,6 +469,9 @@ export interface GenerateUsdidOptions {
 export function generateUuid(): string;
 
 // @public
+export function getComments(client: PrivateClient, mediaId: string, options?: CommentListOptions): Promise<Page<Comment>>;
+
+// @public
 export function getCurrentUser(client: PrivateClient): Promise<Record<string, unknown>>;
 
 // @public
@@ -468,7 +484,16 @@ export function getFollowing(client: PrivateClient, pk: string, options?: Follow
 export function getFriendshipStatus(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
 
 // @public
+export function getHashtagFeed(client: PrivateClient, tag: string, options?: FeedOptions): Promise<Page<Media>>;
+
+// @public
 export function getInbox(client: PrivateClient, options?: CursorOptions): Promise<Page<Thread>>;
+
+// @public
+export function getLikers(client: PrivateClient, mediaId: string): Promise<User[]>;
+
+// @public
+export function getLocationFeed(client: PrivateClient, locationId: string, options?: FeedOptions): Promise<Page<Media>>;
 
 // @public
 export function getMediaInfo(client: PrivateClient, mediaId: string): Promise<Media>;
@@ -487,6 +512,17 @@ export function getUserInfo(client: PrivateClient, pk: string): Promise<User>;
 
 // @public
 export function getUserInfoByUsername(client: PrivateClient, username: string): Promise<User>;
+
+// @public (undocumented)
+export type Hashtag = z.infer<typeof hashtagSchema>;
+
+// @public
+export const hashtagSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodCoercedString<unknown>>;
+    name: z.ZodOptional<z.ZodString>;
+    media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    search_result_subtitle: z.ZodOptional<z.ZodString>;
+}, z.core.$loose>;
 
 // @public (undocumented)
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -553,6 +589,8 @@ export class IgFlare {
     login(credentials: CaaLoginCredentials): Promise<PrivateResponseJson>;
     // (undocumented)
     readonly media: MediaApi;
+    // (undocumented)
+    readonly search: SearchApi;
     get session(): SessionData;
     // (undocumented)
     readonly upload: UploadApi;
@@ -585,6 +623,21 @@ export function jazoest(value: string): string;
 
 // @public
 export function likeMedia(client: PrivateClient, mediaId: string): Promise<void>;
+
+// @public (undocumented)
+export type Location = z.infer<typeof locationSchema>;
+
+// @public
+export const locationSchema: z.ZodObject<{
+    pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+    name: z.ZodOptional<z.ZodString>;
+    address: z.ZodOptional<z.ZodString>;
+    city: z.ZodOptional<z.ZodString>;
+    lat: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    lng: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    external_id: z.ZodOptional<z.ZodCoercedString<unknown>>;
+    facebook_places_id: z.ZodOptional<z.ZodCoercedString<unknown>>;
+}, z.core.$loose>;
 
 // @public
 export interface LocationState {
@@ -620,6 +673,8 @@ export interface MediaApi {
     // (undocumented)
     comment(mediaId: string, text: string): Promise<Comment>;
     // (undocumented)
+    comments(mediaId: string, options?: CommentListOptions): Promise<Page<Comment>>;
+    // (undocumented)
     delete(mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL'): Promise<void>;
     // (undocumented)
     deleteComment(mediaId: string, commentId: string): Promise<void>;
@@ -627,6 +682,10 @@ export interface MediaApi {
     info(mediaId: string): Promise<Media>;
     // (undocumented)
     like(mediaId: string): Promise<void>;
+    // (undocumented)
+    likers(mediaId: string): Promise<User[]>;
+    // (undocumented)
+    paginateComments(mediaId: string): AsyncGenerator<Comment>;
     // (undocumented)
     unlike(mediaId: string): Promise<void>;
 }
@@ -690,13 +749,22 @@ export interface Page<T> {
 export function paginate<T>(fetchPage: (cursor?: string) => Promise<Page<T>>): AsyncGenerator<T>;
 
 // @public
+export function paginateComments(client: PrivateClient, mediaId: string): AsyncGenerator<Comment>;
+
+// @public
 export function paginateFollowers(client: PrivateClient, pk: string): AsyncGenerator<User>;
 
 // @public
 export function paginateFollowing(client: PrivateClient, pk: string): AsyncGenerator<User>;
 
 // @public
+export function paginateHashtagFeed(client: PrivateClient, tag: string): AsyncGenerator<Media>;
+
+// @public
 export function paginateInbox(client: PrivateClient): AsyncGenerator<Thread>;
+
+// @public
+export function paginateLocationFeed(client: PrivateClient, locationId: string): AsyncGenerator<Media>;
 
 // @public
 export function paginateThread(client: PrivateClient, threadId: string): AsyncGenerator<DirectMessage>;
@@ -844,6 +912,25 @@ export class RetryTransport implements HttpTransport {
     // (undocumented)
     request(req: HttpRequest): Promise<HttpResponse>;
 }
+
+// @public
+export interface SearchApi {
+    // (undocumented)
+    hashtags(query: string): Promise<Hashtag[]>;
+    // (undocumented)
+    places(query: string): Promise<Location[]>;
+    // (undocumented)
+    users(query: string): Promise<User[]>;
+}
+
+// @public
+export function searchHashtags(client: PrivateClient, query: string): Promise<Hashtag[]>;
+
+// @public
+export function searchPlaces(client: PrivateClient, query: string): Promise<Location[]>;
+
+// @public
+export function searchUsers(client: PrivateClient, query: string): Promise<User[]>;
 
 // @public
 export function selectChallengeMethod(client: PrivateClient, challenge: Challenge, choice: number): Promise<PrivateResponseJson>;

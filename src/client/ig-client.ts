@@ -25,6 +25,10 @@ import {
   paginateUserFeed,
   getTimelineFeed,
   paginateTimeline,
+  getHashtagFeed,
+  paginateHashtagFeed,
+  getLocationFeed,
+  paginateLocationFeed,
 } from '../endpoints/feed/feed';
 import type { FeedOptions } from '../endpoints/feed/feed';
 import {
@@ -34,7 +38,12 @@ import {
   commentMedia,
   deleteComment,
   deleteMedia,
+  getComments,
+  paginateComments,
+  getLikers,
 } from '../endpoints/media/media';
+import type { CommentListOptions } from '../endpoints/media/media';
+import { searchUsers, searchHashtags, searchPlaces } from '../endpoints/search/search';
 import { uploadPhoto, uploadVideo } from '../endpoints/upload/upload';
 import type { PhotoUploadOptions, VideoUploadOptions } from '../endpoints/upload/upload';
 import {
@@ -50,6 +59,8 @@ import type { FriendshipStatus } from '../schemas/friendship';
 import type { Media } from '../schemas/media';
 import type { Comment } from '../schemas/comment';
 import type { Thread, DirectMessage, DirectSendResult } from '../schemas/direct';
+import type { Hashtag } from '../schemas/hashtag';
+import type { Location } from '../schemas/location';
 
 /** The logged-in account itself. */
 export interface AccountApi {
@@ -80,6 +91,17 @@ export interface FeedApi {
   paginateUser(pk: string): AsyncGenerator<Media>;
   timeline(options?: FeedOptions): Promise<Page<Media>>;
   paginateTimeline(): AsyncGenerator<Media>;
+  hashtag(tag: string, options?: FeedOptions): Promise<Page<Media>>;
+  paginateHashtag(tag: string): AsyncGenerator<Media>;
+  location(locationId: string, options?: FeedOptions): Promise<Page<Media>>;
+  paginateLocation(locationId: string): AsyncGenerator<Media>;
+}
+
+/** Discovery search across users, hashtags and places. */
+export interface SearchApi {
+  users(query: string): Promise<User[]>;
+  hashtags(query: string): Promise<Hashtag[]>;
+  places(query: string): Promise<Location[]>;
 }
 
 /** Direct messages: the inbox, a thread's messages, and sending. */
@@ -99,6 +121,9 @@ export interface MediaApi {
   comment(mediaId: string, text: string): Promise<Comment>;
   deleteComment(mediaId: string, commentId: string): Promise<void>;
   delete(mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL'): Promise<void>;
+  comments(mediaId: string, options?: CommentListOptions): Promise<Page<Comment>>;
+  paginateComments(mediaId: string): AsyncGenerator<Comment>;
+  likers(mediaId: string): Promise<User[]>;
 }
 
 /** Publishing media. */
@@ -134,6 +159,7 @@ export class IgFlare {
   readonly media: MediaApi;
   readonly direct: DirectApi;
   readonly upload: UploadApi;
+  readonly search: SearchApi;
 
   constructor(options: IgFlareOptions = {}) {
     const { retry, ...clientOptions } = options;
@@ -147,6 +173,7 @@ export class IgFlare {
     this.media = this.#buildMediaApi();
     this.direct = this.#buildDirectApi();
     this.upload = this.#buildUploadApi();
+    this.search = this.#buildSearchApi();
   }
 
   /** Builds a client from a saved session in the given store. */
@@ -211,6 +238,10 @@ export class IgFlare {
       paginateUser: (pk) => paginateUserFeed(client, pk),
       timeline: (options) => getTimelineFeed(client, options),
       paginateTimeline: () => paginateTimeline(client),
+      hashtag: (tag, options) => getHashtagFeed(client, tag, options),
+      paginateHashtag: (tag) => paginateHashtagFeed(client, tag),
+      location: (locationId, options) => getLocationFeed(client, locationId, options),
+      paginateLocation: (locationId) => paginateLocationFeed(client, locationId),
     };
   }
 
@@ -223,6 +254,9 @@ export class IgFlare {
       comment: (mediaId, text) => commentMedia(client, mediaId, text),
       deleteComment: (mediaId, commentId) => deleteComment(client, mediaId, commentId),
       delete: (mediaId, mediaType) => deleteMedia(client, mediaId, mediaType),
+      comments: (mediaId, options) => getComments(client, mediaId, options),
+      paginateComments: (mediaId) => paginateComments(client, mediaId),
+      likers: (mediaId) => getLikers(client, mediaId),
     };
   }
 
@@ -242,6 +276,15 @@ export class IgFlare {
       thread: (threadId, options) => getThread(client, threadId, options),
       paginateThread: (threadId) => paginateThread(client, threadId),
       sendText: (text, target) => sendText(client, text, target),
+    };
+  }
+
+  #buildSearchApi(): SearchApi {
+    const client = this.#client;
+    return {
+      users: (query) => searchUsers(client, query),
+      hashtags: (query) => searchHashtags(client, query),
+      places: (query) => searchPlaces(client, query),
     };
   }
 }

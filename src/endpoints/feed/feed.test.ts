@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { getUserFeed, paginateUserFeed, getTimelineFeed, paginateTimeline } from './feed';
+import {
+  getUserFeed,
+  paginateUserFeed,
+  getTimelineFeed,
+  paginateTimeline,
+  getHashtagFeed,
+  getLocationFeed,
+  paginateHashtagFeed,
+} from './feed';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
 import { createSession } from '../../core/session/session';
@@ -149,6 +157,64 @@ describe('getTimelineFeed', () => {
 
     const ids: (string | undefined)[] = [];
     for await (const media of paginateTimeline(client)) {
+      ids.push(media.pk);
+    }
+    expect(ids).toEqual(['1', '2']);
+  });
+});
+
+describe('hashtag and location feeds', () => {
+  it('fetches a hashtag feed and honors more_available for the cursor', async () => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      items: [{ pk: 1, code: 'a' }],
+      next_max_id: 'n1',
+      more_available: true,
+    });
+
+    const page = await getHashtagFeed(client, 'sunset');
+
+    expect(transport.requests[0]?.url).toBe('https://i.instagram.com/api/v1/feed/tag/sunset/');
+    expect(page.items[0]?.code).toBe('a');
+    expect(page.nextCursor).toBe('n1');
+  });
+
+  it('url-encodes the tag and passes max_id', async () => {
+    const { client, transport } = clientReturning({ status: 'ok', items: [{ pk: 2 }] });
+    await getHashtagFeed(client, 'new year', { maxId: 'n1' });
+    expect(transport.requests[0]?.url).toContain('/api/v1/feed/tag/new%20year/?max_id=n1');
+  });
+
+  it('fetches a location feed by id', async () => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      items: [{ pk: 3 }],
+      more_available: false,
+      next_max_id: 'n2',
+    });
+
+    const page = await getLocationFeed(client, '777');
+
+    expect(transport.requests[0]?.url).toContain('/api/v1/feed/location/777/');
+    expect(page.nextCursor).toBeUndefined();
+  });
+});
+
+describe('discovery feed iterators', () => {
+  it('walks a hashtag feed across pages', async () => {
+    let call = 0;
+    const transport = new FakeTransport(() => {
+      call += 1;
+      const body =
+        call === 1
+          ? { status: 'ok', items: [{ pk: 1 }], next_max_id: 'p2', more_available: true }
+          : { status: 'ok', items: [{ pk: 2 }], more_available: false };
+      return { status: 200, headers: {}, body: JSON.stringify(body) };
+    });
+    const client = new PrivateClient({ transport, session: createSession() });
+
+    const ids: (string | undefined)[] = [];
+    for await (const media of paginateHashtagFeed(client, 'x')) {
       ids.push(media.pk);
     }
     expect(ids).toEqual(['1', '2']);

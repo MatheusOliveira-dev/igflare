@@ -21,8 +21,11 @@
       "path": "/api/v1/direct_v2/threads/broadcast/text/"
     },
     { "name": "directThread", "method": "GET", "path": "/api/v1/direct_v2/threads/{thread_id}/" },
+    { "name": "feedLocation", "method": "GET", "path": "/api/v1/feed/location/{id}/" },
+    { "name": "feedTag", "method": "GET", "path": "/api/v1/feed/tag/{tag}/" },
     { "name": "feedTimeline", "method": "POST", "path": "/api/v1/feed/timeline/" },
     { "name": "feedUser", "method": "GET", "path": "/api/v1/feed/user/{pk}/" },
+    { "name": "fbsearchPlaces", "method": "GET", "path": "/api/v1/fbsearch/places/" },
     { "name": "friendshipsCreate", "method": "POST", "path": "/api/v1/friendships/create/{pk}/" },
     {
       "name": "friendshipsFollowers",
@@ -37,7 +40,10 @@
     { "name": "friendshipsDestroy", "method": "POST", "path": "/api/v1/friendships/destroy/{pk}/" },
     { "name": "friendshipsShow", "method": "GET", "path": "/api/v1/friendships/show/{pk}/" },
     { "name": "launcherSync", "method": "POST", "path": "/api/v1/launcher/sync/" },
+    { "name": "tagsSearch", "method": "GET", "path": "/api/v1/tags/search/" },
     { "name": "mediaComment", "method": "POST", "path": "/api/v1/media/{id}/comment/" },
+    { "name": "mediaComments", "method": "GET", "path": "/api/v1/media/{id}/comments/" },
+    { "name": "mediaLikers", "method": "GET", "path": "/api/v1/media/{id}/likers/" },
     { "name": "mediaConfigure", "method": "POST", "path": "/api/v1/media/configure/" },
     { "name": "mediaDelete", "method": "POST", "path": "/api/v1/media/{id}/delete/" },
     {
@@ -49,6 +55,7 @@
     { "name": "mediaLike", "method": "POST", "path": "/api/v1/media/{id}/like/" },
     { "name": "mediaUnlike", "method": "POST", "path": "/api/v1/media/{id}/unlike/" },
     { "name": "userInfo", "method": "GET", "path": "/api/v1/users/{pk}/info/" },
+    { "name": "usersSearch", "method": "GET", "path": "/api/v1/users/search/" },
     {
       "name": "userInfoByUsername",
       "method": "GET",

@@ -109,3 +109,55 @@ export async function getTimelineFeed(
 export function paginateTimeline(client: PrivateClient): AsyncGenerator<Media> {
   return paginate((maxId) => getTimelineFeed(client, maxId !== undefined ? { maxId } : {}));
 }
+
+/** Builds a Page from a feed response's `items`, honoring `more_available`. */
+function mediaPage(json: Record<string, unknown>): Page<Media> {
+  const items = parseMediaList(json);
+  const next = readNextCursor(json);
+  return next !== undefined && json['more_available'] !== false
+    ? { items, nextCursor: next }
+    : { items };
+}
+
+/** One page of a hashtag's recent media. Pass `maxId` to continue. */
+export async function getHashtagFeed(
+  client: PrivateClient,
+  tag: string,
+  options: FeedOptions = {},
+): Promise<Page<Media>> {
+  const json = await client.request({
+    method: endpoints.feedTag.method,
+    endpoint: endpoints.feedTag.path.replace('{tag}', encodeURIComponent(tag)),
+    ...(options.maxId !== undefined ? { query: { max_id: options.maxId } } : {}),
+  });
+  return mediaPage(json);
+}
+
+/** Walks a hashtag's media, yielding one at a time across pages. */
+export function paginateHashtagFeed(client: PrivateClient, tag: string): AsyncGenerator<Media> {
+  return paginate((maxId) => getHashtagFeed(client, tag, maxId !== undefined ? { maxId } : {}));
+}
+
+/** One page of a location's recent media. Pass `maxId` to continue. */
+export async function getLocationFeed(
+  client: PrivateClient,
+  locationId: string,
+  options: FeedOptions = {},
+): Promise<Page<Media>> {
+  const json = await client.request({
+    method: endpoints.feedLocation.method,
+    endpoint: endpoints.feedLocation.path.replace('{id}', locationId),
+    ...(options.maxId !== undefined ? { query: { max_id: options.maxId } } : {}),
+  });
+  return mediaPage(json);
+}
+
+/** Walks a location's media, yielding one at a time across pages. */
+export function paginateLocationFeed(
+  client: PrivateClient,
+  locationId: string,
+): AsyncGenerator<Media> {
+  return paginate((maxId) =>
+    getLocationFeed(client, locationId, maxId !== undefined ? { maxId } : {}),
+  );
+}

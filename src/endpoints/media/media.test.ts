@@ -6,6 +6,9 @@ import {
   commentMedia,
   deleteComment,
   deleteMedia,
+  getComments,
+  getLikers,
+  paginateComments,
 } from './media';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
@@ -102,5 +105,60 @@ describe('media actions', () => {
     await deleteMedia(client, '1_9', 'PHOTO');
     expect(transport.requests[0]?.url).toContain('/api/v1/media/1_9/delete/?media_type=PHOTO');
     expect(signedPayload(transport.requests[0]?.body)['media_id']).toBe('1_9');
+  });
+});
+
+describe('media comments and likers', () => {
+  it('lists comments with the min_id cursor', async () => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      comments: [{ pk: 1, text: 'nice', user: { pk: 2, username: 'a' } }],
+      next_min_id: 'm1',
+    });
+
+    const page = await getComments(client, '1_9');
+
+    expect(transport.requests[0]?.url).toContain('/api/v1/media/1_9/comments/');
+    expect(page.items[0]?.text).toBe('nice');
+    expect(page.nextCursor).toBe('m1');
+  });
+
+  it('passes the cursor as min_id on later pages', async () => {
+    const { client, transport } = clientReturning({ status: 'ok', comments: [] });
+    await getComments(client, '1_9', { cursor: 'm1' });
+    expect(transport.requests[0]?.url).toContain('?min_id=m1');
+  });
+
+  it('lists the likers of a media', async () => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      users: [{ pk: 1, username: 'a' }],
+    });
+
+    const users = await getLikers(client, '1_9');
+
+    expect(transport.requests[0]?.url).toContain('/api/v1/media/1_9/likers/');
+    expect(users[0]?.username).toBe('a');
+  });
+});
+
+describe('comment iterator', () => {
+  it('walks comments across pages', async () => {
+    let call = 0;
+    const transport = new FakeTransport(() => {
+      call += 1;
+      const body =
+        call === 1
+          ? { status: 'ok', comments: [{ pk: 1, text: 'a' }], next_min_id: 'm2' }
+          : { status: 'ok', comments: [{ pk: 2, text: 'b' }] };
+      return { status: 200, headers: {}, body: JSON.stringify(body) };
+    });
+    const client = new PrivateClient({ transport, session: createSession() });
+
+    const texts: (string | undefined)[] = [];
+    for await (const comment of paginateComments(client, '1_9')) {
+      texts.push(comment.text);
+    }
+    expect(texts).toEqual(['a', 'b']);
   });
 });

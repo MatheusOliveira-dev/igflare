@@ -191,6 +191,53 @@ describe('IgFlare facade', () => {
     expect(media.code).toBe('vv');
   });
 
+  it('delegates discovery search, hashtag feed and comments/likers', async () => {
+    const { ig, transport } = clientWith((req) => {
+      if (req.url.includes('/users/search/'))
+        return json({ status: 'ok', users: [{ pk: 1, username: 'a' }] });
+      if (req.url.includes('/tags/search/'))
+        return json({ status: 'ok', results: [{ id: 5, name: 'sun' }] });
+      if (req.url.includes('/feed/tag/'))
+        return json({ status: 'ok', items: [{ pk: 9, code: 't' }] });
+      if (req.url.includes('/comments/'))
+        return json({ status: 'ok', comments: [{ pk: 3, text: 'hi' }] });
+      return json({ status: 'ok', users: [{ pk: 2, username: 'b' }] }); // likers
+    });
+
+    expect((await ig.search.users('a'))[0]?.username).toBe('a');
+    expect((await ig.search.hashtags('s'))[0]?.name).toBe('sun');
+    expect((await ig.feed.hashtag('sun')).items[0]?.code).toBe('t');
+    expect((await ig.media.comments('1_9')).items[0]?.text).toBe('hi');
+    expect((await ig.media.likers('1_9'))[0]?.username).toBe('b');
+    expect(transport.requests.some((r) => r.url.includes('/api/v1/users/search/'))).toBe(true);
+  });
+
+  it('delegates places search, location feed and the discovery iterators', async () => {
+    const { ig } = clientWith((req) => {
+      if (req.url.includes('/fbsearch/places/'))
+        return json({ status: 'ok', items: [{ location: { pk: 7, name: 'Park' } }] });
+      if (req.url.includes('/feed/location/'))
+        return json({ status: 'ok', items: [{ pk: 1, code: 'l' }] });
+      if (req.url.includes('/feed/tag/')) return json({ status: 'ok', items: [{ pk: 2 }] });
+      return json({ status: 'ok', comments: [{ pk: 3, text: 'c' }] });
+    });
+
+    expect((await ig.search.places('park'))[0]?.name).toBe('Park');
+    expect((await ig.feed.location('777')).items[0]?.code).toBe('l');
+
+    const tagIds: (string | undefined)[] = [];
+    for await (const m of ig.feed.paginateHashtag('x')) tagIds.push(m.pk);
+    expect(tagIds).toEqual(['2']);
+
+    const locIds: (string | undefined)[] = [];
+    for await (const m of ig.feed.paginateLocation('777')) locIds.push(m.pk);
+    expect(locIds).toEqual(['1']);
+
+    const texts: (string | undefined)[] = [];
+    for await (const c of ig.media.paginateComments('1_9')) texts.push(c.text);
+    expect(texts).toEqual(['c']);
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();

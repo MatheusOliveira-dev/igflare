@@ -3,7 +3,16 @@ import type { PrivateClient } from '../../core/http/private-client';
 import { endpoints } from '../../generated/endpoints';
 import { mediaSchema, type Media } from '../../schemas/media';
 import { commentSchema, type Comment } from '../../schemas/comment';
+import { userSchema, type User } from '../../schemas/user';
+import { paginate } from '../../core/pagination';
+import type { Page } from '../../core/pagination';
+import { parseSchemaList } from '../../schemas/parse-list';
 import { ClientSchemaError } from '../../errors/api-errors';
+
+export interface CommentListOptions {
+  /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
+  readonly cursor?: string;
+}
 
 /**
  * Fetches one media by its full id (the `pk_userid` composite the feed returns).
@@ -112,4 +121,36 @@ export async function deleteComment(
       .replace('{comment_id}', commentId),
     payload: mediaActionPayload(client),
   });
+}
+
+/** One page of a media's comments. Pass `cursor` from a previous page to continue. */
+export async function getComments(
+  client: PrivateClient,
+  mediaId: string,
+  options: CommentListOptions = {},
+): Promise<Page<Comment>> {
+  const json = await client.request({
+    method: endpoints.mediaComments.method,
+    endpoint: endpoints.mediaComments.path.replace('{id}', mediaId),
+    ...(options.cursor !== undefined ? { query: { min_id: options.cursor } } : {}),
+  });
+  const items = parseSchemaList<Comment>(json['comments'], commentSchema, 'comment');
+  const next = json['next_min_id'];
+  const nextCursor =
+    typeof next === 'string' || typeof next === 'number' ? String(next) : undefined;
+  return nextCursor !== undefined ? { items, nextCursor } : { items };
+}
+
+/** Walks a media's comments, yielding one at a time across pages. */
+export function paginateComments(client: PrivateClient, mediaId: string): AsyncGenerator<Comment> {
+  return paginate((cursor) => getComments(client, mediaId, cursor !== undefined ? { cursor } : {}));
+}
+
+/** The users who liked a media (the ranked first page). */
+export async function getLikers(client: PrivateClient, mediaId: string): Promise<User[]> {
+  const json = await client.request({
+    method: endpoints.mediaLikers.method,
+    endpoint: endpoints.mediaLikers.path.replace('{id}', mediaId),
+  });
+  return parseSchemaList<User>(json['users'], userSchema, 'user');
 }

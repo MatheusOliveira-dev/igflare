@@ -84,6 +84,7 @@ export type {
   MediaApi,
   DirectApi,
   UploadApi,
+  SearchApi,
 } from './client/ig-client';
 export {
   getMediaInfo,
@@ -92,7 +93,11 @@ export {
   commentMedia,
   deleteComment,
   deleteMedia,
+  getComments,
+  paginateComments,
+  getLikers,
 } from './endpoints/media/media';
+export type { CommentListOptions } from './endpoints/media/media';
 export { uploadPhoto, uploadVideo } from './endpoints/upload/upload';
 export type { PhotoUploadOptions, VideoUploadOptions } from './endpoints/upload/upload';
 export { parseJpegSize } from './core/media/jpeg';
@@ -116,7 +121,16 @@ export {
   paginateUserFeed,
   getTimelineFeed,
   paginateTimeline,
+  getHashtagFeed,
+  paginateHashtagFeed,
+  getLocationFeed,
+  paginateLocationFeed,
 } from './endpoints/feed/feed';
+export { searchUsers, searchHashtags, searchPlaces } from './endpoints/search/search';
+export { hashtagSchema } from './schemas/hashtag';
+export type { Hashtag } from './schemas/hashtag';
+export { locationSchema } from './schemas/location';
+export type { Location } from './schemas/location';
 export type { FeedOptions } from './endpoints/feed/feed';
 export { mediaSchema } from './schemas/media';
 export type { Media } from './schemas/media';

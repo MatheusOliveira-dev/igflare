@@ -6,7 +6,7 @@ export interface EndpointDefinition {
   readonly path: string;
 }
 
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaComment' | 'mediaCommentDelete' | 'mediaConfigure' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaUnlike' | 'userInfo' | 'userInfoByUsername';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'fbsearchPlaces' | 'feedLocation' | 'feedTag' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaUnlike' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
 
 export const endpoints: Record<EndpointName, EndpointDefinition> = {
   accountsCurrentUser: { method: 'GET', path: '/api/v1/accounts/current_user/' },
@@ -17,6 +17,9 @@ export const endpoints: Record<EndpointName, EndpointDefinition> = {
   directInbox: { method: 'GET', path: '/api/v1/direct_v2/inbox/' },
   directSendText: { method: 'POST', path: '/api/v1/direct_v2/threads/broadcast/text/' },
   directThread: { method: 'GET', path: '/api/v1/direct_v2/threads/{thread_id}/' },
+  fbsearchPlaces: { method: 'GET', path: '/api/v1/fbsearch/places/' },
+  feedLocation: { method: 'GET', path: '/api/v1/feed/location/{id}/' },
+  feedTag: { method: 'GET', path: '/api/v1/feed/tag/{tag}/' },
   feedTimeline: { method: 'POST', path: '/api/v1/feed/timeline/' },
   feedUser: { method: 'GET', path: '/api/v1/feed/user/{pk}/' },
   friendshipsCreate: { method: 'POST', path: '/api/v1/friendships/create/{pk}/' },
@@ -27,11 +30,15 @@ export const endpoints: Record<EndpointName, EndpointDefinition> = {
   launcherSync: { method: 'POST', path: '/api/v1/launcher/sync/' },
   mediaComment: { method: 'POST', path: '/api/v1/media/{id}/comment/' },
   mediaCommentDelete: { method: 'POST', path: '/api/v1/media/{id}/comment/{comment_id}/delete/' },
+  mediaComments: { method: 'GET', path: '/api/v1/media/{id}/comments/' },
   mediaConfigure: { method: 'POST', path: '/api/v1/media/configure/' },
   mediaDelete: { method: 'POST', path: '/api/v1/media/{id}/delete/' },
   mediaInfo: { method: 'GET', path: '/api/v1/media/{id}/info/' },
   mediaLike: { method: 'POST', path: '/api/v1/media/{id}/like/' },
+  mediaLikers: { method: 'GET', path: '/api/v1/media/{id}/likers/' },
   mediaUnlike: { method: 'POST', path: '/api/v1/media/{id}/unlike/' },
+  tagsSearch: { method: 'GET', path: '/api/v1/tags/search/' },
   userInfo: { method: 'GET', path: '/api/v1/users/{pk}/info/' },
   userInfoByUsername: { method: 'GET', path: '/api/v1/users/{username}/usernameinfo/' },
+  usersSearch: { method: 'GET', path: '/api/v1/users/search/' },
 };

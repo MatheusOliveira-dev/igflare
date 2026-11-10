@@ -11,6 +11,7 @@ import {
 } from '../../schemas/direct';
 import { paginate } from '../../core/pagination';
 import type { Page } from '../../core/pagination';
+import { parseSchemaList } from '../../schemas/parse-list';
 import { ClientSchemaError } from '../../errors/api-errors';
 
 export interface CursorOptions {
@@ -20,28 +21,6 @@ export interface CursorOptions {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-/** Validates an array with a zod schema, throwing a typed error naming `what`. */
-function parseList<T>(
-  values: unknown,
-  schema: {
-    safeParse: (v: unknown) => { success: true; data: T } | { success: false; error: unknown };
-  },
-  what: string,
-): T[] {
-  if (!Array.isArray(values)) {
-    throw new ClientSchemaError(`direct response did not include a ${what} array`, values);
-  }
-  return values.map((candidate) => {
-    const parsed = schema.safeParse(candidate);
-    if (!parsed.success) {
-      throw new ClientSchemaError(`a ${what} did not match its schema`, candidate, {
-        cause: parsed.error,
-      });
-    }
-    return parsed.data;
-  });
 }
 
 /** The cursor a direct `inbox`/`thread` node carries, or undefined when exhausted. */
@@ -68,7 +47,7 @@ export async function getInbox(
   if (!isRecord(inbox)) {
     throw new ClientSchemaError('direct inbox response did not include an inbox', json);
   }
-  const items = parseList<Thread>(inbox['threads'], threadSchema, 'thread');
+  const items = parseSchemaList<Thread>(inbox['threads'], threadSchema, 'thread');
   const nextCursor = nodeCursor(inbox);
   return nextCursor !== undefined ? { items, nextCursor } : { items };
 }
@@ -93,7 +72,7 @@ export async function getThread(
   if (!isRecord(thread)) {
     throw new ClientSchemaError('direct thread response did not include a thread', json);
   }
-  const items = parseList<DirectMessage>(thread['items'], directMessageSchema, 'message');
+  const items = parseSchemaList<DirectMessage>(thread['items'], directMessageSchema, 'message');
   const nextCursor = nodeCursor(thread);
   return nextCursor !== undefined ? { items, nextCursor } : { items };
 }
