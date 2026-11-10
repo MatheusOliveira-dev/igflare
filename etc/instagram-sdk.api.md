@@ -164,6 +164,33 @@ export class ClientSchemaError extends IgError {
     readonly raw: unknown;
 }
 
+// @public (undocumented)
+export type Comment = z.infer<typeof commentSchema>;
+
+// @public
+export function commentMedia(client: PrivateClient, mediaId: string, text: string): Promise<Comment>;
+
+// @public
+export const commentSchema: z.ZodObject<{
+    pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+    text: z.ZodOptional<z.ZodString>;
+    created_at: z.ZodOptional<z.ZodNumber>;
+    content_type: z.ZodOptional<z.ZodString>;
+    status: z.ZodOptional<z.ZodString>;
+    user: z.ZodOptional<z.ZodObject<{
+        pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+        username: z.ZodOptional<z.ZodString>;
+        full_name: z.ZodOptional<z.ZodString>;
+        is_private: z.ZodOptional<z.ZodBoolean>;
+        is_verified: z.ZodOptional<z.ZodBoolean>;
+        profile_pic_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        biography: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>>;
+}, z.core.$loose>;
+
 // @public
 export function createDeviceState(overrides?: Partial<DeviceState>): DeviceState;
 
@@ -190,6 +217,9 @@ export const DEFAULT_DEVICE_PROFILE: DeviceProfile;
 
 // @public (undocumented)
 export const DEFAULT_LOCATION: LocationState;
+
+// @public
+export function deleteComment(client: PrivateClient, mediaId: string, commentId: string): Promise<void>;
 
 // @public
 export interface DeviceProfile {
@@ -263,7 +293,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaInfo' | 'userInfo' | 'userInfoByUsername';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaComment' | 'mediaCommentDelete' | 'mediaInfo' | 'mediaLike' | 'mediaUnlike' | 'userInfo' | 'userInfoByUsername';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -482,6 +512,9 @@ export class IgResponseError extends IgError {
 export function jazoest(value: string): string;
 
 // @public
+export function likeMedia(client: PrivateClient, mediaId: string): Promise<void>;
+
+// @public
 export interface LocationState {
     // (undocumented)
     readonly country: string;
@@ -513,7 +546,15 @@ export type Media = z.infer<typeof mediaSchema>;
 // @public
 export interface MediaApi {
     // (undocumented)
+    comment(mediaId: string, text: string): Promise<Comment>;
+    // (undocumented)
+    deleteComment(mediaId: string, commentId: string): Promise<void>;
+    // (undocumented)
     info(mediaId: string): Promise<Media>;
+    // (undocumented)
+    like(mediaId: string): Promise<void>;
+    // (undocumented)
+    unlike(mediaId: string): Promise<void>;
 }
 
 // @public
@@ -754,6 +795,9 @@ export class TwoFactorRequiredError extends IgApiError {
 
 // @public
 export function unfollowUser(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
+
+// @public
+export function unlikeMedia(client: PrivateClient, mediaId: string): Promise<void>;
 
 // @public
 export const USDID_TOKEN_TTL = 3600;
