@@ -28,7 +28,7 @@ describe('bloksAsyncAction', () => {
     expect(request?.headers['Content-Type']).toContain('application/x-www-form-urlencoded');
 
     // Unsigned form body: not a signed_body, fields recoverable as form data.
-    const body = request?.body ?? '';
+    const body = typeof request?.body === 'string' ? request.body : '';
     expect(body).not.toContain('signed_body=');
     const form = new URLSearchParams(body);
     expect(form.get('params')).toBe('{"k":"v"}');
@@ -54,6 +54,10 @@ describe('bloksAsyncAction', () => {
     const request = fake.requests[0];
     expect(request?.url).toContain('https://b.i.instagram.com/');
     expect(request?.headers['X-IG-Attest-Params']).toBe('{}');
-    expect(new URLSearchParams(request?.body ?? '').get('bloks_versioning_id')).toBe('OVERRIDE');
+    expect(
+      new URLSearchParams(typeof request?.body === 'string' ? request.body : '').get(
+        'bloks_versioning_id',
+      ),
+    ).toBe('OVERRIDE');
   });
 });

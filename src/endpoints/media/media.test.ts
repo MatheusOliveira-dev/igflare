@@ -1,13 +1,20 @@
 import { describe, it, expect } from 'vitest';
-import { getMediaInfo, likeMedia, unlikeMedia, commentMedia, deleteComment } from './media';
+import {
+  getMediaInfo,
+  likeMedia,
+  unlikeMedia,
+  commentMedia,
+  deleteComment,
+  deleteMedia,
+} from './media';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
 import { createSession } from '../../core/session/session';
 import { ClientSchemaError } from '../../errors/api-errors';
 
 /** Recovers the JSON payload from a signed_body form request. */
-function signedPayload(body: string | undefined): Record<string, unknown> {
-  const form = new URLSearchParams(body ?? '');
+function signedPayload(body: string | Uint8Array | undefined): Record<string, unknown> {
+  const form = new URLSearchParams(typeof body === 'string' ? body : '');
   const signed = form.get('signed_body') ?? '';
   return JSON.parse(signed.slice(signed.indexOf('.') + 1)) as Record<string, unknown>;
 }
@@ -88,5 +95,12 @@ describe('media actions', () => {
     const { client, transport } = clientReturning({ status: 'ok' });
     await deleteComment(client, '1_9', '77');
     expect(transport.requests[0]?.url).toContain('/api/v1/media/1_9/comment/77/delete/');
+  });
+
+  it('deletes a media with its type in the query', async () => {
+    const { client, transport } = clientReturning({ status: 'ok', did_delete: true });
+    await deleteMedia(client, '1_9', 'PHOTO');
+    expect(transport.requests[0]?.url).toContain('/api/v1/media/1_9/delete/?media_type=PHOTO');
+    expect(signedPayload(transport.requests[0]?.body)['media_id']).toBe('1_9');
   });
 });

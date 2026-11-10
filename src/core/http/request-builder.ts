@@ -26,6 +26,12 @@ export interface PrivateRequestInput {
   readonly domain?: string;
   /** A fully-formed URL, used as-is instead of building one under `/api/v1`. */
   readonly rawUrl?: string;
+  /**
+   * Raw bytes to send as the body verbatim (for binary uploads). When set it
+   * bypasses signing/form encoding, and the caller supplies the `Content-Type`
+   * via `headers`.
+   */
+  readonly rawBody?: Uint8Array;
   readonly now?: number;
 }
 
@@ -111,8 +117,8 @@ export function buildPrivateRequest(input: PrivateRequestInput): HttpRequest {
     ...input.headers,
   };
 
-  const body = buildBody(input);
-  if (body !== undefined) {
+  const body: string | Uint8Array | undefined = input.rawBody ?? buildBody(input);
+  if (body !== undefined && input.rawBody === undefined) {
     headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
   }
 

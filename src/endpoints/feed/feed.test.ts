@@ -6,8 +6,8 @@ import { createSession } from '../../core/session/session';
 import { ClientSchemaError } from '../../errors/api-errors';
 
 /** Recovers the JSON payload from a signed_body form request. */
-function signedPayload(body: string | undefined): Record<string, unknown> {
-  const form = new URLSearchParams(body ?? '');
+function signedPayload(body: string | Uint8Array | undefined): Record<string, unknown> {
+  const form = new URLSearchParams(typeof body === 'string' ? body : '');
   const signed = form.get('signed_body') ?? '';
   return JSON.parse(signed.slice(signed.indexOf('.') + 1)) as Record<string, unknown>;
 }

@@ -38,6 +38,8 @@
     { "name": "friendshipsShow", "method": "GET", "path": "/api/v1/friendships/show/{pk}/" },
     { "name": "launcherSync", "method": "POST", "path": "/api/v1/launcher/sync/" },
     { "name": "mediaComment", "method": "POST", "path": "/api/v1/media/{id}/comment/" },
+    { "name": "mediaConfigure", "method": "POST", "path": "/api/v1/media/configure/" },
+    { "name": "mediaDelete", "method": "POST", "path": "/api/v1/media/{id}/delete/" },
     {
       "name": "mediaCommentDelete",
       "method": "POST",

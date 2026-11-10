@@ -14,8 +14,8 @@ function clientReturning(body: unknown): { client: PrivateClient; transport: Fak
   return { client: new PrivateClient({ transport, session: createSession() }), transport };
 }
 
-function signedPayload(body: string | undefined): Record<string, unknown> {
-  const form = new URLSearchParams(body ?? '');
+function signedPayload(body: string | Uint8Array | undefined): Record<string, unknown> {
+  const form = new URLSearchParams(typeof body === 'string' ? body : '');
   const signed = form.get('signed_body') ?? '';
   return JSON.parse(signed.slice(signed.indexOf('.') + 1)) as Record<string, unknown>;
 }

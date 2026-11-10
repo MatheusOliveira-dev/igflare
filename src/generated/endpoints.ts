@@ -6,7 +6,7 @@ export interface EndpointDefinition {
   readonly path: string;
 }
 
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaComment' | 'mediaCommentDelete' | 'mediaInfo' | 'mediaLike' | 'mediaUnlike' | 'userInfo' | 'userInfoByUsername';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaComment' | 'mediaCommentDelete' | 'mediaConfigure' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaUnlike' | 'userInfo' | 'userInfoByUsername';
 
 export const endpoints: Record<EndpointName, EndpointDefinition> = {
   accountsCurrentUser: { method: 'GET', path: '/api/v1/accounts/current_user/' },
@@ -27,6 +27,8 @@ export const endpoints: Record<EndpointName, EndpointDefinition> = {
   launcherSync: { method: 'POST', path: '/api/v1/launcher/sync/' },
   mediaComment: { method: 'POST', path: '/api/v1/media/{id}/comment/' },
   mediaCommentDelete: { method: 'POST', path: '/api/v1/media/{id}/comment/{comment_id}/delete/' },
+  mediaConfigure: { method: 'POST', path: '/api/v1/media/configure/' },
+  mediaDelete: { method: 'POST', path: '/api/v1/media/{id}/delete/' },
   mediaInfo: { method: 'GET', path: '/api/v1/media/{id}/info/' },
   mediaLike: { method: 'POST', path: '/api/v1/media/{id}/like/' },
   mediaUnlike: { method: 'POST', path: '/api/v1/media/{id}/unlike/' },

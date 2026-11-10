@@ -81,6 +81,20 @@ export async function commentMedia(
   return parsed.data;
 }
 
+/** Deletes one of the logged-in account's own media by its id. */
+export async function deleteMedia(
+  client: PrivateClient,
+  mediaId: string,
+  mediaType: 'PHOTO' | 'VIDEO' | 'CAROUSEL' = 'PHOTO',
+): Promise<void> {
+  await client.request({
+    method: endpoints.mediaDelete.method,
+    endpoint: endpoints.mediaDelete.path.replace('{id}', mediaId),
+    query: { media_type: mediaType },
+    payload: { media_id: mediaId },
+  });
+}
+
 /** Deletes a comment from a media by the comment's id. */
 export async function deleteComment(
   client: PrivateClient,

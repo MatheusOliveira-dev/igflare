@@ -116,7 +116,7 @@ describe('caaLogin', () => {
 
     const send = fake.requests.find((r) => r.url.includes('send_login_request'));
     expect(send?.headers['X-IG-Attest-Params']).toContain('"challenge_nonce":"NONCE1"');
-    const body = new URLSearchParams(send?.body ?? '');
+    const body = new URLSearchParams(typeof send?.body === 'string' ? send.body : '');
     const params = JSON.parse(body.get('params') ?? '{}') as {
       client_input_params: { machine_id: string; contact_point: string };
     };

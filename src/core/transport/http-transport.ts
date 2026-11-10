@@ -4,7 +4,7 @@ export interface HttpRequest {
   readonly method: HttpMethod;
   readonly url: string;
   readonly headers: Record<string, string>;
-  readonly body?: string;
+  readonly body?: string | Uint8Array;
 }
 
 export interface HttpResponse {

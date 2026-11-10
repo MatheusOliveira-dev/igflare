@@ -164,6 +164,21 @@ describe('IgClient facade', () => {
     expect(transport.requests[0]?.url).toContain('/api/v1/direct_v2/inbox/');
   });
 
+  it('delegates photo upload and media delete', async () => {
+    const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90]);
+    const { ig, transport } = clientWith((req) =>
+      req.url.includes('rupload_igphoto')
+        ? json({ upload_id: 'U1', status: 'ok' })
+        : json({ status: 'ok', media: { pk: 1, code: 'up' } }),
+    );
+
+    const media = await ig.upload.photo(jpeg, { caption: 'c' });
+    expect(media.code).toBe('up');
+
+    await ig.media.delete('1_9', 'PHOTO');
+    expect(transport.requests.at(-1)?.url).toContain('/api/v1/media/1_9/delete/');
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();

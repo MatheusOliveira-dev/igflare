@@ -33,7 +33,10 @@ import {
   unlikeMedia,
   commentMedia,
   deleteComment,
+  deleteMedia,
 } from '../endpoints/media/media';
+import { uploadPhoto } from '../endpoints/upload/upload';
+import type { PhotoUploadOptions } from '../endpoints/upload/upload';
 import {
   getInbox,
   paginateInbox,
@@ -95,6 +98,12 @@ export interface MediaApi {
   unlike(mediaId: string): Promise<void>;
   comment(mediaId: string, text: string): Promise<Comment>;
   deleteComment(mediaId: string, commentId: string): Promise<void>;
+  delete(mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL'): Promise<void>;
+}
+
+/** Publishing media. */
+export interface UploadApi {
+  photo(jpeg: Uint8Array, options?: PhotoUploadOptions): Promise<Media>;
 }
 
 /** Construction options for {@link IgClient}. */
@@ -123,6 +132,7 @@ export class IgClient {
   readonly feed: FeedApi;
   readonly media: MediaApi;
   readonly direct: DirectApi;
+  readonly upload: UploadApi;
 
   constructor(options: IgClientOptions = {}) {
     const { retry, ...clientOptions } = options;
@@ -135,6 +145,7 @@ export class IgClient {
     this.feed = this.#buildFeedApi();
     this.media = this.#buildMediaApi();
     this.direct = this.#buildDirectApi();
+    this.upload = this.#buildUploadApi();
   }
 
   /** Builds a client from a saved session in the given store. */
@@ -210,6 +221,14 @@ export class IgClient {
       unlike: (mediaId) => unlikeMedia(client, mediaId),
       comment: (mediaId, text) => commentMedia(client, mediaId, text),
       deleteComment: (mediaId, commentId) => deleteComment(client, mediaId, commentId),
+      delete: (mediaId, mediaType) => deleteMedia(client, mediaId, mediaType),
+    };
+  }
+
+  #buildUploadApi(): UploadApi {
+    const client = this.#client;
+    return {
+      photo: (jpeg, options) => uploadPhoto(client, jpeg, options),
     };
   }
 

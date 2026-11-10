@@ -83,6 +83,7 @@ export type {
   FeedApi,
   MediaApi,
   DirectApi,
+  UploadApi,
 } from './client/ig-client';
 export {
   getMediaInfo,
@@ -90,7 +91,12 @@ export {
   unlikeMedia,
   commentMedia,
   deleteComment,
+  deleteMedia,
 } from './endpoints/media/media';
+export { uploadPhoto } from './endpoints/upload/upload';
+export type { PhotoUploadOptions } from './endpoints/upload/upload';
+export { parseJpegSize } from './core/media/jpeg';
+export type { ImageSize } from './core/media/jpeg';
 export { commentSchema } from './schemas/comment';
 export type { Comment } from './schemas/comment';
 export {
