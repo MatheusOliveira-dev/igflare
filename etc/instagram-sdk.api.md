@@ -6,6 +6,11 @@
 
 import { z } from 'zod';
 
+// @public
+export interface AccountApi {
+    me(): Promise<Record<string, unknown>>;
+}
+
 // @public (undocumented)
 export class AccountSuspendedError extends IgApiError {
 }
@@ -305,6 +310,24 @@ export interface FollowListOptions {
 // @public
 export function followUser(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
 
+// @public
+export interface FriendshipApi {
+    // (undocumented)
+    follow(pk: string): Promise<FriendshipStatus>;
+    // (undocumented)
+    followers(pk: string, options?: FollowListOptions): Promise<Page<User>>;
+    // (undocumented)
+    following(pk: string, options?: FollowListOptions): Promise<Page<User>>;
+    // (undocumented)
+    paginateFollowers(pk: string): AsyncGenerator<User>;
+    // (undocumented)
+    paginateFollowing(pk: string): AsyncGenerator<User>;
+    // (undocumented)
+    status(pk: string): Promise<FriendshipStatus>;
+    // (undocumented)
+    unfollow(pk: string): Promise<FriendshipStatus>;
+}
+
 // @public (undocumented)
 export type FriendshipStatus = z.infer<typeof friendshipStatusSchema>;
 
@@ -401,6 +424,23 @@ export class IgApiError extends IgResponseError {
     constructor(message: string, statusCode: number, payload?: ApiErrorPayload, options?: ErrorOptions);
     // (undocumented)
     readonly payload: ApiErrorPayload;
+}
+
+// @public
+export class IgClient {
+    constructor(options?: PrivateClientOptions);
+    // (undocumented)
+    readonly account: AccountApi;
+    get client(): PrivateClient;
+    // (undocumented)
+    readonly friendship: FriendshipApi;
+    static fromStore(store: SessionStore, options?: {
+        readonly transport?: HttpTransport;
+    }): Promise<IgClient>;
+    login(credentials: CaaLoginCredentials): Promise<PrivateResponseJson>;
+    get session(): SessionData;
+    // (undocumented)
+    readonly user: UserApi;
 }
 
 // @public
@@ -665,6 +705,14 @@ export function usdidPublicKeyDer(identity: UsdidIdentity): Buffer;
 
 // @public (undocumented)
 export type User = z.infer<typeof userSchema>;
+
+// @public
+export interface UserApi {
+    // (undocumented)
+    info(pk: string): Promise<User>;
+    // (undocumented)
+    infoByUsername(username: string): Promise<User>;
+}
 
 // @public
 export const userSchema: z.ZodObject<{
