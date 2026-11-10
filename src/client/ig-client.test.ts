@@ -5,6 +5,7 @@ import { FakeTransport } from '../core/transport/adapters/fake';
 import type { HttpRequest, HttpResponse } from '../core/transport/http-transport';
 import { MemorySessionStore } from '../core/session/adapters/memory';
 import { createSession } from '../core/session/session';
+import { IgApiError } from '../errors/api-errors';
 
 function json(body: unknown): HttpResponse {
   return { status: 200, headers: {}, body: JSON.stringify(body) };
@@ -112,6 +113,31 @@ describe('IgClient facade', () => {
 
     expect(transport.requests[0]?.url).toContain('/api/v1/media/1_9/like/');
     expect(comment.text).toBe('hi');
+  });
+
+  it('retries a transient 429 by default and then succeeds', async () => {
+    let n = 0;
+    const transport = new FakeTransport(() => {
+      n += 1;
+      return n === 1
+        ? { status: 429, headers: {}, body: '{}' }
+        : { status: 200, headers: {}, body: JSON.stringify({ user: { pk: 1, username: 'a' } }) };
+    });
+    const ig = new IgClient({
+      transport,
+      session: createSession(),
+      retry: { sleep: () => Promise.resolve() },
+    });
+
+    const user = await ig.user.info('1');
+    expect(user.username).toBe('a');
+    expect(n).toBe(2);
+  });
+
+  it('does not retry when retry is false', async () => {
+    const transport = new FakeTransport(() => ({ status: 429, headers: {}, body: '{}' }));
+    const ig = new IgClient({ transport, session: createSession(), retry: false });
+    await expect(ig.user.info('1')).rejects.toBeInstanceOf(IgApiError);
   });
 
   it('exposes the session and the underlying engine', () => {

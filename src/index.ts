@@ -57,6 +57,8 @@ export { HttpsTransport } from './core/transport/adapters/https';
 export { FetchTransport } from './core/transport/adapters/fetch';
 export { FakeTransport } from './core/transport/adapters/fake';
 export type { FakeHandler } from './core/transport/adapters/fake';
+export { RetryTransport } from './core/transport/adapters/retry';
+export type { RetryOptions } from './core/transport/adapters/retry';
 export { createSession, parseSessionData, DEFAULT_LOCATION } from './core/session/session';
 export type {
   SessionData,
@@ -73,7 +75,14 @@ export { applyResponseToSession } from './core/http/session-update';
 export { PrivateClient } from './core/http/private-client';
 export type { PrivateClientOptions, PrivateRequestOptions } from './core/http/private-client';
 export { IgClient } from './client/ig-client';
-export type { AccountApi, UserApi, FriendshipApi, FeedApi, MediaApi } from './client/ig-client';
+export type {
+  IgClientOptions,
+  AccountApi,
+  UserApi,
+  FriendshipApi,
+  FeedApi,
+  MediaApi,
+} from './client/ig-client';
 export {
   getMediaInfo,
   likeMedia,

@@ -1,6 +1,8 @@
 import { PrivateClient } from '../core/http/private-client';
 import type { PrivateClientOptions } from '../core/http/private-client';
-import type { HttpTransport } from '../core/transport/http-transport';
+import { HttpsTransport } from '../core/transport/adapters/https';
+import { RetryTransport } from '../core/transport/adapters/retry';
+import type { RetryOptions } from '../core/transport/adapters/retry';
 import type { SessionStore, SessionData } from '../core/session/session';
 import type { PrivateResponseJson } from '../core/http/response';
 import type { Page } from '../core/pagination';
@@ -70,10 +72,21 @@ export interface MediaApi {
   deleteComment(mediaId: string, commentId: string): Promise<void>;
 }
 
+/** Construction options for {@link IgClient}. */
+export interface IgClientOptions extends PrivateClientOptions {
+  /**
+   * Retry policy. By default the transport is wrapped in a `RetryTransport` with
+   * conservative backoff; pass tuning here, or `false` to disable retries (e.g.
+   * when supplying a transport that already retries).
+   */
+  readonly retry?: false | RetryOptions;
+}
+
 /**
  * The ergonomic entry point. Wraps the low-level engine and groups the endpoints
- * by domain (`ig.user.*`, `ig.friendship.*`). Persistence is pluggable: pass any
- * `SessionStore` (memory, file, or a provider adapter) as `store`.
+ * by domain (`ig.user.*`, `ig.friendship.*`, `ig.feed.*`, `ig.media.*`).
+ * Persistence is pluggable: pass any `SessionStore` (memory, file, or a provider
+ * adapter) as `store`. The transport retries transient failures by default.
  *
  * The class name is provisional; the public brand is settled before publishing.
  */
@@ -85,8 +98,11 @@ export class IgClient {
   readonly feed: FeedApi;
   readonly media: MediaApi;
 
-  constructor(options: PrivateClientOptions = {}) {
-    this.#client = new PrivateClient(options);
+  constructor(options: IgClientOptions = {}) {
+    const { retry, ...clientOptions } = options;
+    const base = clientOptions.transport ?? new HttpsTransport();
+    const transport = retry === false ? base : new RetryTransport(base, retry);
+    this.#client = new PrivateClient({ ...clientOptions, transport });
     this.account = this.#buildAccountApi();
     this.user = this.#buildUserApi();
     this.friendship = this.#buildFriendshipApi();
@@ -97,9 +113,12 @@ export class IgClient {
   /** Builds a client from a saved session in the given store. */
   static async fromStore(
     store: SessionStore,
-    options: { readonly transport?: HttpTransport } = {},
+    options: Omit<IgClientOptions, 'store' | 'session'> = {},
   ): Promise<IgClient> {
-    const client = await PrivateClient.fromStore(store, options);
+    const client = await PrivateClient.fromStore(
+      store,
+      options.transport !== undefined ? { transport: options.transport } : {},
+    );
     return new IgClient({ session: client.session, store, ...options });
   }
 
