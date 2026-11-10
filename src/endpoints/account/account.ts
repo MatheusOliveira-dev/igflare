@@ -3,11 +3,7 @@ import { endpoints } from '../../generated/endpoints';
 import { userSchema, type User } from '../../schemas/user';
 import { ClientSchemaError } from '../../errors/api-errors';
 
-/**
- * Sets the logged-in account's biography and returns the updated profile. Only
- * the bio is changed; editing the name or link (the full edit_profile body) is
- * not wired yet.
- */
+/** Sets the logged-in account's biography and returns the updated profile. */
 export async function setBiography(client: PrivateClient, text: string): Promise<User> {
   const json = await client.request({
     method: endpoints.accountsSetBiography.method,

@@ -19,6 +19,8 @@ export const userSchema = z
     following_count: z.number().nullable().optional(),
     media_count: z.number().nullable().optional(),
     biography: z.string().optional(),
+    /** The link shown on the profile; empty or null when there is none. */
+    external_url: z.string().nullable().optional(),
   })
   .loose();
 

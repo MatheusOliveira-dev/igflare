@@ -21,6 +21,9 @@ import {
   getFollowing,
   paginateFollowers,
   paginateFollowing,
+  removeFollower,
+  addCloseFriend,
+  removeCloseFriend,
   approveRequest,
   denyRequest,
   blockUser,
@@ -80,7 +83,7 @@ import type { EditMediaOptions } from '../endpoints/media/media-manage';
 import { searchUsers, searchHashtags, searchPlaces } from '../endpoints/search/search';
 import { uploadPhoto, uploadVideo, uploadStoryPhoto } from '../endpoints/upload/upload';
 import type { PhotoUploadOptions, VideoUploadOptions } from '../endpoints/upload/upload';
-import { getReelsTray, getUserStories } from '../endpoints/story/story';
+import { getReelsTray, getUserStories, markStoriesSeen } from '../endpoints/story/story';
 import {
   getInbox,
   paginateInbox,
@@ -155,6 +158,9 @@ export interface FriendshipApi {
   unblock(pk: string): Promise<FriendshipStatus>;
   mute(pk: string, options?: MuteOptions): Promise<void>;
   unmute(pk: string, options?: MuteOptions): Promise<void>;
+  removeFollower(pk: string): Promise<FriendshipStatus>;
+  addCloseFriend(pk: string): Promise<FriendshipStatus>;
+  removeCloseFriend(pk: string): Promise<FriendshipStatus>;
 }
 
 /** Media feeds. */
@@ -249,6 +255,8 @@ export interface UploadApi {
 export interface StoryApi {
   tray(): Promise<Reel[]>;
   user(pk: string): Promise<Media[]>;
+  /** Marks stories as seen by their full ids (`pk_userid`). */
+  markSeen(storyIds: readonly string[]): Promise<void>;
 }
 
 /** What `login` takes: the account credentials and, optionally, the second-factor source. */
@@ -404,6 +412,9 @@ export class IgFlare {
       unblock: (pk) => unblockUser(client, pk),
       mute: (pk, options) => muteUser(client, pk, options),
       unmute: (pk, options) => unmuteUser(client, pk, options),
+      removeFollower: (pk) => removeFollower(client, pk),
+      addCloseFriend: (pk) => addCloseFriend(client, pk),
+      removeCloseFriend: (pk) => removeCloseFriend(client, pk),
     };
   }
 
@@ -467,6 +478,7 @@ export class IgFlare {
     return {
       tray: () => getReelsTray(client),
       user: (pk) => getUserStories(client, pk),
+      markSeen: (storyIds) => markStoriesSeen(client, storyIds),
     };
   }
 

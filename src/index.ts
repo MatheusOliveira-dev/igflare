@@ -126,7 +126,7 @@ export {
 } from './endpoints/media/media-manage';
 export type { EditMediaOptions } from './endpoints/media/media-manage';
 export { uploadPhoto, uploadVideo, uploadStoryPhoto } from './endpoints/upload/upload';
-export { getReelsTray, getUserStories } from './endpoints/story/story';
+export { getReelsTray, getUserStories, markStoriesSeen } from './endpoints/story/story';
 export { reelSchema } from './schemas/reel';
 export type { Reel } from './schemas/reel';
 export type { PhotoUploadOptions, VideoUploadOptions } from './endpoints/upload/upload';
@@ -220,6 +220,9 @@ export {
   paginatePendingRequests,
   muteUser,
   unmuteUser,
+  removeFollower,
+  addCloseFriend,
+  removeCloseFriend,
 } from './endpoints/friendship/friendship';
 export type { FollowListOptions, MuteOptions } from './endpoints/friendship/friendship';
 export { friendshipStatusSchema } from './schemas/friendship';

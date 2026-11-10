@@ -13,6 +13,9 @@ import {
   getPendingRequests,
   muteUser,
   unmuteUser,
+  removeFollower,
+  addCloseFriend,
+  removeCloseFriend,
 } from './friendship';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
@@ -200,5 +203,45 @@ describe('relationship management', () => {
     expect(payload['target_reel_author_id']).toBe('42');
     expect(payload['target_posts_author_id']).toBeUndefined();
     expect(transport.requests[0]?.url).toContain('/unmute_posts_or_story_from_follow/');
+  });
+});
+
+describe('remove follower and close friends', () => {
+  it('removes a follower and returns the new status', async () => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      friendship_status: { followed_by: false },
+    });
+    const status = await removeFollower(client, '42');
+    expect(transport.requests[0]?.url).toContain('/api/v1/friendships/remove_follower/42/');
+    expect(status.followed_by).toBe(false);
+  });
+
+  it('adds a close friend with the id in the add list', async () => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      friendship_statuses: { '42': { is_bestie: true } },
+    });
+    const status = await addCloseFriend(client, '42');
+    expect(transport.requests[0]?.url).toContain('/api/v1/friendships/set_besties/');
+    expect(mutePayload(transport.requests[0]?.body)).toMatchObject({ add: ['42'], remove: [] });
+    expect(status.is_bestie).toBe(true);
+  });
+
+  it('removes a close friend with the id in the remove list', async () => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      friendship_statuses: { '42': { is_bestie: false } },
+    });
+    const status = await removeCloseFriend(client, '42');
+    expect(mutePayload(transport.requests[0]?.body)).toMatchObject({ add: [], remove: ['42'] });
+    expect(status.is_bestie).toBe(false);
+  });
+
+  it('rejects a user id that is not numeric, and a response without the status', async () => {
+    const bad = clientReturning({ status: 'ok' });
+    await expect(addCloseFriend(bad.client, 'x')).rejects.toThrow(/numeric/);
+    expect(bad.transport.requests).toHaveLength(0);
+    await expect(addCloseFriend(bad.client, '42')).rejects.toBeInstanceOf(ClientSchemaError);
   });
 });

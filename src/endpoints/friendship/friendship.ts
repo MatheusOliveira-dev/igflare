@@ -8,6 +8,8 @@ import { parseSchemaList } from '../../schemas/parse-list';
 import { paginate } from '../../core/pagination';
 import type { Page } from '../../core/pagination';
 import { ClientSchemaError } from '../../errors/api-errors';
+import { IgError } from '../../errors/ig-error';
+import { isRecord } from '../direct/direct-wire';
 
 /** Validates a friendship_status value into the typed model, or throws a typed error. */
 function parseFriendship(value: unknown): FriendshipStatus {
@@ -232,4 +234,44 @@ export async function unmuteUser(
     endpoint: endpoints.friendshipsUnmute.path,
     payload: muteTargets(pk, options),
   });
+}
+
+/** Removes a user from the account's followers (they stop following it, without a block). */
+export function removeFollower(client: PrivateClient, pk: string): Promise<FriendshipStatus> {
+  return friendshipAction(client, endpoints.friendshipsRemoveFollower, pk);
+}
+
+/** Adds or removes a user on the close friends list and returns their new status. */
+async function setCloseFriend(
+  client: PrivateClient,
+  pk: string,
+  add: boolean,
+): Promise<FriendshipStatus> {
+  if (!/^\d+$/.test(pk)) {
+    throw new IgError('A user id must be numeric');
+  }
+  const json = await client.request({
+    method: endpoints.friendshipsSetBesties.method,
+    endpoint: endpoints.friendshipsSetBesties.path,
+    payload: {
+      block_on_empty_thread_creation: 'false',
+      module: 'CLOSE_FRIENDS_V2_SEARCH',
+      source: 'audience_manager',
+      ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),
+      remove: add ? [] : [pk],
+      add: add ? [pk] : [],
+    },
+  });
+  const statuses = json['friendship_statuses'];
+  return parseFriendship(isRecord(statuses) ? statuses[pk] : undefined);
+}
+
+/** Adds a user to the close friends list. */
+export function addCloseFriend(client: PrivateClient, pk: string): Promise<FriendshipStatus> {
+  return setCloseFriend(client, pk, true);
+}
+
+/** Removes a user from the close friends list. */
+export function removeCloseFriend(client: PrivateClient, pk: string): Promise<FriendshipStatus> {
+  return setCloseFriend(client, pk, false);
 }

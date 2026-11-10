@@ -1,9 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { getReelsTray, getUserStories } from './story';
+import { getReelsTray, getUserStories, markStoriesSeen } from './story';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
 import { createSession } from '../../core/session/session';
 import { ClientSchemaError } from '../../errors/api-errors';
+import { IgError } from '../../errors/ig-error';
 
 function clientReturning(body: unknown): { client: PrivateClient; transport: FakeTransport } {
   const transport = new FakeTransport(() => ({
@@ -55,5 +56,33 @@ describe('getUserStories', () => {
   it('returns an empty array when the user has no active story', async () => {
     const { client } = clientReturning({ status: 'ok', reel: null });
     expect(await getUserStories(client, '9')).toEqual([]);
+  });
+});
+
+describe('markStoriesSeen', () => {
+  it('posts the viewing window of each story to the v2 seen endpoint', async () => {
+    const { client, transport } = clientReturning({ status: 'ok' });
+
+    await markStoriesSeen(client, ['4000000000000000003_10000000001']);
+
+    const request = transport.requests[0];
+    expect(request?.url).toContain('/api/v2/media/seen/');
+    expect(request?.url).toContain('reel=1');
+    expect(request?.url).toContain('live_vod=0');
+    const form = new URLSearchParams(typeof request?.body === 'string' ? request.body : '');
+    const signed = form.get('signed_body') ?? '';
+    const body = JSON.parse(signed.slice(signed.indexOf('.') + 1)) as {
+      reels: Record<string, string[]>;
+    };
+    const key = '4000000000000000003_10000000001_10000000001';
+    expect(Object.keys(body.reels)).toEqual([key]);
+    expect(body.reels[key]?.[0]).toMatch(/^\d{10}_\d{10}$/);
+  });
+
+  it('rejects an empty list and an id that is not pk_userid', async () => {
+    const { client, transport } = clientReturning({ status: 'ok' });
+    await expect(markStoriesSeen(client, [])).rejects.toBeInstanceOf(IgError);
+    await expect(markStoriesSeen(client, ['123'])).rejects.toBeInstanceOf(IgError);
+    expect(transport.requests).toHaveLength(0);
   });
 });

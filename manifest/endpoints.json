@@ -217,6 +217,16 @@
       "path": "/api/v1/friendships/pending/"
     },
     {
+      "name": "friendshipsRemoveFollower",
+      "method": "POST",
+      "path": "/api/v1/friendships/remove_follower/{pk}/"
+    },
+    {
+      "name": "friendshipsSetBesties",
+      "method": "POST",
+      "path": "/api/v1/friendships/set_besties/"
+    },
+    {
       "name": "friendshipsShow",
       "method": "GET",
       "path": "/api/v1/friendships/show/{pk}/"
@@ -330,6 +340,11 @@
       "name": "mediaSave",
       "method": "POST",
       "path": "/api/v1/media/{id}/save/"
+    },
+    {
+      "name": "mediaSeenV2",
+      "method": "POST",
+      "path": "/api/v2/media/seen/"
     },
     {
       "name": "mediaUnarchive",

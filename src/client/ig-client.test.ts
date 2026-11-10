@@ -574,6 +574,21 @@ describe('IgFlare facade', () => {
     expect(transport.requests.some((r) => r.url.includes('/users/pin_timeline_media/'))).toBe(true);
   });
 
+  it('delegates the step 4 friendship and story extras', async () => {
+    const { ig, transport } = clientWith((req) => {
+      if (req.url.includes('/set_besties/'))
+        return json({ status: 'ok', friendship_statuses: { '7': { is_bestie: true } } });
+      return json({ status: 'ok', friendship_status: { followed_by: false } });
+    });
+
+    expect((await ig.friendship.removeFollower('7')).followed_by).toBe(false);
+    expect((await ig.friendship.addCloseFriend('7')).is_bestie).toBe(true);
+    await ig.friendship.removeCloseFriend('7');
+    await ig.story.markSeen(['1_2']);
+
+    expect(transport.requests.some((r) => r.url.includes('/api/v2/media/seen/'))).toBe(true);
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();
