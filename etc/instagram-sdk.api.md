@@ -263,7 +263,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'userInfo' | 'userInfoByUsername';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaInfo' | 'userInfo' | 'userInfoByUsername';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -390,6 +390,9 @@ export function getFollowing(client: PrivateClient, pk: string, options?: Follow
 export function getFriendshipStatus(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
 
 // @public
+export function getMediaInfo(client: PrivateClient, mediaId: string): Promise<Media>;
+
+// @public
 export function getUserFeed(client: PrivateClient, pk: string, options?: FeedOptions): Promise<Page<Media>>;
 
 // @public
@@ -456,6 +459,8 @@ export class IgClient {
         readonly transport?: HttpTransport;
     }): Promise<IgClient>;
     login(credentials: CaaLoginCredentials): Promise<PrivateResponseJson>;
+    // (undocumented)
+    readonly media: MediaApi;
     get session(): SessionData;
     // (undocumented)
     readonly user: UserApi;
@@ -504,6 +509,12 @@ export class LoginRequiredError extends IgApiError {
 
 // @public (undocumented)
 export type Media = z.infer<typeof mediaSchema>;
+
+// @public
+export interface MediaApi {
+    // (undocumented)
+    info(mediaId: string): Promise<Media>;
+}
 
 // @public
 export const mediaSchema: z.ZodObject<{
