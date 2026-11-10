@@ -21,8 +21,10 @@
       "path": "/api/v1/direct_v2/threads/broadcast/text/"
     },
     { "name": "directThread", "method": "GET", "path": "/api/v1/direct_v2/threads/{thread_id}/" },
+    { "name": "feedReelsTray", "method": "POST", "path": "/api/v1/feed/reels_tray/" },
     { "name": "feedTimeline", "method": "POST", "path": "/api/v1/feed/timeline/" },
     { "name": "feedUser", "method": "GET", "path": "/api/v1/feed/user/{pk}/" },
+    { "name": "feedUserStory", "method": "GET", "path": "/api/v1/feed/user/{pk}/story/" },
     { "name": "fbsearchPlaces", "method": "GET", "path": "/api/v1/fbsearch/places/" },
     { "name": "friendshipsApprove", "method": "POST", "path": "/api/v1/friendships/approve/{pk}/" },
     { "name": "friendshipsBlock", "method": "POST", "path": "/api/v1/friendships/block/{pk}/" },
@@ -64,6 +66,11 @@
     { "name": "mediaComments", "method": "GET", "path": "/api/v1/media/{id}/comments/" },
     { "name": "mediaLikers", "method": "GET", "path": "/api/v1/media/{id}/likers/" },
     { "name": "mediaConfigure", "method": "POST", "path": "/api/v1/media/configure/" },
+    {
+      "name": "mediaConfigureToStory",
+      "method": "POST",
+      "path": "/api/v1/media/configure_to_story/"
+    },
     { "name": "mediaDelete", "method": "POST", "path": "/api/v1/media/{id}/delete/" },
     {
       "name": "mediaCommentDelete",

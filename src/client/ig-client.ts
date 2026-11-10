@@ -52,8 +52,9 @@ import {
 } from '../endpoints/media/media';
 import type { CommentListOptions } from '../endpoints/media/media';
 import { searchUsers, searchHashtags, searchPlaces } from '../endpoints/search/search';
-import { uploadPhoto, uploadVideo } from '../endpoints/upload/upload';
+import { uploadPhoto, uploadVideo, uploadStoryPhoto } from '../endpoints/upload/upload';
 import type { PhotoUploadOptions, VideoUploadOptions } from '../endpoints/upload/upload';
+import { getReelsTray, getUserStories } from '../endpoints/story/story';
 import {
   getInbox,
   paginateInbox,
@@ -69,6 +70,7 @@ import type { Comment } from '../schemas/comment';
 import type { Thread, DirectMessage, DirectSendResult } from '../schemas/direct';
 import type { Hashtag } from '../schemas/hashtag';
 import type { Location } from '../schemas/location';
+import type { Reel } from '../schemas/reel';
 
 /** The logged-in account itself. */
 export interface AccountApi {
@@ -146,6 +148,13 @@ export interface MediaApi {
 export interface UploadApi {
   photo(jpeg: Uint8Array, options?: PhotoUploadOptions): Promise<Media>;
   video(mp4: Uint8Array, coverJpeg: Uint8Array, options?: VideoUploadOptions): Promise<Media>;
+  story(jpeg: Uint8Array): Promise<Media>;
+}
+
+/** Stories. */
+export interface StoryApi {
+  tray(): Promise<Reel[]>;
+  user(pk: string): Promise<Media[]>;
 }
 
 /** Construction options for {@link IgFlare}. */
@@ -176,6 +185,7 @@ export class IgFlare {
   readonly direct: DirectApi;
   readonly upload: UploadApi;
   readonly search: SearchApi;
+  readonly story: StoryApi;
 
   constructor(options: IgFlareOptions = {}) {
     const { retry, ...clientOptions } = options;
@@ -190,6 +200,7 @@ export class IgFlare {
     this.direct = this.#buildDirectApi();
     this.upload = this.#buildUploadApi();
     this.search = this.#buildSearchApi();
+    this.story = this.#buildStoryApi();
   }
 
   /** Builds a client from a saved session in the given store. */
@@ -289,6 +300,15 @@ export class IgFlare {
     return {
       photo: (jpeg, options) => uploadPhoto(client, jpeg, options),
       video: (mp4, coverJpeg, options) => uploadVideo(client, mp4, coverJpeg, options),
+      story: (jpeg) => uploadStoryPhoto(client, jpeg),
+    };
+  }
+
+  #buildStoryApi(): StoryApi {
+    const client = this.#client;
+    return {
+      tray: () => getReelsTray(client),
+      user: (pk) => getUserStories(client, pk),
     };
   }
 

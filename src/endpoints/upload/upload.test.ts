@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { uploadPhoto, uploadVideo } from './upload';
+import { uploadPhoto, uploadVideo, uploadStoryPhoto } from './upload';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
 import type { HttpRequest } from '../../core/transport/http-transport';
@@ -118,5 +118,27 @@ describe('uploadVideo', () => {
     expect(signedPayload(configure?.body)).toMatchObject({ length: 8, clips: [{ length: 8 }] });
 
     expect(media.code).toBe('vid');
+  });
+});
+
+describe('uploadStoryPhoto', () => {
+  it('ruploads then configures to story with source_type 3', async () => {
+    const transport = new FakeTransport((req: HttpRequest) =>
+      req.url.includes('rupload_igphoto')
+        ? { status: 200, headers: {}, body: JSON.stringify({ upload_id: 'S1', status: 'ok' }) }
+        : {
+            status: 200,
+            headers: {},
+            body: JSON.stringify({ status: 'ok', media: { pk: 1, code: 'st' } }),
+          },
+    );
+    const client = new PrivateClient({ transport, session: createSession() });
+
+    const media = await uploadStoryPhoto(client, JPEG);
+
+    const configure = transport.requests[1];
+    expect(configure?.url).toContain('/api/v1/media/configure_to_story/');
+    expect(signedPayload(configure?.body)['source_type']).toBe('3');
+    expect(media.code).toBe('st');
   });
 });

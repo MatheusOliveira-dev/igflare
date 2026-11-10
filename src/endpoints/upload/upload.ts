@@ -230,3 +230,33 @@ export async function uploadVideo(
   await ruploadPhoto(client, coverJpeg, uploadId, '2');
   return configureVideo(client, uploadId, options.caption ?? '', parsed);
 }
+
+/** Configures an uploaded photo as a story (source_type 3). */
+async function configureStory(
+  client: PrivateClient,
+  uploadId: string,
+  width: number,
+  height: number,
+): Promise<Media> {
+  const json = await client.request({
+    method: endpoints.mediaConfigureToStory.method,
+    endpoint: endpoints.mediaConfigureToStory.path,
+    payload: {
+      upload_id: uploadId,
+      source_type: '3',
+      caption: '',
+      ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),
+      device: deviceBlock(client),
+      edits: { crop_original_size: [width, height], crop_center: [0, 0], crop_zoom: 1 },
+      extra: { source_width: width, source_height: height },
+    },
+  });
+  return parseConfiguredMedia(json);
+}
+
+/** Publishes a JPEG as a story. Dimensions are read from the JPEG. */
+export async function uploadStoryPhoto(client: PrivateClient, jpeg: Uint8Array): Promise<Media> {
+  const { width, height } = parseJpegSize(jpeg);
+  const uploadId = await ruploadPhoto(client, jpeg, newUploadId(), '1');
+  return configureStory(client, uploadId, width, height);
+}

@@ -85,6 +85,7 @@ export type {
   DirectApi,
   UploadApi,
   SearchApi,
+  StoryApi,
 } from './client/ig-client';
 export {
   getMediaInfo,
@@ -98,7 +99,10 @@ export {
   getLikers,
 } from './endpoints/media/media';
 export type { CommentListOptions } from './endpoints/media/media';
-export { uploadPhoto, uploadVideo } from './endpoints/upload/upload';
+export { uploadPhoto, uploadVideo, uploadStoryPhoto } from './endpoints/upload/upload';
+export { getReelsTray, getUserStories } from './endpoints/story/story';
+export { reelSchema } from './schemas/reel';
+export type { Reel } from './schemas/reel';
 export type { PhotoUploadOptions, VideoUploadOptions } from './endpoints/upload/upload';
 export { parseJpegSize } from './core/media/jpeg';
 export type { ImageSize } from './core/media/jpeg';

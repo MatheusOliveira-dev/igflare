@@ -268,6 +268,21 @@ describe('IgFlare facade', () => {
     ).toBe(true);
   });
 
+  it('delegates stories: tray, user stories and story upload', async () => {
+    const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90]);
+    const { ig } = clientWith((req) => {
+      if (req.url.includes('/reels_tray/'))
+        return json({ status: 'ok', tray: [{ id: 1, user: { pk: 9, username: 'a' } }] });
+      if (req.url.includes('/story/')) return json({ status: 'ok', reel: { items: [{ pk: 2 }] } });
+      if (req.url.includes('rupload')) return json({ upload_id: 'S1', status: 'ok' });
+      return json({ status: 'ok', media: { pk: 3, code: 'st' } });
+    });
+
+    expect((await ig.story.tray())[0]?.user?.username).toBe('a');
+    expect((await ig.story.user('9'))[0]?.pk).toBe('2');
+    expect((await ig.upload.story(jpeg)).code).toBe('st');
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();
