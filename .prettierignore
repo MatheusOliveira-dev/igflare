@@ -5,3 +5,4 @@ reports
 .stryker-tmp
 src/generated
 package-lock.json
+src/core/http/__fixtures__
