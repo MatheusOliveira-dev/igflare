@@ -35,16 +35,16 @@ describe('getUserFeed', () => {
     expect(transport.requests[0]?.method).toBe('GET');
     expect(page.items[0]?.pk).toBe('1');
     expect(page.items[0]?.user?.username).toBe('a');
-    expect(page.nextMaxId).toBe('n1');
+    expect(page.nextCursor).toBe('n1');
   });
 
-  it('passes the cursor as max_id and omits nextMaxId on the last page', async () => {
+  it('passes the cursor as max_id and omits nextCursor on the last page', async () => {
     const { client, transport } = clientReturning({ status: 'ok', items: [{ pk: 2 }] });
 
     const page = await getUserFeed(client, '42', { maxId: 'n1' });
 
     expect(transport.requests[0]?.url).toContain('/api/v1/feed/user/42/?max_id=n1');
-    expect(page.nextMaxId).toBeUndefined();
+    expect(page.nextCursor).toBeUndefined();
   });
 
   it('walks every post across pages with the iterator', async () => {
@@ -99,7 +99,7 @@ describe('getTimelineFeed', () => {
     expect(signedPayload(transport.requests[0]?.body)['reason']).toBe('cold_start_fetch');
     expect(page.items).toHaveLength(1);
     expect(page.items[0]?.code).toBe('a');
-    expect(page.nextMaxId).toBe('n1');
+    expect(page.nextCursor).toBe('n1');
   });
 
   it('reads the flat items envelope and sends pagination reason with max_id', async () => {
@@ -116,10 +116,10 @@ describe('getTimelineFeed', () => {
     expect(payload['reason']).toBe('pagination');
     expect(payload['max_id']).toBe('n1');
     expect(page.items[0]?.pk).toBe('2');
-    expect(page.nextMaxId).toBe('n2');
+    expect(page.nextCursor).toBe('n2');
   });
 
-  it('omits nextMaxId when more_available is false', async () => {
+  it('omits nextCursor when more_available is false', async () => {
     const { client } = clientReturning({
       status: 'ok',
       items: [{ pk: 3 }],
@@ -127,7 +127,7 @@ describe('getTimelineFeed', () => {
       more_available: false,
     });
     const page = await getTimelineFeed(client);
-    expect(page.nextMaxId).toBeUndefined();
+    expect(page.nextCursor).toBeUndefined();
   });
 
   it('throws when the response has neither feed_items nor items', async () => {

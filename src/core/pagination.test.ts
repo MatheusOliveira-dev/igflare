@@ -10,10 +10,10 @@ async function collect<T>(gen: AsyncGenerator<T>): Promise<T[]> {
 }
 
 describe('paginate', () => {
-  it('walks every page until a page has no nextMaxId', async () => {
+  it('walks every page until a page has no nextCursor', async () => {
     const pages: Record<string, Page<number>> = {
-      __first: { items: [1, 2], nextMaxId: 'a' },
-      a: { items: [3, 4], nextMaxId: 'b' },
+      __first: { items: [1, 2], nextCursor: 'a' },
+      a: { items: [3, 4], nextCursor: 'b' },
       b: { items: [5] },
     };
     const seen: (string | undefined)[] = [];
@@ -34,7 +34,7 @@ describe('paginate', () => {
     const all = await collect(
       paginate(() => {
         calls += 1;
-        return Promise.resolve({ items: [1], nextMaxId: '' });
+        return Promise.resolve({ items: [1], nextCursor: '' });
       }),
     );
     expect(all).toEqual([1]);

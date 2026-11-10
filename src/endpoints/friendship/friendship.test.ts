@@ -91,10 +91,10 @@ describe('friendship lists', () => {
     expect(url).toContain('rank_token=');
     expect(url).not.toContain('max_id=');
     expect(page.items[0]?.username).toBe('a');
-    expect(page.nextMaxId).toBe('100');
+    expect(page.nextCursor).toBe('100');
   });
 
-  it('passes the cursor as max_id and omits nextMaxId on the last page', async () => {
+  it('passes the cursor as max_id and omits nextCursor on the last page', async () => {
     const { client, transport } = clientReturning({
       status: 'ok',
       users: [{ pk: 2, username: 'b' }],
@@ -104,7 +104,7 @@ describe('friendship lists', () => {
 
     expect(transport.requests[0]?.url).toContain('/friendships/42/following/?');
     expect(transport.requests[0]?.url).toContain('max_id=100');
-    expect(page.nextMaxId).toBeUndefined();
+    expect(page.nextCursor).toBeUndefined();
   });
 
   it('walks every follower across pages with the iterator', async () => {

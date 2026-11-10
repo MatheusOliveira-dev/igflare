@@ -6,7 +6,7 @@ import type { Page } from '../../core/pagination';
 import { ClientSchemaError } from '../../errors/api-errors';
 
 export interface FeedOptions {
-  /** The cursor from a previous page's `nextMaxId`. Omit for the first page. */
+  /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
   readonly maxId?: string;
 }
 
@@ -28,7 +28,7 @@ function parseMediaList(json: Record<string, unknown>): Media[] {
 }
 
 /** Reads the next-page cursor from a feed response, or undefined on the last page. */
-function readNextMaxId(json: Record<string, unknown>): string | undefined {
+function readNextCursor(json: Record<string, unknown>): string | undefined {
   const next = json['next_max_id'];
   return typeof next === 'string' || typeof next === 'number' ? String(next) : undefined;
 }
@@ -45,8 +45,8 @@ export async function getUserFeed(
     ...(options.maxId !== undefined ? { query: { max_id: options.maxId } } : {}),
   });
   const items = parseMediaList(json);
-  const nextMaxId = readNextMaxId(json);
-  return nextMaxId !== undefined ? { items, nextMaxId } : { items };
+  const nextCursor = readNextCursor(json);
+  return nextCursor !== undefined ? { items, nextCursor } : { items };
 }
 
 /** Walks every post of a user, yielding one at a time across pages. */
@@ -100,9 +100,9 @@ export async function getTimelineFeed(
     }
     return parsed.data;
   });
-  const next = readNextMaxId(json);
+  const next = readNextCursor(json);
   const moreAvailable = json['more_available'];
-  return next !== undefined && moreAvailable !== false ? { items, nextMaxId: next } : { items };
+  return next !== undefined && moreAvailable !== false ? { items, nextCursor: next } : { items };
 }
 
 /** Walks the home timeline, yielding one media at a time across pages. */

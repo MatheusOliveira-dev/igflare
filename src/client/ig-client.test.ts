@@ -53,7 +53,7 @@ describe('IgClient facade', () => {
     expect(followed.following).toBe(true);
     expect(transport.requests[0]?.url).toContain('/api/v1/friendships/create/42/');
     expect(page.items[0]?.username).toBe('f');
-    expect(page.nextMaxId).toBe('10');
+    expect(page.nextCursor).toBe('10');
   });
 
   it('walks a list through the facade iterator', async () => {
