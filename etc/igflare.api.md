@@ -740,6 +740,10 @@ export interface ImageSize {
 }
 
 // @public
+export class InvalidVerificationCodeError extends IgApiError {
+}
+
+// @public
 export function jazoest(value: string): string;
 
 // @public
