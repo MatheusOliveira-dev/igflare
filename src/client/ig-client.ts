@@ -10,7 +10,7 @@ import { caaLogin } from '../endpoints/auth/caa-login';
 import type { CaaLoginCredentials } from '../endpoints/auth/caa-login';
 import { resolveCaaTwoFactor } from '../endpoints/auth/caa-two-factor';
 import type { TwoFactorSource } from '../endpoints/auth/caa-two-factor';
-import type { CaaTwoFactorRequiredError } from '../errors/api-errors';
+import type { CaaTwoFactorRequiredError, LoginRequiredError } from '../errors/api-errors';
 import { getCurrentUser } from '../endpoints/user/current-user';
 import { getUserInfo, getUserInfoByUsername } from '../endpoints/user/user-info';
 import {
@@ -182,6 +182,14 @@ export interface IgFlareOptions extends PrivateClientOptions {
    * when supplying a transport that already retries).
    */
   readonly retry?: false | RetryOptions;
+  /**
+   * Re-authenticate automatically when the session expires: the credentials (and
+   * second-factor source) of the last `login()` are kept in this process's memory
+   * and replayed, then the rejected request is repeated once. Ignored when
+   * `onSessionExpired` is set, which takes precedence and keeps credentials out of
+   * the SDK. Has no effect for a session loaded from a store without a `login()`.
+   */
+  readonly autoRelogin?: boolean;
 }
 
 /**
@@ -194,6 +202,8 @@ export interface IgFlareOptions extends PrivateClientOptions {
  */
 export class IgFlare {
   readonly #client: PrivateClient;
+  readonly #rememberLogin: boolean;
+  #lastLogin: IgFlareLogin | undefined;
   readonly account: AccountApi;
   readonly user: UserApi;
   readonly friendship: FriendshipApi;
@@ -205,10 +215,17 @@ export class IgFlare {
   readonly story: StoryApi;
 
   constructor(options: IgFlareOptions = {}) {
-    const { retry, ...clientOptions } = options;
+    const { retry, autoRelogin, ...clientOptions } = options;
     const base = clientOptions.transport ?? new HttpsTransport();
     const transport = retry === false ? base : new RetryTransport(base, retry);
-    this.#client = new PrivateClient({ ...clientOptions, transport });
+    this.#rememberLogin = autoRelogin === true && clientOptions.onSessionExpired === undefined;
+    this.#client = new PrivateClient({
+      ...clientOptions,
+      transport,
+      ...(this.#rememberLogin
+        ? { onSessionExpired: (error: LoginRequiredError) => this.#relogin(error) }
+        : {}),
+    });
     this.account = this.#buildAccountApi();
     this.user = this.#buildUserApi();
     this.friendship = this.#buildFriendshipApi();
@@ -239,8 +256,20 @@ export class IgFlare {
    * `CaaTwoFactorRequiredError` is thrown, to finish with `resolveTwoFactor`.
    */
   login(credentials: IgFlareLogin): Promise<PrivateResponseJson> {
+    if (this.#rememberLogin) {
+      this.#lastLogin = credentials;
+    }
     const { twoFactor, ...account } = credentials;
     return caaLogin(this.#client, account, twoFactor !== undefined ? { twoFactor } : {});
+  }
+
+  /** Replays the last login after a session expiry, or rethrows when there is none. */
+  async #relogin(error: LoginRequiredError): Promise<void> {
+    const last = this.#lastLogin;
+    if (last === undefined) {
+      throw error;
+    }
+    await this.login(last);
   }
 
   /** Finishes a login that stopped at the two-factor step by submitting the code. */

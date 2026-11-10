@@ -5,7 +5,7 @@ import { FakeTransport } from '../core/transport/adapters/fake';
 import type { HttpRequest, HttpResponse } from '../core/transport/http-transport';
 import { MemorySessionStore } from '../core/session/adapters/memory';
 import { createSession } from '../core/session/session';
-import { IgApiError, CaaTwoFactorRequiredError } from '../errors/api-errors';
+import { IgApiError, CaaTwoFactorRequiredError, LoginRequiredError } from '../errors/api-errors';
 
 function json(body: unknown): HttpResponse {
   return { status: 200, headers: {}, body: JSON.stringify(body) };
@@ -392,6 +392,98 @@ describe('IgFlare facade', () => {
 
     await ig.resolveTwoFactor(error as CaaTwoFactorRequiredError, '654321');
     expect(ig.session.auth.userId).toBe('42');
+  });
+
+  /** A logged-in flow whose session can be flipped to expired; a login un-expires it. */
+  function expiringFlow(): {
+    state: { expired: boolean; logins: number };
+    transport: FakeTransport;
+  } {
+    const state = { expired: false, logins: 0 };
+    const transport = caaFlowTransport((req) => {
+      if (req.url.includes('send_login_request')) {
+        state.logins += 1;
+        state.expired = false;
+        return loginResponse(state.logins);
+      }
+      if (req.url.includes('/users/')) {
+        return state.expired
+          ? {
+              status: 403,
+              headers: {},
+              body: JSON.stringify({ message: 'login_required', status: 'fail' }),
+            }
+          : json({ status: 'ok', user: { pk: 1, username: 'a' } });
+      }
+      return undefined;
+    });
+    return { state, transport };
+  }
+
+  it('replays the login and repeats the request when the session expires (autoRelogin)', async () => {
+    const { state, transport } = expiringFlow();
+    const ig = new IgFlare({
+      transport,
+      session: createSession(),
+      retry: false,
+      autoRelogin: true,
+    });
+    await ig.login({ username: 'u', password: 'p' });
+
+    state.expired = true;
+    const user = await ig.user.info('1');
+
+    expect(user.username).toBe('a');
+    expect(state.logins).toBe(2);
+    expect(ig.session.auth.userId).toBe('2');
+  });
+
+  it('does not re-authenticate by default', async () => {
+    const { state, transport } = expiringFlow();
+    const ig = new IgFlare({ transport, session: createSession(), retry: false });
+    await ig.login({ username: 'u', password: 'p' });
+
+    state.expired = true;
+
+    await expect(ig.user.info('1')).rejects.toBeInstanceOf(LoginRequiredError);
+    expect(state.logins).toBe(1);
+  });
+
+  it('rethrows the expiry when autoRelogin has no earlier login to replay', async () => {
+    const { state, transport } = expiringFlow();
+    state.expired = true;
+    const ig = new IgFlare({
+      transport,
+      session: createSession(),
+      retry: false,
+      autoRelogin: true,
+    });
+
+    await expect(ig.user.info('1')).rejects.toBeInstanceOf(LoginRequiredError);
+    expect(state.logins).toBe(0);
+  });
+
+  it('lets onSessionExpired take precedence over autoRelogin and keeps credentials out', async () => {
+    const { state, transport } = expiringFlow();
+    let hookCalls = 0;
+    const ig = new IgFlare({
+      transport,
+      session: createSession(),
+      retry: false,
+      autoRelogin: true,
+      onSessionExpired: () => {
+        hookCalls += 1;
+        state.expired = false;
+        return Promise.resolve();
+      },
+    });
+    await ig.login({ username: 'u', password: 'p' });
+
+    state.expired = true;
+    await ig.user.info('1');
+
+    expect(hookCalls).toBe(1);
+    expect(state.logins).toBe(1); // the hook, not a credential replay, restored the session
   });
 
   it('exposes the session and the underlying engine', () => {

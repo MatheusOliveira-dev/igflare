@@ -61,3 +61,141 @@ describe('PrivateClient', () => {
     expect(client.session.device.uuid).toMatch(/^[0-9a-f-]{36}$/);
   });
 });
+
+describe('PrivateClient session expiry', () => {
+  const EXPIRED = {
+    status: 403,
+    headers: {},
+    body: JSON.stringify({ message: 'login_required', status: 'fail' }),
+  };
+  const OK = { status: 200, headers: {}, body: JSON.stringify({ status: 'ok' }) };
+
+  /** A transport that rejects with login_required until `fresh` is flipped on. */
+  function expiring(): { transport: FakeTransport; fresh: { value: boolean } } {
+    const fresh = { value: false };
+    const transport = new FakeTransport(() => (fresh.value ? OK : EXPIRED));
+    return { transport, fresh };
+  }
+
+  it('re-authenticates and repeats the rejected request once', async () => {
+    const { transport, fresh } = expiring();
+    let hookCalls = 0;
+    const client = new PrivateClient({
+      transport,
+      session: createSession(),
+      onSessionExpired: () => {
+        hookCalls += 1;
+        fresh.value = true;
+        return Promise.resolve();
+      },
+    });
+
+    const json = await client.request({ method: 'GET', endpoint: 'x/' });
+
+    expect(json.status).toBe('ok');
+    expect(hookCalls).toBe(1);
+    expect(transport.requests).toHaveLength(2);
+  });
+
+  it('throws the typed error when no hook is set', async () => {
+    const { transport } = expiring();
+    const client = new PrivateClient({ transport, session: createSession() });
+    await expect(client.request({ method: 'GET', endpoint: 'x/' })).rejects.toBeInstanceOf(
+      LoginRequiredError,
+    );
+  });
+
+  it('does not loop when the repeated request is rejected again', async () => {
+    const { transport } = expiring();
+    let hookCalls = 0;
+    const client = new PrivateClient({
+      transport,
+      session: createSession(),
+      onSessionExpired: () => {
+        hookCalls += 1;
+        return Promise.resolve(); // the hook "succeeds" but the session stays expired
+      },
+    });
+
+    await expect(client.request({ method: 'GET', endpoint: 'x/' })).rejects.toBeInstanceOf(
+      LoginRequiredError,
+    );
+    expect(hookCalls).toBe(1);
+    expect(transport.requests).toHaveLength(2);
+  });
+
+  it('shares one re-authentication between requests that fail together', async () => {
+    const { transport, fresh } = expiring();
+    let hookCalls = 0;
+    const client = new PrivateClient({
+      transport,
+      session: createSession(),
+      onSessionExpired: async () => {
+        hookCalls += 1;
+        await Promise.resolve();
+        fresh.value = true;
+      },
+    });
+
+    const results = await Promise.all([
+      client.request({ method: 'GET', endpoint: 'a/' }),
+      client.request({ method: 'GET', endpoint: 'b/' }),
+      client.request({ method: 'GET', endpoint: 'c/' }),
+    ]);
+
+    expect(results.map((json) => json.status)).toEqual(['ok', 'ok', 'ok']);
+    expect(hookCalls).toBe(1);
+  });
+
+  it('does not re-enter the hook for requests the hook itself makes', async () => {
+    const { transport } = expiring();
+    let hookCalls = 0;
+    const client: PrivateClient = new PrivateClient({
+      transport,
+      session: createSession(),
+      onSessionExpired: async () => {
+        hookCalls += 1;
+        // A login-like request made inside the hook is also rejected; it must
+        // surface to the hook instead of recursing into another re-authentication.
+        await client.request({ method: 'GET', endpoint: 'inside/' }).catch(() => undefined);
+      },
+    });
+
+    await expect(client.request({ method: 'GET', endpoint: 'x/' })).rejects.toBeInstanceOf(
+      LoginRequiredError,
+    );
+    expect(hookCalls).toBe(1);
+  });
+
+  it('propagates a failure of the hook itself', async () => {
+    const { transport } = expiring();
+    const client = new PrivateClient({
+      transport,
+      session: createSession(),
+      onSessionExpired: () => Promise.reject(new Error('relogin failed')),
+    });
+    await expect(client.request({ method: 'GET', endpoint: 'x/' })).rejects.toThrow(
+      'relogin failed',
+    );
+  });
+
+  it('allows a later expiry to re-authenticate again', async () => {
+    const { transport, fresh } = expiring();
+    let hookCalls = 0;
+    const client = new PrivateClient({
+      transport,
+      session: createSession(),
+      onSessionExpired: () => {
+        hookCalls += 1;
+        fresh.value = true;
+        return Promise.resolve();
+      },
+    });
+
+    await client.request({ method: 'GET', endpoint: 'x/' });
+    fresh.value = false; // the session expires again
+    await client.request({ method: 'GET', endpoint: 'y/' });
+
+    expect(hookCalls).toBe(2);
+  });
+});
