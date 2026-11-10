@@ -258,7 +258,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsShow' | 'launcherSync' | 'userInfo' | 'userInfoByUsername';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'userInfo' | 'userInfoByUsername';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -295,6 +295,11 @@ export class FileSessionStore implements SessionStore {
     load(): Promise<SessionData | null>;
     // (undocumented)
     save(data: SessionData): Promise<void>;
+}
+
+// @public (undocumented)
+export interface FollowListOptions {
+    readonly maxId?: string;
 }
 
 // @public
@@ -338,6 +343,12 @@ export function generateUuid(): string;
 
 // @public
 export function getCurrentUser(client: PrivateClient): Promise<Record<string, unknown>>;
+
+// @public
+export function getFollowers(client: PrivateClient, pk: string, options?: FollowListOptions): Promise<Page<User>>;
+
+// @public
+export function getFollowing(client: PrivateClient, pk: string, options?: FollowListOptions): Promise<Page<User>>;
 
 // @public
 export function getFriendshipStatus(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
@@ -441,6 +452,23 @@ export class MemorySessionStore implements SessionStore {
     // (undocumented)
     save(data: SessionData): Promise<void>;
 }
+
+// @public
+export interface Page<T> {
+    // (undocumented)
+    readonly items: readonly T[];
+    // (undocumented)
+    readonly nextMaxId?: string;
+}
+
+// @public
+export function paginate<T>(fetchPage: (maxId?: string) => Promise<Page<T>>): AsyncGenerator<T>;
+
+// @public
+export function paginateFollowers(client: PrivateClient, pk: string): AsyncGenerator<User>;
+
+// @public
+export function paginateFollowing(client: PrivateClient, pk: string): AsyncGenerator<User>;
 
 // @public
 export function parsePrivateResponse(response: HttpResponse): PrivateResponseJson;
