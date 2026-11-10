@@ -351,7 +351,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'fbsearchPlaces' | 'feedTimeline' | 'feedUser' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaUnlike' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaUnlike' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -527,6 +527,9 @@ export function getMediaInfo(client: PrivateClient, mediaId: string): Promise<Me
 export function getPendingRequests(client: PrivateClient, options?: FollowListOptions): Promise<Page<User>>;
 
 // @public
+export function getReelsTray(client: PrivateClient): Promise<Reel[]>;
+
+// @public
 export function getThread(client: PrivateClient, threadId: string, options?: CursorOptions): Promise<Page<DirectMessage>>;
 
 // @public
@@ -540,6 +543,9 @@ export function getUserInfo(client: PrivateClient, pk: string): Promise<User>;
 
 // @public
 export function getUserInfoByUsername(client: PrivateClient, username: string): Promise<User>;
+
+// @public
+export function getUserStories(client: PrivateClient, pk: string): Promise<Media[]>;
 
 // @public (undocumented)
 export type Hashtag = z.infer<typeof hashtagSchema>;
@@ -620,6 +626,8 @@ export class IgFlare {
     // (undocumented)
     readonly search: SearchApi;
     get session(): SessionData;
+    // (undocumented)
+    readonly story: StoryApi;
     // (undocumented)
     readonly upload: UploadApi;
     // (undocumented)
@@ -930,6 +938,65 @@ export class RateLimitError extends IgApiError {
 }
 
 // @public (undocumented)
+export type Reel = z.infer<typeof reelSchema>;
+
+// @public
+export const reelSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodCoercedString<unknown>>;
+    user: z.ZodOptional<z.ZodObject<{
+        pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+        username: z.ZodOptional<z.ZodString>;
+        full_name: z.ZodOptional<z.ZodString>;
+        is_private: z.ZodOptional<z.ZodBoolean>;
+        is_verified: z.ZodOptional<z.ZodBoolean>;
+        profile_pic_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        biography: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>>;
+    items: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+        id: z.ZodOptional<z.ZodString>;
+        code: z.ZodOptional<z.ZodString>;
+        media_type: z.ZodOptional<z.ZodNumber>;
+        taken_at: z.ZodOptional<z.ZodNumber>;
+        like_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        comment_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        caption: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+            text: z.ZodOptional<z.ZodString>;
+        }, z.core.$loose>>>;
+        user: z.ZodOptional<z.ZodObject<{
+            pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+            username: z.ZodOptional<z.ZodString>;
+            full_name: z.ZodOptional<z.ZodString>;
+            is_private: z.ZodOptional<z.ZodBoolean>;
+            is_verified: z.ZodOptional<z.ZodBoolean>;
+            profile_pic_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+            follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            biography: z.ZodOptional<z.ZodString>;
+        }, z.core.$loose>>;
+        image_versions2: z.ZodOptional<z.ZodObject<{
+            candidates: z.ZodOptional<z.ZodArray<z.ZodObject<{
+                url: z.ZodOptional<z.ZodString>;
+                width: z.ZodOptional<z.ZodNumber>;
+                height: z.ZodOptional<z.ZodNumber>;
+            }, z.core.$loose>>>;
+        }, z.core.$loose>>;
+        video_versions: z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodObject<{
+            url: z.ZodOptional<z.ZodString>;
+            width: z.ZodOptional<z.ZodNumber>;
+            height: z.ZodOptional<z.ZodNumber>;
+        }, z.core.$loose>>>>;
+    }, z.core.$loose>>>;
+    seen: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    expiring_at: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    latest_reel_media: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+}, z.core.$loose>;
+
+// @public (undocumented)
 export interface RegistrationTokenOptions {
     // (undocumented)
     readonly appId: string;
@@ -1026,6 +1093,14 @@ export function signUsdid(identity: UsdidIdentity, message: string): Buffer;
 export function startChallenge(client: PrivateClient, error: ChallengeRequiredError): Promise<Challenge>;
 
 // @public
+export interface StoryApi {
+    // (undocumented)
+    tray(): Promise<Reel[]>;
+    // (undocumented)
+    user(pk: string): Promise<Media[]>;
+}
+
+// @public
 export function submitChallengeCode(client: PrivateClient, challenge: Challenge, code: string): Promise<PrivateResponseJson>;
 
 // @public (undocumented)
@@ -1098,11 +1173,16 @@ export interface UploadApi {
     // (undocumented)
     photo(jpeg: Uint8Array, options?: PhotoUploadOptions): Promise<Media>;
     // (undocumented)
+    story(jpeg: Uint8Array): Promise<Media>;
+    // (undocumented)
     video(mp4: Uint8Array, coverJpeg: Uint8Array, options?: VideoUploadOptions): Promise<Media>;
 }
 
 // @public
 export function uploadPhoto(client: PrivateClient, jpeg: Uint8Array, options?: PhotoUploadOptions): Promise<Media>;
+
+// @public
+export function uploadStoryPhoto(client: PrivateClient, jpeg: Uint8Array): Promise<Media>;
 
 // @public
 export function uploadVideo(client: PrivateClient, mp4: Uint8Array, coverJpeg: Uint8Array, options?: VideoUploadOptions): Promise<Media>;
