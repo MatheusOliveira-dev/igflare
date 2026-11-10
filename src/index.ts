@@ -82,9 +82,20 @@ export { getCurrentUser } from './endpoints/user/current-user';
 export { getUserInfo, getUserInfoByUsername } from './endpoints/user/user-info';
 export { userSchema } from './schemas/user';
 export type { User } from './schemas/user';
-export { followUser, unfollowUser, getFriendshipStatus } from './endpoints/friendship/friendship';
+export {
+  followUser,
+  unfollowUser,
+  getFriendshipStatus,
+  getFollowers,
+  getFollowing,
+  paginateFollowers,
+  paginateFollowing,
+} from './endpoints/friendship/friendship';
+export type { FollowListOptions } from './endpoints/friendship/friendship';
 export { friendshipStatusSchema } from './schemas/friendship';
 export type { FriendshipStatus } from './schemas/friendship';
+export { paginate } from './core/pagination';
+export type { Page } from './core/pagination';
 export { twoFactorLogin } from './endpoints/auth/two-factor';
 export type { TwoFactorOptions } from './endpoints/auth/two-factor';
 export {

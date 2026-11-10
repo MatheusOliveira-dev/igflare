@@ -16,6 +16,16 @@
     { "name": "bloksAsyncAction", "method": "POST", "path": "/api/v1/bloks/async_action/" },
     { "name": "feedTimeline", "method": "POST", "path": "/api/v1/feed/timeline/" },
     { "name": "friendshipsCreate", "method": "POST", "path": "/api/v1/friendships/create/{pk}/" },
+    {
+      "name": "friendshipsFollowers",
+      "method": "GET",
+      "path": "/api/v1/friendships/{pk}/followers/"
+    },
+    {
+      "name": "friendshipsFollowing",
+      "method": "GET",
+      "path": "/api/v1/friendships/{pk}/following/"
+    },
     { "name": "friendshipsDestroy", "method": "POST", "path": "/api/v1/friendships/destroy/{pk}/" },
     { "name": "friendshipsShow", "method": "GET", "path": "/api/v1/friendships/show/{pk}/" },
     { "name": "launcherSync", "method": "POST", "path": "/api/v1/launcher/sync/" },
