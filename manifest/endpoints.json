@@ -8,6 +8,7 @@
       "path": "/api/v1/accounts/two_factor_login/"
     },
     { "name": "accountsCurrentUser", "method": "GET", "path": "/api/v1/accounts/current_user/" },
+    { "name": "accountsSetBiography", "method": "POST", "path": "/api/v1/accounts/set_biography/" },
     {
       "name": "attestationCreateAndroidKeystore",
       "method": "POST",
@@ -22,6 +23,7 @@
     },
     { "name": "directThread", "method": "GET", "path": "/api/v1/direct_v2/threads/{thread_id}/" },
     { "name": "feedReelsTray", "method": "POST", "path": "/api/v1/feed/reels_tray/" },
+    { "name": "feedSaved", "method": "GET", "path": "/api/v1/feed/saved/posts/" },
     { "name": "feedTimeline", "method": "POST", "path": "/api/v1/feed/timeline/" },
     { "name": "feedUser", "method": "GET", "path": "/api/v1/feed/user/{pk}/" },
     { "name": "feedUserStory", "method": "GET", "path": "/api/v1/feed/user/{pk}/story/" },
@@ -65,6 +67,8 @@
     { "name": "mediaComment", "method": "POST", "path": "/api/v1/media/{id}/comment/" },
     { "name": "mediaComments", "method": "GET", "path": "/api/v1/media/{id}/comments/" },
     { "name": "mediaLikers", "method": "GET", "path": "/api/v1/media/{id}/likers/" },
+    { "name": "mediaSave", "method": "POST", "path": "/api/v1/media/{id}/save/" },
+    { "name": "mediaUnsave", "method": "POST", "path": "/api/v1/media/{id}/unsave/" },
     { "name": "mediaConfigure", "method": "POST", "path": "/api/v1/media/configure/" },
     {
       "name": "mediaConfigureToStory",

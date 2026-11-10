@@ -49,7 +49,12 @@ import {
   getComments,
   paginateComments,
   getLikers,
+  saveMedia,
+  unsaveMedia,
+  getSavedPosts,
+  paginateSavedPosts,
 } from '../endpoints/media/media';
+import { setBiography } from '../endpoints/account/account';
 import type { CommentListOptions } from '../endpoints/media/media';
 import { searchUsers, searchHashtags, searchPlaces } from '../endpoints/search/search';
 import { uploadPhoto, uploadVideo, uploadStoryPhoto } from '../endpoints/upload/upload';
@@ -76,6 +81,8 @@ import type { Reel } from '../schemas/reel';
 export interface AccountApi {
   /** The current account's own profile; also the simplest check that auth is accepted. */
   me(): Promise<Record<string, unknown>>;
+  /** Sets the account's biography, returning the updated profile. */
+  setBiography(text: string): Promise<User>;
 }
 
 /** Reads about any user. */
@@ -142,6 +149,10 @@ export interface MediaApi {
   comments(mediaId: string, options?: CommentListOptions): Promise<Page<Comment>>;
   paginateComments(mediaId: string): AsyncGenerator<Comment>;
   likers(mediaId: string): Promise<User[]>;
+  save(mediaId: string): Promise<void>;
+  unsave(mediaId: string): Promise<void>;
+  saved(options?: CommentListOptions): Promise<Page<Media>>;
+  paginateSaved(): AsyncGenerator<Media>;
 }
 
 /** Publishing media. */
@@ -234,6 +245,7 @@ export class IgFlare {
     const client = this.#client;
     return {
       me: () => getCurrentUser(client),
+      setBiography: (text) => setBiography(client, text),
     };
   }
 
@@ -292,6 +304,10 @@ export class IgFlare {
       comments: (mediaId, options) => getComments(client, mediaId, options),
       paginateComments: (mediaId) => paginateComments(client, mediaId),
       likers: (mediaId) => getLikers(client, mediaId),
+      save: (mediaId) => saveMedia(client, mediaId),
+      unsave: (mediaId) => unsaveMedia(client, mediaId),
+      saved: (options) => getSavedPosts(client, options),
+      paginateSaved: () => paginateSavedPosts(client),
     };
   }
 

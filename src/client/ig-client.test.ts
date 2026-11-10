@@ -283,6 +283,23 @@ describe('IgFlare facade', () => {
     expect((await ig.upload.story(jpeg)).code).toBe('st');
   });
 
+  it('delegates profile bio and saved posts', async () => {
+    const { ig, transport } = clientWith((req) => {
+      if (req.url.includes('/set_biography/'))
+        return json({ status: 'ok', user: { pk: 1, username: 'me', biography: 'hi' } });
+      if (req.url.includes('/feed/saved/'))
+        return json({ status: 'ok', items: [{ media: { pk: 2, code: 's' } }] });
+      return json({ status: 'ok' }); // save/unsave
+    });
+
+    expect((await ig.account.setBiography('hi')).biography).toBe('hi');
+    await ig.media.save('1_9');
+    await ig.media.unsave('1_9');
+    expect((await ig.media.saved()).items[0]?.code).toBe('s');
+    for await (const m of ig.media.paginateSaved()) expect(m.code).toBe('s');
+    expect(transport.requests.some((r) => r.url.includes('/media/1_9/save/'))).toBe(true);
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();

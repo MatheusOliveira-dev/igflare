@@ -9,6 +9,9 @@ import {
   getComments,
   getLikers,
   paginateComments,
+  saveMedia,
+  unsaveMedia,
+  getSavedPosts,
 } from './media';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
@@ -160,5 +163,32 @@ describe('comment iterator', () => {
       texts.push(comment.text);
     }
     expect(texts).toEqual(['a', 'b']);
+  });
+});
+
+describe('saved', () => {
+  it('saves and unsaves a media', async () => {
+    const a = clientReturning({ status: 'ok' });
+    await saveMedia(a.client, '1_9');
+    expect(a.transport.requests[0]?.url).toContain('/api/v1/media/1_9/save/');
+
+    const b = clientReturning({ status: 'ok' });
+    await unsaveMedia(b.client, '1_9');
+    expect(b.transport.requests[0]?.url).toContain('/api/v1/media/1_9/unsave/');
+  });
+
+  it('lists saved posts, unwrapping each item media', async () => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      items: [{ media: { pk: 1, code: 'a' } }],
+      next_max_id: 's2',
+      more_available: true,
+    });
+
+    const page = await getSavedPosts(client);
+
+    expect(transport.requests[0]?.url).toContain('/api/v1/feed/saved/posts/');
+    expect(page.items[0]?.code).toBe('a');
+    expect(page.nextCursor).toBe('s2');
   });
 });

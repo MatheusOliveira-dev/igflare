@@ -97,7 +97,12 @@ export {
   getComments,
   paginateComments,
   getLikers,
+  saveMedia,
+  unsaveMedia,
+  getSavedPosts,
+  paginateSavedPosts,
 } from './endpoints/media/media';
+export { setBiography } from './endpoints/account/account';
 export type { CommentListOptions } from './endpoints/media/media';
 export { uploadPhoto, uploadVideo, uploadStoryPhoto } from './endpoints/upload/upload';
 export { getReelsTray, getUserStories } from './endpoints/story/story';

@@ -154,3 +154,57 @@ export async function getLikers(client: PrivateClient, mediaId: string): Promise
   });
   return parseSchemaList<User>(json['users'], userSchema, 'user');
 }
+
+/** Saves a media to the account's saved collection. */
+export async function saveMedia(client: PrivateClient, mediaId: string): Promise<void> {
+  await client.request({
+    method: endpoints.mediaSave.method,
+    endpoint: endpoints.mediaSave.path.replace('{id}', mediaId),
+    payload: mediaActionPayload(client),
+  });
+}
+
+/** Removes a media from the account's saved collection. */
+export async function unsaveMedia(client: PrivateClient, mediaId: string): Promise<void> {
+  await client.request({
+    method: endpoints.mediaUnsave.method,
+    endpoint: endpoints.mediaUnsave.path.replace('{id}', mediaId),
+    payload: mediaActionPayload(client),
+  });
+}
+
+/** One page of the account's saved posts. Pass `cursor` (a max_id) to continue. */
+export async function getSavedPosts(
+  client: PrivateClient,
+  options: CommentListOptions = {},
+): Promise<Page<Media>> {
+  const json = await client.request({
+    method: endpoints.feedSaved.method,
+    endpoint: endpoints.feedSaved.path,
+    ...(options.cursor !== undefined ? { query: { max_id: options.cursor } } : {}),
+  });
+  const items = json['items'];
+  if (!Array.isArray(items)) {
+    throw new ClientSchemaError('saved feed response did not include an items array', json);
+  }
+  const medias = parseSchemaList<Media>(
+    items.map((entry) =>
+      typeof entry === 'object' && entry !== null
+        ? (entry as Record<string, unknown>)['media']
+        : undefined,
+    ),
+    mediaSchema,
+    'saved media',
+  );
+  const next = json['next_max_id'];
+  const nextCursor =
+    typeof next === 'string' || typeof next === 'number' ? String(next) : undefined;
+  return nextCursor !== undefined && json['more_available'] !== false
+    ? { items: medias, nextCursor }
+    : { items: medias };
+}
+
+/** Walks the account's saved posts, yielding one at a time across pages. */
+export function paginateSavedPosts(client: PrivateClient): AsyncGenerator<Media> {
+  return paginate((cursor) => getSavedPosts(client, cursor !== undefined ? { cursor } : {}));
+}
