@@ -16,6 +16,9 @@ export interface AccountApi {
 export class AccountSuspendedError extends IgApiError {
 }
 
+// @public
+export function addThreadUsers(client: PrivateClient, threadId: string, userIds: readonly string[]): Promise<void>;
+
 // @public (undocumented)
 export const API_DOMAIN = "i.instagram.com";
 
@@ -35,6 +38,9 @@ export function applyResponseToSession(session: SessionData, response: HttpRespo
 
 // @public
 export function approveRequest(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
+
+// @public
+export function approveThread(client: PrivateClient, threadId: string): Promise<void>;
 
 // @public
 export const ATTESTATION_KEYSTORE_ERROR = -1013;
@@ -218,6 +224,9 @@ export const commentSchema: z.ZodObject<{
 // @public
 export function createDeviceState(overrides?: Partial<DeviceState>): DeviceState;
 
+// @public
+export function createGroupThread(client: PrivateClient, userIds: readonly string[], title?: string): Promise<string>;
+
 // @public (undocumented)
 export function createSession(options?: CreateSessionOptions): SessionData;
 
@@ -252,6 +261,9 @@ export function deleteComment(client: PrivateClient, mediaId: string, commentId:
 
 // @public
 export function deleteMedia(client: PrivateClient, mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL' | 'STORY'): Promise<void>;
+
+// @public
+export function deleteMessage(client: PrivateClient, threadId: string, itemId: string): Promise<void>;
 
 // @public
 export function denyRequest(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
@@ -309,15 +321,45 @@ export interface DeviceState {
 // @public
 export interface DirectApi {
     // (undocumented)
+    addUsers(threadId: string, userIds: readonly string[]): Promise<void>;
+    // (undocumented)
+    approve(threadId: string): Promise<void>;
+    // (undocumented)
+    createGroup(userIds: readonly string[], title?: string): Promise<string>;
+    // (undocumented)
+    deleteMessage(threadId: string, itemId: string): Promise<void>;
+    // (undocumented)
+    findThread(userIds: readonly string[]): Promise<Thread | undefined>;
+    // (undocumented)
+    hide(threadId: string, options?: HideThreadOptions): Promise<void>;
+    // (undocumented)
     inbox(options?: CursorOptions): Promise<Page<Thread>>;
+    // (undocumented)
+    markSeen(threadId: string, itemId: string): Promise<void>;
+    // (undocumented)
+    mute(threadId: string): Promise<void>;
     // (undocumented)
     paginateInbox(): AsyncGenerator<Thread>;
     // (undocumented)
+    paginatePending(): AsyncGenerator<Thread>;
+    // (undocumented)
+    paginateSpam(): AsyncGenerator<Thread>;
+    // (undocumented)
     paginateThread(threadId: string): AsyncGenerator<DirectMessage>;
+    // (undocumented)
+    pending(options?: CursorOptions): Promise<Page<Thread>>;
+    // (undocumented)
+    searchRecipients(query: string, mode?: RecipientSearchMode): Promise<User[]>;
     // (undocumented)
     sendText(text: string, target: SendTarget): Promise<DirectSendResult>;
     // (undocumented)
+    setTitle(threadId: string, title: string): Promise<void>;
+    // (undocumented)
+    spam(options?: CursorOptions): Promise<Page<Thread>>;
+    // (undocumented)
     thread(threadId: string, options?: CursorOptions): Promise<Page<DirectMessage>>;
+    // (undocumented)
+    unmute(threadId: string): Promise<void>;
 }
 
 // @public (undocumented)
@@ -364,7 +406,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -427,6 +469,9 @@ export class FileSessionStore implements SessionStore {
     // (undocumented)
     save(data: SessionData): Promise<void>;
 }
+
+// @public
+export function findThreadByParticipants(client: PrivateClient, userIds: readonly string[]): Promise<Thread | undefined>;
 
 // @public (undocumented)
 export interface FollowListOptions {
@@ -540,6 +585,9 @@ export function getLocationFeed(client: PrivateClient, locationId: string, optio
 export function getMediaInfo(client: PrivateClient, mediaId: string): Promise<Media>;
 
 // @public
+export function getPendingInbox(client: PrivateClient, options?: CursorOptions): Promise<Page<Thread>>;
+
+// @public
 export function getPendingRequests(client: PrivateClient, options?: FollowListOptions): Promise<Page<User>>;
 
 // @public
@@ -547,6 +595,9 @@ export function getReelsTray(client: PrivateClient): Promise<Reel[]>;
 
 // @public
 export function getSavedPosts(client: PrivateClient, options?: CommentListOptions): Promise<Page<Media>>;
+
+// @public
+export function getSpamInbox(client: PrivateClient, options?: CursorOptions): Promise<Page<Thread>>;
 
 // @public
 export function getThread(client: PrivateClient, threadId: string, options?: CursorOptions): Promise<Page<DirectMessage>>;
@@ -576,6 +627,14 @@ export const hashtagSchema: z.ZodObject<{
     media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     search_result_subtitle: z.ZodOptional<z.ZodString>;
 }, z.core.$loose>;
+
+// @public
+export function hideThread(client: PrivateClient, threadId: string, options?: HideThreadOptions): Promise<void>;
+
+// @public (undocumented)
+export interface HideThreadOptions {
+    readonly moveToSpam?: boolean;
+}
 
 // @public (undocumented)
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -727,6 +786,9 @@ export interface LoginCredentials {
 export class LoginRequiredError extends IgApiError {
 }
 
+// @public
+export function markMessageSeen(client: PrivateClient, threadId: string, itemId: string): Promise<void>;
+
 // @public (undocumented)
 export type Media = z.infer<typeof mediaSchema>;
 
@@ -816,6 +878,9 @@ export interface MuteOptions {
 }
 
 // @public
+export function muteThread(client: PrivateClient, threadId: string): Promise<void>;
+
+// @public
 export function muteUser(client: PrivateClient, pk: string, options?: MuteOptions): Promise<void>;
 
 // @public
@@ -848,10 +913,16 @@ export function paginateInbox(client: PrivateClient): AsyncGenerator<Thread>;
 export function paginateLocationFeed(client: PrivateClient, locationId: string): AsyncGenerator<Media>;
 
 // @public
+export function paginatePendingInbox(client: PrivateClient): AsyncGenerator<Thread>;
+
+// @public
 export function paginatePendingRequests(client: PrivateClient): AsyncGenerator<User>;
 
 // @public
 export function paginateSavedPosts(client: PrivateClient): AsyncGenerator<Media>;
+
+// @public
+export function paginateSpamInbox(client: PrivateClient): AsyncGenerator<Thread>;
 
 // @public
 export function paginateThread(client: PrivateClient, threadId: string): AsyncGenerator<DirectMessage>;
@@ -976,6 +1047,9 @@ export class RateLimitError extends IgApiError {
 }
 
 // @public (undocumented)
+export type RecipientSearchMode = 'universal' | 'raven';
+
+// @public (undocumented)
 export type Reel = z.infer<typeof reelSchema>;
 
 // @public
@@ -1086,6 +1160,9 @@ export function searchHashtags(client: PrivateClient, query: string): Promise<Ha
 export function searchPlaces(client: PrivateClient, query: string): Promise<Location[]>;
 
 // @public
+export function searchRecipients(client: PrivateClient, query: string, mode?: RecipientSearchMode): Promise<User[]>;
+
+// @public
 export function searchUsers(client: PrivateClient, query: string): Promise<User[]>;
 
 // @public
@@ -1129,6 +1206,9 @@ export interface SessionStore {
 
 // @public
 export function setBiography(client: PrivateClient, text: string): Promise<User>;
+
+// @public
+export function setThreadTitle(client: PrivateClient, threadId: string, title: string): Promise<void>;
 
 // @public
 export interface Signer {
@@ -1230,6 +1310,9 @@ export function unfollowUser(client: PrivateClient, pk: string): Promise<Friends
 
 // @public
 export function unlikeMedia(client: PrivateClient, mediaId: string): Promise<void>;
+
+// @public
+export function unmuteThread(client: PrivateClient, threadId: string): Promise<void>;
 
 // @public
 export function unmuteUser(client: PrivateClient, pk: string, options?: MuteOptions): Promise<void>;
