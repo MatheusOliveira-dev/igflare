@@ -17,6 +17,9 @@ export class AccountSuspendedError extends IgApiError {
 }
 
 // @public
+export function addCloseFriend(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
+
+// @public
 export function addThreadUsers(client: PrivateClient, threadId: string, userIds: readonly string[]): Promise<void>;
 
 // @public (undocumented)
@@ -226,6 +229,7 @@ export const commentSchema: z.ZodObject<{
         following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
         media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
         biography: z.ZodOptional<z.ZodString>;
+        external_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     }, z.core.$loose>>;
 }, z.core.$loose>;
 
@@ -435,7 +439,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastReaction' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastReaction' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsRemoveFollower' | 'friendshipsSetBesties' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaSeenV2' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -513,6 +517,8 @@ export function followUser(client: PrivateClient, pk: string): Promise<Friendshi
 // @public
 export interface FriendshipApi {
     // (undocumented)
+    addCloseFriend(pk: string): Promise<FriendshipStatus>;
+    // (undocumented)
     approve(pk: string): Promise<FriendshipStatus>;
     // (undocumented)
     block(pk: string): Promise<FriendshipStatus>;
@@ -534,6 +540,10 @@ export interface FriendshipApi {
     paginatePending(): AsyncGenerator<User>;
     // (undocumented)
     pending(options?: FollowListOptions): Promise<Page<User>>;
+    // (undocumented)
+    removeCloseFriend(pk: string): Promise<FriendshipStatus>;
+    // (undocumented)
+    removeFollower(pk: string): Promise<FriendshipStatus>;
     // (undocumented)
     status(pk: string): Promise<FriendshipStatus>;
     // (undocumented)
@@ -828,6 +838,9 @@ export class LoginRequiredError extends IgApiError {
 // @public
 export function markMessageSeen(client: PrivateClient, threadId: string, itemId: string): Promise<void>;
 
+// @public
+export function markStoriesSeen(client: PrivateClient, storyIds: readonly string[]): Promise<void>;
+
 // @public (undocumented)
 export type Media = z.infer<typeof mediaSchema>;
 
@@ -908,6 +921,7 @@ export const mediaSchema: z.ZodObject<{
         following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
         media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
         biography: z.ZodOptional<z.ZodString>;
+        external_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     }, z.core.$loose>>;
     image_versions2: z.ZodOptional<z.ZodObject<{
         candidates: z.ZodOptional<z.ZodArray<z.ZodObject<{
@@ -1147,6 +1161,7 @@ export const reelSchema: z.ZodObject<{
         following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
         media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
         biography: z.ZodOptional<z.ZodString>;
+        external_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     }, z.core.$loose>>;
     items: z.ZodOptional<z.ZodArray<z.ZodObject<{
         pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
@@ -1170,6 +1185,7 @@ export const reelSchema: z.ZodObject<{
             following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
             media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
             biography: z.ZodOptional<z.ZodString>;
+            external_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         }, z.core.$loose>>;
         image_versions2: z.ZodOptional<z.ZodObject<{
             candidates: z.ZodOptional<z.ZodArray<z.ZodObject<{
@@ -1198,6 +1214,12 @@ export interface RegistrationTokenOptions {
     // (undocumented)
     readonly ttl?: number;
 }
+
+// @public
+export function removeCloseFriend(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
+
+// @public
+export function removeFollower(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
 
 // @public (undocumented)
 export interface ReplyListOptions {
@@ -1327,6 +1349,7 @@ export function startChallenge(client: PrivateClient, error: ChallengeRequiredEr
 
 // @public
 export interface StoryApi {
+    markSeen(storyIds: readonly string[]): Promise<void>;
     // (undocumented)
     tray(): Promise<Reel[]>;
     // (undocumented)
@@ -1356,6 +1379,7 @@ export const threadSchema: z.ZodObject<{
         following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
         media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
         biography: z.ZodOptional<z.ZodString>;
+        external_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     }, z.core.$loose>>>;
     items: z.ZodOptional<z.ZodArray<z.ZodObject<{
         item_id: z.ZodOptional<z.ZodString>;
@@ -1498,6 +1522,7 @@ export const userSchema: z.ZodObject<{
     following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     biography: z.ZodOptional<z.ZodString>;
+    external_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
 }, z.core.$loose>;
 
 // @public (undocumented)
