@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { generateKeyPairSync } from 'node:crypto';
-import { IgClient } from './ig-client';
+import { IgFlare } from './ig-client';
 import { FakeTransport } from '../core/transport/adapters/fake';
 import type { HttpRequest, HttpResponse } from '../core/transport/http-transport';
 import { MemorySessionStore } from '../core/session/adapters/memory';
@@ -12,14 +12,14 @@ function json(body: unknown): HttpResponse {
 }
 
 function clientWith(handler: (req: HttpRequest) => HttpResponse): {
-  ig: IgClient;
+  ig: IgFlare;
   transport: FakeTransport;
 } {
   const transport = new FakeTransport(handler);
-  return { ig: new IgClient({ transport, session: createSession() }), transport };
+  return { ig: new IgFlare({ transport, session: createSession() }), transport };
 }
 
-describe('IgClient facade', () => {
+describe('IgFlare facade', () => {
   it('delegates user reads to the user endpoints', async () => {
     const { ig, transport } = clientWith(() =>
       json({ status: 'ok', user: { pk: 7, username: 'x' } }),
@@ -123,7 +123,7 @@ describe('IgClient facade', () => {
         ? { status: 429, headers: {}, body: '{}' }
         : { status: 200, headers: {}, body: JSON.stringify({ user: { pk: 1, username: 'a' } }) };
     });
-    const ig = new IgClient({
+    const ig = new IgFlare({
       transport,
       session: createSession(),
       retry: { sleep: () => Promise.resolve() },
@@ -136,7 +136,7 @@ describe('IgClient facade', () => {
 
   it('does not retry when retry is false', async () => {
     const transport = new FakeTransport(() => ({ status: 429, headers: {}, body: '{}' }));
-    const ig = new IgClient({ transport, session: createSession(), retry: false });
+    const ig = new IgFlare({ transport, session: createSession(), retry: false });
     await expect(ig.user.info('1')).rejects.toBeInstanceOf(IgApiError);
   });
 
@@ -241,7 +241,7 @@ describe('IgClient facade', () => {
       }
       return json({ status: 'ok' });
     });
-    const ig = new IgClient({
+    const ig = new IgFlare({
       transport,
       store: new MemorySessionStore(),
       session: createSession(),

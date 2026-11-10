@@ -107,8 +107,8 @@ export interface UploadApi {
   video(mp4: Uint8Array, coverJpeg: Uint8Array, options?: VideoUploadOptions): Promise<Media>;
 }
 
-/** Construction options for {@link IgClient}. */
-export interface IgClientOptions extends PrivateClientOptions {
+/** Construction options for {@link IgFlare}. */
+export interface IgFlareOptions extends PrivateClientOptions {
   /**
    * Retry policy. By default the transport is wrapped in a `RetryTransport` with
    * conservative backoff; pass tuning here, or `false` to disable retries (e.g.
@@ -125,7 +125,7 @@ export interface IgClientOptions extends PrivateClientOptions {
  *
  * The class name is provisional; the public brand is settled before publishing.
  */
-export class IgClient {
+export class IgFlare {
   readonly #client: PrivateClient;
   readonly account: AccountApi;
   readonly user: UserApi;
@@ -135,7 +135,7 @@ export class IgClient {
   readonly direct: DirectApi;
   readonly upload: UploadApi;
 
-  constructor(options: IgClientOptions = {}) {
+  constructor(options: IgFlareOptions = {}) {
     const { retry, ...clientOptions } = options;
     const base = clientOptions.transport ?? new HttpsTransport();
     const transport = retry === false ? base : new RetryTransport(base, retry);
@@ -152,13 +152,13 @@ export class IgClient {
   /** Builds a client from a saved session in the given store. */
   static async fromStore(
     store: SessionStore,
-    options: Omit<IgClientOptions, 'store' | 'session'> = {},
-  ): Promise<IgClient> {
+    options: Omit<IgFlareOptions, 'store' | 'session'> = {},
+  ): Promise<IgFlare> {
     const client = await PrivateClient.fromStore(
       store,
       options.transport !== undefined ? { transport: options.transport } : {},
     );
-    return new IgClient({ session: client.session, store, ...options });
+    return new IgFlare({ session: client.session, store, ...options });
   }
 
   /** Logs in with username and password through the CAA/Bloks flow. */

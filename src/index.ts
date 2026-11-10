@@ -74,9 +74,9 @@ export type { PrivateRequestInput, BodyEncoding } from './core/http/request-buil
 export { applyResponseToSession } from './core/http/session-update';
 export { PrivateClient } from './core/http/private-client';
 export type { PrivateClientOptions, PrivateRequestOptions } from './core/http/private-client';
-export { IgClient } from './client/ig-client';
+export { IgFlare } from './client/ig-client';
 export type {
-  IgClientOptions,
+  IgFlareOptions,
   AccountApi,
   UserApi,
   FriendshipApi,

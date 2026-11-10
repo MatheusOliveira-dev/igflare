@@ -1,5 +1,5 @@
 {
-  "name": "instagram-sdk",
+  "name": "igflare",
   "version": "0.0.0",
   "description": "TypeScript client for the Instagram mobile private API",
   "type": "module",
