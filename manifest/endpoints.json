@@ -15,6 +15,7 @@
     },
     { "name": "bloksAsyncAction", "method": "POST", "path": "/api/v1/bloks/async_action/" },
     { "name": "feedTimeline", "method": "POST", "path": "/api/v1/feed/timeline/" },
+    { "name": "feedUser", "method": "GET", "path": "/api/v1/feed/user/{pk}/" },
     { "name": "friendshipsCreate", "method": "POST", "path": "/api/v1/friendships/create/{pk}/" },
     {
       "name": "friendshipsFollowers",

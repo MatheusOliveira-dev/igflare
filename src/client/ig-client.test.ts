@@ -73,6 +73,24 @@ describe('IgClient facade', () => {
     expect(names).toEqual(['a', 'b']);
   });
 
+  it('delegates the user feed and its iterator', async () => {
+    let call = 0;
+    const { ig } = clientWith(() => {
+      call += 1;
+      return json(
+        call === 1
+          ? { status: 'ok', items: [{ pk: 1 }], next_max_id: 'p2' }
+          : { status: 'ok', items: [{ pk: 2 }] },
+      );
+    });
+
+    const ids: (string | undefined)[] = [];
+    for await (const media of ig.feed.paginateUser('42')) {
+      ids.push(media.pk);
+    }
+    expect(ids).toEqual(['1', '2']);
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();

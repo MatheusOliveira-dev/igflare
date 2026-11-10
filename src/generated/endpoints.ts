@@ -6,7 +6,7 @@ export interface EndpointDefinition {
   readonly path: string;
 }
 
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'userInfo' | 'userInfoByUsername';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'userInfo' | 'userInfoByUsername';
 
 export const endpoints: Record<EndpointName, EndpointDefinition> = {
   accountsCurrentUser: { method: 'GET', path: '/api/v1/accounts/current_user/' },
@@ -15,6 +15,7 @@ export const endpoints: Record<EndpointName, EndpointDefinition> = {
   attestationCreateAndroidKeystore: { method: 'POST', path: '/api/v1/attestation/create_android_keystore/' },
   bloksAsyncAction: { method: 'POST', path: '/api/v1/bloks/async_action/' },
   feedTimeline: { method: 'POST', path: '/api/v1/feed/timeline/' },
+  feedUser: { method: 'GET', path: '/api/v1/feed/user/{pk}/' },
   friendshipsCreate: { method: 'POST', path: '/api/v1/friendships/create/{pk}/' },
   friendshipsDestroy: { method: 'POST', path: '/api/v1/friendships/destroy/{pk}/' },
   friendshipsFollowers: { method: 'GET', path: '/api/v1/friendships/{pk}/followers/' },
