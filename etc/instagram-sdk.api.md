@@ -313,7 +313,11 @@ export class FakeTransport implements HttpTransport {
 // @public
 export interface FeedApi {
     // (undocumented)
+    paginateTimeline(): AsyncGenerator<Media>;
+    // (undocumented)
     paginateUser(pk: string): AsyncGenerator<Media>;
+    // (undocumented)
+    timeline(options?: FeedOptions): Promise<Page<Media>>;
     // (undocumented)
     user(pk: string, options?: FeedOptions): Promise<Page<Media>>;
 }
@@ -421,6 +425,9 @@ export function getFriendshipStatus(client: PrivateClient, pk: string): Promise<
 
 // @public
 export function getMediaInfo(client: PrivateClient, mediaId: string): Promise<Media>;
+
+// @public
+export function getTimelineFeed(client: PrivateClient, options?: FeedOptions): Promise<Page<Media>>;
 
 // @public
 export function getUserFeed(client: PrivateClient, pk: string, options?: FeedOptions): Promise<Page<Media>>;
@@ -623,6 +630,9 @@ export function paginateFollowers(client: PrivateClient, pk: string): AsyncGener
 
 // @public
 export function paginateFollowing(client: PrivateClient, pk: string): AsyncGenerator<User>;
+
+// @public
+export function paginateTimeline(client: PrivateClient): AsyncGenerator<Media>;
 
 // @public
 export function paginateUserFeed(client: PrivateClient, pk: string): AsyncGenerator<Media>;
