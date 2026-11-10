@@ -477,7 +477,7 @@ export class IgApiError extends IgResponseError {
 
 // @public
 export class IgClient {
-    constructor(options?: PrivateClientOptions);
+    constructor(options?: IgClientOptions);
     // (undocumented)
     readonly account: AccountApi;
     get client(): PrivateClient;
@@ -485,15 +485,18 @@ export class IgClient {
     readonly feed: FeedApi;
     // (undocumented)
     readonly friendship: FriendshipApi;
-    static fromStore(store: SessionStore, options?: {
-        readonly transport?: HttpTransport;
-    }): Promise<IgClient>;
+    static fromStore(store: SessionStore, options?: Omit<IgClientOptions, 'store' | 'session'>): Promise<IgClient>;
     login(credentials: CaaLoginCredentials): Promise<PrivateResponseJson>;
     // (undocumented)
     readonly media: MediaApi;
     get session(): SessionData;
     // (undocumented)
     readonly user: UserApi;
+}
+
+// @public
+export interface IgClientOptions extends PrivateClientOptions {
+    readonly retry?: false | RetryOptions;
 }
 
 // @public
@@ -731,6 +734,22 @@ export interface RegistrationTokenOptions {
     readonly now?: number;
     // (undocumented)
     readonly ttl?: number;
+}
+
+// @public
+export interface RetryOptions {
+    readonly baseDelayMs?: number;
+    readonly maxDelayMs?: number;
+    readonly maxRetries?: number;
+    readonly random?: () => number;
+    readonly sleep?: (ms: number) => Promise<void>;
+}
+
+// @public
+export class RetryTransport implements HttpTransport {
+    constructor(inner: HttpTransport, options?: RetryOptions);
+    // (undocumented)
+    request(req: HttpRequest): Promise<HttpResponse>;
 }
 
 // @public
