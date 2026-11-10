@@ -248,6 +248,26 @@ describe('IgFlare facade', () => {
     expect(texts).toEqual(['c']);
   });
 
+  it('delegates relationship management actions', async () => {
+    const { ig, transport } = clientWith((req) =>
+      req.url.includes('/pending/')
+        ? json({ status: 'ok', users: [{ pk: 1, username: 'a' }] })
+        : json({ status: 'ok', friendship_status: { blocking: true } }),
+    );
+
+    expect((await ig.friendship.block('42')).blocking).toBe(true);
+    await ig.friendship.approve('42');
+    await ig.friendship.mute('42', { stories: true });
+    expect((await ig.friendship.pending()).items[0]?.username).toBe('a');
+
+    for await (const u of ig.friendship.paginatePending()) expect(u.username).toBe('a');
+
+    expect(transport.requests.some((r) => r.url.includes('/friendships/block/42/'))).toBe(true);
+    expect(
+      transport.requests.some((r) => r.url.includes('/mute_posts_or_story_from_follow/')),
+    ).toBe(true);
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();

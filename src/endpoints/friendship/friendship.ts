@@ -4,6 +4,7 @@ import { endpoints } from '../../generated/endpoints';
 import type { EndpointDefinition } from '../../generated/endpoints';
 import { friendshipStatusSchema, type FriendshipStatus } from '../../schemas/friendship';
 import { userSchema, type User } from '../../schemas/user';
+import { parseSchemaList } from '../../schemas/parse-list';
 import { paginate } from '../../core/pagination';
 import type { Page } from '../../core/pagination';
 import { ClientSchemaError } from '../../errors/api-errors';
@@ -134,4 +135,101 @@ export function paginateFollowers(client: PrivateClient, pk: string): AsyncGener
 /** Walks every account a user follows, yielding one at a time across pages. */
 export function paginateFollowing(client: PrivateClient, pk: string): AsyncGenerator<User> {
   return paginate((maxId) => getFollowing(client, pk, maxId !== undefined ? { maxId } : {}));
+}
+
+/** Posts a friendship action by user id and returns the resulting status. */
+async function friendshipAction(
+  client: PrivateClient,
+  definition: EndpointDefinition,
+  pk: string,
+): Promise<FriendshipStatus> {
+  const json = await client.request({
+    method: definition.method,
+    endpoint: definition.path.replace('{pk}', pk),
+    payload: { user_id: pk },
+  });
+  return parseFriendship(json['friendship_status']);
+}
+
+/** Approves a pending follow request from a user. */
+export function approveRequest(client: PrivateClient, pk: string): Promise<FriendshipStatus> {
+  return friendshipAction(client, endpoints.friendshipsApprove, pk);
+}
+
+/** Denies (ignores) a pending follow request from a user. */
+export function denyRequest(client: PrivateClient, pk: string): Promise<FriendshipStatus> {
+  return friendshipAction(client, endpoints.friendshipsIgnore, pk);
+}
+
+/** Blocks a user. */
+export function blockUser(client: PrivateClient, pk: string): Promise<FriendshipStatus> {
+  return friendshipAction(client, endpoints.friendshipsBlock, pk);
+}
+
+/** Unblocks a user. */
+export function unblockUser(client: PrivateClient, pk: string): Promise<FriendshipStatus> {
+  return friendshipAction(client, endpoints.friendshipsUnblock, pk);
+}
+
+/** One page of incoming follow requests. Pass `maxId` to continue. */
+export async function getPendingRequests(
+  client: PrivateClient,
+  options: FollowListOptions = {},
+): Promise<Page<User>> {
+  const json = await client.request({
+    method: endpoints.friendshipsPending.method,
+    endpoint: endpoints.friendshipsPending.path,
+    ...(options.maxId !== undefined ? { query: { max_id: options.maxId } } : {}),
+  });
+  const items = parseSchemaList<User>(json['users'], userSchema, 'user');
+  const next = json['next_max_id'];
+  const nextCursor =
+    typeof next === 'string' || typeof next === 'number' ? String(next) : undefined;
+  return nextCursor !== undefined ? { items, nextCursor } : { items };
+}
+
+/** Walks every incoming follow request, yielding one at a time across pages. */
+export function paginatePendingRequests(client: PrivateClient): AsyncGenerator<User> {
+  return paginate((maxId) => getPendingRequests(client, maxId !== undefined ? { maxId } : {}));
+}
+
+/** Which of a user's content to mute; omit both to mute posts and stories. */
+export interface MuteOptions {
+  readonly posts?: boolean;
+  readonly stories?: boolean;
+}
+
+function muteTargets(pk: string, options: MuteOptions): Record<string, unknown> {
+  const both = options.posts === undefined && options.stories === undefined;
+  return {
+    ...(both || options.posts === true ? { target_posts_author_id: pk } : {}),
+    ...(both || options.stories === true ? { target_reel_author_id: pk } : {}),
+    container_module: 'media_mute_sheet',
+  };
+}
+
+/** Mutes a user's posts and/or stories (both by default). */
+export async function muteUser(
+  client: PrivateClient,
+  pk: string,
+  options: MuteOptions = {},
+): Promise<void> {
+  await client.request({
+    method: endpoints.friendshipsMute.method,
+    endpoint: endpoints.friendshipsMute.path,
+    payload: muteTargets(pk, options),
+  });
+}
+
+/** Unmutes a user's posts and/or stories (both by default). */
+export async function unmuteUser(
+  client: PrivateClient,
+  pk: string,
+  options: MuteOptions = {},
+): Promise<void> {
+  await client.request({
+    method: endpoints.friendshipsUnmute.method,
+    endpoint: endpoints.friendshipsUnmute.path,
+    payload: muteTargets(pk, options),
+  });
 }

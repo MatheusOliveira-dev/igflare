@@ -6,6 +6,13 @@ import {
   getFollowers,
   getFollowing,
   paginateFollowers,
+  approveRequest,
+  denyRequest,
+  blockUser,
+  unblockUser,
+  getPendingRequests,
+  muteUser,
+  unmuteUser,
 } from './friendship';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
@@ -137,5 +144,61 @@ describe('friendship lists', () => {
     const error = await getFollowers(client, '42').catch((caught: unknown) => caught);
 
     expect(error).toBeInstanceOf(ClientSchemaError);
+  });
+});
+
+function mutePayload(body: string | Uint8Array | undefined): Record<string, unknown> {
+  const form = new URLSearchParams(typeof body === 'string' ? body : '');
+  const signed = form.get('signed_body') ?? '';
+  return JSON.parse(signed.slice(signed.indexOf('.') + 1)) as Record<string, unknown>;
+}
+
+describe('relationship management', () => {
+  it.each([
+    ['approve', approveRequest, '/api/v1/friendships/approve/42/'],
+    ['deny', denyRequest, '/api/v1/friendships/ignore/42/'],
+    ['block', blockUser, '/api/v1/friendships/block/42/'],
+    ['unblock', unblockUser, '/api/v1/friendships/unblock/42/'],
+  ])('%s posts to its endpoint and returns the status', async (_name, fn, path) => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      friendship_status: { following: false, blocking: true },
+    });
+    const status = await fn(client, '42');
+    expect(transport.requests[0]?.url).toContain(path);
+    expect(transport.requests[0]?.method).toBe('POST');
+    expect(status.blocking).toBe(true);
+  });
+
+  it('lists pending requests with a cursor', async () => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      users: [{ pk: 1, username: 'a' }],
+      next_max_id: 'p2',
+    });
+    const page = await getPendingRequests(client);
+    expect(transport.requests[0]?.url).toContain('/api/v1/friendships/pending/');
+    expect(page.items[0]?.username).toBe('a');
+    expect(page.nextCursor).toBe('p2');
+  });
+
+  it('mutes posts and stories by default', async () => {
+    const { client, transport } = clientReturning({ status: 'ok' });
+    await muteUser(client, '42');
+    expect(transport.requests[0]?.url).toContain(
+      '/api/v1/friendships/mute_posts_or_story_from_follow/',
+    );
+    const payload = mutePayload(transport.requests[0]?.body);
+    expect(payload['target_posts_author_id']).toBe('42');
+    expect(payload['target_reel_author_id']).toBe('42');
+  });
+
+  it('mutes only stories when asked', async () => {
+    const { client, transport } = clientReturning({ status: 'ok' });
+    await unmuteUser(client, '42', { stories: true });
+    const payload = mutePayload(transport.requests[0]?.body);
+    expect(payload['target_reel_author_id']).toBe('42');
+    expect(payload['target_posts_author_id']).toBeUndefined();
+    expect(transport.requests[0]?.url).toContain('/unmute_posts_or_story_from_follow/');
   });
 });

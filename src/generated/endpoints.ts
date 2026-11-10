@@ -6,7 +6,7 @@ export interface EndpointDefinition {
   readonly path: string;
 }
 
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'fbsearchPlaces' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaUnlike' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'fbsearchPlaces' | 'feedTimeline' | 'feedUser' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaUnlike' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
 
 export const endpoints: Record<EndpointName, EndpointDefinition> = {
   accountsCurrentUser: { method: 'GET', path: '/api/v1/accounts/current_user/' },
@@ -20,11 +20,18 @@ export const endpoints: Record<EndpointName, EndpointDefinition> = {
   fbsearchPlaces: { method: 'GET', path: '/api/v1/fbsearch/places/' },
   feedTimeline: { method: 'POST', path: '/api/v1/feed/timeline/' },
   feedUser: { method: 'GET', path: '/api/v1/feed/user/{pk}/' },
+  friendshipsApprove: { method: 'POST', path: '/api/v1/friendships/approve/{pk}/' },
+  friendshipsBlock: { method: 'POST', path: '/api/v1/friendships/block/{pk}/' },
   friendshipsCreate: { method: 'POST', path: '/api/v1/friendships/create/{pk}/' },
   friendshipsDestroy: { method: 'POST', path: '/api/v1/friendships/destroy/{pk}/' },
   friendshipsFollowers: { method: 'GET', path: '/api/v1/friendships/{pk}/followers/' },
   friendshipsFollowing: { method: 'GET', path: '/api/v1/friendships/{pk}/following/' },
+  friendshipsIgnore: { method: 'POST', path: '/api/v1/friendships/ignore/{pk}/' },
+  friendshipsMute: { method: 'POST', path: '/api/v1/friendships/mute_posts_or_story_from_follow/' },
+  friendshipsPending: { method: 'GET', path: '/api/v1/friendships/pending/' },
   friendshipsShow: { method: 'GET', path: '/api/v1/friendships/show/{pk}/' },
+  friendshipsUnblock: { method: 'POST', path: '/api/v1/friendships/unblock/{pk}/' },
+  friendshipsUnmute: { method: 'POST', path: '/api/v1/friendships/unmute_posts_or_story_from_follow/' },
   launcherSync: { method: 'POST', path: '/api/v1/launcher/sync/' },
   locationsSections: { method: 'POST', path: '/api/v1/locations/{id}/sections/' },
   mediaComment: { method: 'POST', path: '/api/v1/media/{id}/comment/' },

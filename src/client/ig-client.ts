@@ -18,8 +18,16 @@ import {
   getFollowing,
   paginateFollowers,
   paginateFollowing,
+  approveRequest,
+  denyRequest,
+  blockUser,
+  unblockUser,
+  getPendingRequests,
+  paginatePendingRequests,
+  muteUser,
+  unmuteUser,
 } from '../endpoints/friendship/friendship';
-import type { FollowListOptions } from '../endpoints/friendship/friendship';
+import type { FollowListOptions, MuteOptions } from '../endpoints/friendship/friendship';
 import {
   getUserFeed,
   paginateUserFeed,
@@ -83,6 +91,14 @@ export interface FriendshipApi {
   following(pk: string, options?: FollowListOptions): Promise<Page<User>>;
   paginateFollowers(pk: string): AsyncGenerator<User>;
   paginateFollowing(pk: string): AsyncGenerator<User>;
+  pending(options?: FollowListOptions): Promise<Page<User>>;
+  paginatePending(): AsyncGenerator<User>;
+  approve(pk: string): Promise<FriendshipStatus>;
+  deny(pk: string): Promise<FriendshipStatus>;
+  block(pk: string): Promise<FriendshipStatus>;
+  unblock(pk: string): Promise<FriendshipStatus>;
+  mute(pk: string, options?: MuteOptions): Promise<void>;
+  unmute(pk: string, options?: MuteOptions): Promise<void>;
 }
 
 /** Media feeds. */
@@ -228,6 +244,14 @@ export class IgFlare {
       following: (pk, options) => getFollowing(client, pk, options),
       paginateFollowers: (pk) => paginateFollowers(client, pk),
       paginateFollowing: (pk) => paginateFollowing(client, pk),
+      pending: (options) => getPendingRequests(client, options),
+      paginatePending: () => paginatePendingRequests(client),
+      approve: (pk) => approveRequest(client, pk),
+      deny: (pk) => denyRequest(client, pk),
+      block: (pk) => blockUser(client, pk),
+      unblock: (pk) => unblockUser(client, pk),
+      mute: (pk, options) => muteUser(client, pk, options),
+      unmute: (pk, options) => unmuteUser(client, pk, options),
     };
   }
 

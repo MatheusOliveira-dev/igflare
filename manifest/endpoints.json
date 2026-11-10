@@ -24,7 +24,22 @@
     { "name": "feedTimeline", "method": "POST", "path": "/api/v1/feed/timeline/" },
     { "name": "feedUser", "method": "GET", "path": "/api/v1/feed/user/{pk}/" },
     { "name": "fbsearchPlaces", "method": "GET", "path": "/api/v1/fbsearch/places/" },
+    { "name": "friendshipsApprove", "method": "POST", "path": "/api/v1/friendships/approve/{pk}/" },
+    { "name": "friendshipsBlock", "method": "POST", "path": "/api/v1/friendships/block/{pk}/" },
     { "name": "friendshipsCreate", "method": "POST", "path": "/api/v1/friendships/create/{pk}/" },
+    { "name": "friendshipsIgnore", "method": "POST", "path": "/api/v1/friendships/ignore/{pk}/" },
+    {
+      "name": "friendshipsMute",
+      "method": "POST",
+      "path": "/api/v1/friendships/mute_posts_or_story_from_follow/"
+    },
+    { "name": "friendshipsPending", "method": "GET", "path": "/api/v1/friendships/pending/" },
+    { "name": "friendshipsUnblock", "method": "POST", "path": "/api/v1/friendships/unblock/{pk}/" },
+    {
+      "name": "friendshipsUnmute",
+      "method": "POST",
+      "path": "/api/v1/friendships/unmute_posts_or_story_from_follow/"
+    },
     {
       "name": "friendshipsFollowers",
       "method": "GET",

@@ -152,8 +152,16 @@ export {
   getFollowing,
   paginateFollowers,
   paginateFollowing,
+  approveRequest,
+  denyRequest,
+  blockUser,
+  unblockUser,
+  getPendingRequests,
+  paginatePendingRequests,
+  muteUser,
+  unmuteUser,
 } from './endpoints/friendship/friendship';
-export type { FollowListOptions } from './endpoints/friendship/friendship';
+export type { FollowListOptions, MuteOptions } from './endpoints/friendship/friendship';
 export { friendshipStatusSchema } from './schemas/friendship';
 export type { FriendshipStatus } from './schemas/friendship';
 export { paginate } from './core/pagination';
