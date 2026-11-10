@@ -89,6 +89,14 @@ import {
   searchRecipients,
 } from '../endpoints/direct/direct-manage';
 import type { HideThreadOptions, RecipientSearchMode } from '../endpoints/direct/direct-manage';
+import {
+  sendLink,
+  reactToMessage,
+  shareMedia,
+  shareProfile,
+  sendPhoto,
+} from '../endpoints/direct/direct-send';
+import type { ReactionOptions, ShareMediaOptions } from '../endpoints/direct/direct-send';
 import type { User } from '../schemas/user';
 import type { FriendshipStatus } from '../schemas/friendship';
 import type { Media } from '../schemas/media';
@@ -172,6 +180,15 @@ export interface DirectApi {
   createGroup(userIds: readonly string[], title?: string): Promise<string>;
   findThread(userIds: readonly string[]): Promise<Thread | undefined>;
   searchRecipients(query: string, mode?: RecipientSearchMode): Promise<User[]>;
+  sendLink(text: string, target: SendTarget): Promise<DirectSendResult>;
+  react(threadId: string, itemId: string, options?: ReactionOptions): Promise<void>;
+  shareMedia(
+    mediaId: string,
+    target: SendTarget,
+    options?: ShareMediaOptions,
+  ): Promise<DirectSendResult>;
+  shareProfile(userId: string, target: SendTarget): Promise<DirectSendResult>;
+  sendPhoto(jpeg: Uint8Array, target: SendTarget): Promise<DirectSendResult>;
 }
 
 /** Single media reads and actions. */
@@ -433,6 +450,11 @@ export class IgFlare {
       createGroup: (userIds, title) => createGroupThread(client, userIds, title),
       findThread: (userIds) => findThreadByParticipants(client, userIds),
       searchRecipients: (query, mode) => searchRecipients(client, query, mode),
+      sendLink: (text, target) => sendLink(client, text, target),
+      react: (threadId, itemId, options) => reactToMessage(client, threadId, itemId, options),
+      shareMedia: (mediaId, target, options) => shareMedia(client, mediaId, target, options),
+      shareProfile: (userId, target) => shareProfile(client, userId, target),
+      sendPhoto: (jpeg, target) => sendPhoto(client, jpeg, target),
     };
   }
 

@@ -1,4 +1,4 @@
-import { randomInt, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import type { PrivateClient } from '../../core/http/private-client';
 import { endpoints } from '../../generated/endpoints';
 import type { EndpointDefinition } from '../../generated/endpoints';
@@ -7,33 +7,7 @@ import { userSchema, type User } from '../../schemas/user';
 import { parseSchemaList } from '../../schemas/parse-list';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-/**
- * The 19-digit numeric token the app attaches to direct mutations as its client
- * context. It only has to be unique per action.
- */
-function mutationToken(): string {
-  return `68000${String(randomInt(11_111_111_111_111, 99_999_999_999_999))}`;
-}
-
-/** Rejects anything that is not a plain numeric id, so a path or body cannot be forged. */
-function assertIds(ids: readonly string[], what: string): void {
-  if (ids.length === 0 || ids.some((id) => !/^\d+$/.test(id))) {
-    throw new IgError(`${what} must be a non-empty list of numeric ids`);
-  }
-}
-
-/**
- * A JSON array of numeric ids built by hand: ids are 64-bit, and going through a
- * JS number would silently round them.
- */
-function numericIdArray(ids: readonly string[]): string {
-  return `[${ids.join(',')}]`;
-}
+import { assertIds, isRecord, mutationToken, numericIdArray } from './direct-wire';
 
 function threadPath(definition: EndpointDefinition, threadId: string): string {
   assertIds([threadId], 'A thread id');

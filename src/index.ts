@@ -143,6 +143,14 @@ export {
   searchRecipients,
 } from './endpoints/direct/direct-manage';
 export type { HideThreadOptions, RecipientSearchMode } from './endpoints/direct/direct-manage';
+export {
+  sendLink,
+  reactToMessage,
+  shareMedia,
+  shareProfile,
+  sendPhoto,
+} from './endpoints/direct/direct-send';
+export type { ReactionOptions, ShareMediaOptions } from './endpoints/direct/direct-send';
 export type { CursorOptions, SendTarget } from './endpoints/direct/direct';
 export { threadSchema, directMessageSchema, directSendResultSchema } from './schemas/direct';
 export type { Thread, DirectMessage, DirectSendResult } from './schemas/direct';

@@ -17,6 +17,31 @@
     { "name": "bloksApps", "method": "POST", "path": "/api/v1/bloks/apps/" },
     { "name": "bloksAsyncAction", "method": "POST", "path": "/api/v1/bloks/async_action/" },
     {
+      "name": "directBroadcastLink",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/broadcast/link/"
+    },
+    {
+      "name": "directBroadcastMediaShare",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/broadcast/media_share/"
+    },
+    {
+      "name": "directBroadcastPhotoAttachment",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/broadcast/photo_attachment/"
+    },
+    {
+      "name": "directBroadcastProfile",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/broadcast/profile/"
+    },
+    {
+      "name": "directBroadcastReaction",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/broadcast/reaction/"
+    },
+    {
       "name": "directCreateGroupThread",
       "method": "POST",
       "path": "/api/v1/direct_v2/create_group_thread/"

@@ -519,6 +519,30 @@ describe('IgFlare facade', () => {
     expect(transport.requests.some((r) => r.url.includes('/threads/10/items/20/seen/'))).toBe(true);
   });
 
+  it('delegates the rich direct sends', async () => {
+    const jpeg = new Uint8Array([
+      0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90, 0x03,
+    ]);
+    const { ig, transport } = clientWith((req) => {
+      if (req.url.includes('rupload.facebook.com')) return json({ media_id: '55' });
+      if (req.url.includes('/broadcast/reaction/')) return json({ status: 'ok' });
+      return json({ status: 'ok', payload: { item_id: 'i1', thread_id: '9' } });
+    });
+    const target = { threadId: '123' };
+
+    expect((await ig.direct.sendLink('see https://a.b', target)).item_id).toBe('i1');
+    await ig.direct.react('123', '456');
+    await ig.direct.react('123', '456', { remove: true });
+    expect((await ig.direct.shareMedia('1_2', target)).item_id).toBe('i1');
+    expect((await ig.direct.shareProfile('77', target)).item_id).toBe('i1');
+    expect((await ig.direct.sendPhoto(jpeg, target)).item_id).toBe('i1');
+
+    expect(transport.requests.some((r) => r.url.includes('/broadcast/link/'))).toBe(true);
+    expect(transport.requests.some((r) => r.url.includes('/broadcast/photo_attachment/'))).toBe(
+      true,
+    );
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();
