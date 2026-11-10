@@ -129,7 +129,7 @@ export function buildUserAgent(profile: DeviceProfile, locale?: string): string;
 export const CAA_API_DOMAIN = "b.i.instagram.com";
 
 // @public
-export function caaLogin(client: PrivateClient, credentials: CaaLoginCredentials): Promise<PrivateResponseJson>;
+export function caaLogin(client: PrivateClient, credentials: CaaLoginCredentials, options?: CaaLoginOptions): Promise<PrivateResponseJson>;
 
 // @public (undocumented)
 export interface CaaLoginCredentials {
@@ -137,6 +137,18 @@ export interface CaaLoginCredentials {
     readonly password: string;
     // (undocumented)
     readonly username: string;
+}
+
+// @public (undocumented)
+export interface CaaLoginOptions {
+    readonly twoFactor?: TwoFactorSource;
+}
+
+// @public
+export class CaaTwoFactorRequiredError extends TwoFactorRequiredError {
+    constructor(message: string, statusCode: number, payload: ApiErrorPayload, aac: string, options?: ErrorOptions);
+    // (undocumented)
+    readonly aac: string;
 }
 
 // @public (undocumented)
@@ -352,7 +364,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -477,6 +489,9 @@ export const friendshipStatusSchema: z.ZodObject<{
 
 // @public (undocumented)
 export function generateAndroidDeviceId(seed?: string): string;
+
+// @public
+export function generateTotp(secret: string, options?: TotpOptions): string;
 
 // @public
 export function generateUsdidIdentity(options?: GenerateUsdidOptions): UsdidIdentity;
@@ -624,9 +639,10 @@ export class IgFlare {
     // (undocumented)
     readonly friendship: FriendshipApi;
     static fromStore(store: SessionStore, options?: Omit<IgFlareOptions, 'store' | 'session'>): Promise<IgFlare>;
-    login(credentials: CaaLoginCredentials): Promise<PrivateResponseJson>;
+    login(credentials: IgFlareLogin): Promise<PrivateResponseJson>;
     // (undocumented)
     readonly media: MediaApi;
+    resolveTwoFactor(error: CaaTwoFactorRequiredError, code: string): Promise<PrivateResponseJson>;
     // (undocumented)
     readonly search: SearchApi;
     get session(): SessionData;
@@ -637,6 +653,11 @@ export class IgFlare {
     // (undocumented)
     readonly user: UserApi;
 }
+
+// @public
+export type IgFlareLogin = CaaLoginCredentials & {
+    readonly twoFactor?: TwoFactorSource;
+};
 
 // @public
 export interface IgFlareOptions extends PrivateClientOptions {
@@ -1022,6 +1043,12 @@ export interface RegistrationTokenOptions {
 }
 
 // @public
+export function resolveCaaTwoFactor(client: PrivateClient, error: CaaTwoFactorRequiredError, code: string): Promise<PrivateResponseJson>;
+
+// @public
+export function resolveTwoFactorCode(source: TwoFactorSource): Promise<string>;
+
+// @public
 export interface RetryOptions {
     readonly baseDelayMs?: number;
     readonly maxDelayMs?: number;
@@ -1161,6 +1188,13 @@ export const threadSchema: z.ZodObject<{
     }, z.core.$loose>>;
 }, z.core.$loose>;
 
+// @public (undocumented)
+export interface TotpOptions {
+    readonly digits?: number;
+    readonly now?: number;
+    readonly period?: number;
+}
+
 // @public
 export function twoFactorLogin(client: PrivateClient, error: TwoFactorRequiredError, options: TwoFactorOptions): Promise<PrivateResponseJson>;
 
@@ -1176,6 +1210,15 @@ export interface TwoFactorOptions {
 // @public (undocumented)
 export class TwoFactorRequiredError extends IgApiError {
 }
+
+// @public
+export type TwoFactorSource = {
+    readonly code: string;
+} | {
+    readonly totpSecret: string;
+} | {
+    readonly provider: () => string | Promise<string>;
+};
 
 // @public
 export function unblockUser(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
