@@ -711,6 +711,9 @@ export function paginateUserFeed(client: PrivateClient, pk: string): AsyncGenera
 export function parseJpegSize(bytes: Uint8Array): ImageSize;
 
 // @public
+export function parseMp4Meta(bytes: Uint8Array): VideoMeta;
+
+// @public
 export function parsePrivateResponse(response: HttpResponse): PrivateResponseJson;
 
 // @public
@@ -959,10 +962,15 @@ export function unlikeMedia(client: PrivateClient, mediaId: string): Promise<voi
 export interface UploadApi {
     // (undocumented)
     photo(jpeg: Uint8Array, options?: PhotoUploadOptions): Promise<Media>;
+    // (undocumented)
+    video(mp4: Uint8Array, coverJpeg: Uint8Array, options?: VideoUploadOptions): Promise<Media>;
 }
 
 // @public
 export function uploadPhoto(client: PrivateClient, jpeg: Uint8Array, options?: PhotoUploadOptions): Promise<Media>;
+
+// @public
+export function uploadVideo(client: PrivateClient, mp4: Uint8Array, coverJpeg: Uint8Array, options?: VideoUploadOptions): Promise<Media>;
 
 // @public
 export const USDID_TOKEN_TTL = 3600;
@@ -1009,6 +1017,27 @@ export const userSchema: z.ZodObject<{
     media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     biography: z.ZodOptional<z.ZodString>;
 }, z.core.$loose>;
+
+// @public (undocumented)
+export interface VideoMeta {
+    // (undocumented)
+    readonly durationMs: number;
+    // (undocumented)
+    readonly height: number;
+    // (undocumented)
+    readonly width: number;
+}
+
+// @public (undocumented)
+export interface VideoUploadOptions {
+    // (undocumented)
+    readonly caption?: string;
+    readonly durationMs?: number;
+    // (undocumented)
+    readonly height?: number;
+    // (undocumented)
+    readonly width?: number;
+}
 
 // (No @packageDocumentation comment for this package)
 
