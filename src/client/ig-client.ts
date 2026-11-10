@@ -138,7 +138,7 @@ export interface MediaApi {
   unlike(mediaId: string): Promise<void>;
   comment(mediaId: string, text: string): Promise<Comment>;
   deleteComment(mediaId: string, commentId: string): Promise<void>;
-  delete(mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL'): Promise<void>;
+  delete(mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL' | 'STORY'): Promise<void>;
   comments(mediaId: string, options?: CommentListOptions): Promise<Page<Comment>>;
   paginateComments(mediaId: string): AsyncGenerator<Comment>;
   likers(mediaId: string): Promise<User[]>;

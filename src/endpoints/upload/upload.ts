@@ -238,13 +238,22 @@ async function configureStory(
   width: number,
   height: number,
 ): Promise<Media> {
+  const nowSec = String(Math.floor(Date.now() / 1000));
   const json = await client.request({
     method: endpoints.mediaConfigureToStory.method,
     endpoint: endpoints.mediaConfigureToStory.path,
     payload: {
       upload_id: uploadId,
       source_type: '3',
+      configure_mode: '1',
       caption: '',
+      creation_surface: 'camera',
+      camera_entry_point: '12',
+      capture_type: 'normal',
+      client_shared_at: nowSec,
+      client_timestamp: nowSec,
+      story_media_creation_date: nowSec,
+      disable_comments: '0',
       ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),
       device: deviceBlock(client),
       edits: { crop_original_size: [width, height], crop_center: [0, 0], crop_zoom: 1 },

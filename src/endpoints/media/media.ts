@@ -94,7 +94,7 @@ export async function commentMedia(
 export async function deleteMedia(
   client: PrivateClient,
   mediaId: string,
-  mediaType: 'PHOTO' | 'VIDEO' | 'CAROUSEL' = 'PHOTO',
+  mediaType: 'PHOTO' | 'VIDEO' | 'CAROUSEL' | 'STORY' = 'PHOTO',
 ): Promise<void> {
   await client.request({
     method: endpoints.mediaDelete.method,
