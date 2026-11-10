@@ -9,6 +9,7 @@ import { z } from 'zod';
 // @public
 export interface AccountApi {
     me(): Promise<Record<string, unknown>>;
+    setBiography(text: string): Promise<User>;
 }
 
 // @public (undocumented)
@@ -351,7 +352,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaUnlike' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -528,6 +529,9 @@ export function getPendingRequests(client: PrivateClient, options?: FollowListOp
 
 // @public
 export function getReelsTray(client: PrivateClient): Promise<Reel[]>;
+
+// @public
+export function getSavedPosts(client: PrivateClient, options?: CommentListOptions): Promise<Page<Media>>;
 
 // @public
 export function getThread(client: PrivateClient, threadId: string, options?: CursorOptions): Promise<Page<DirectMessage>>;
@@ -723,7 +727,15 @@ export interface MediaApi {
     // (undocumented)
     paginateComments(mediaId: string): AsyncGenerator<Comment>;
     // (undocumented)
+    paginateSaved(): AsyncGenerator<Media>;
+    // (undocumented)
+    save(mediaId: string): Promise<void>;
+    // (undocumented)
+    saved(options?: CommentListOptions): Promise<Page<Media>>;
+    // (undocumented)
     unlike(mediaId: string): Promise<void>;
+    // (undocumented)
+    unsave(mediaId: string): Promise<void>;
 }
 
 // @public
@@ -815,6 +827,9 @@ export function paginateLocationFeed(client: PrivateClient, locationId: string):
 
 // @public
 export function paginatePendingRequests(client: PrivateClient): AsyncGenerator<User>;
+
+// @public
+export function paginateSavedPosts(client: PrivateClient): AsyncGenerator<Media>;
 
 // @public
 export function paginateThread(client: PrivateClient, threadId: string): AsyncGenerator<DirectMessage>;
@@ -1023,6 +1038,9 @@ export class RetryTransport implements HttpTransport {
 }
 
 // @public
+export function saveMedia(client: PrivateClient, mediaId: string): Promise<void>;
+
+// @public
 export interface SearchApi {
     // (undocumented)
     hashtags(query: string): Promise<Hashtag[]>;
@@ -1079,6 +1097,9 @@ export interface SessionStore {
     // (undocumented)
     save(data: SessionData): Promise<void>;
 }
+
+// @public
+export function setBiography(client: PrivateClient, text: string): Promise<User>;
 
 // @public
 export interface Signer {
@@ -1167,6 +1188,9 @@ export function unlikeMedia(client: PrivateClient, mediaId: string): Promise<voi
 
 // @public
 export function unmuteUser(client: PrivateClient, pk: string, options?: MuteOptions): Promise<void>;
+
+// @public
+export function unsaveMedia(client: PrivateClient, mediaId: string): Promise<void>;
 
 // @public
 export interface UploadApi {
