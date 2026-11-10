@@ -1,9 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import { getMediaInfo } from './media';
+import { getMediaInfo, likeMedia, unlikeMedia, commentMedia, deleteComment } from './media';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
 import { createSession } from '../../core/session/session';
 import { ClientSchemaError } from '../../errors/api-errors';
+
+/** Recovers the JSON payload from a signed_body form request. */
+function signedPayload(body: string | undefined): Record<string, unknown> {
+  const form = new URLSearchParams(body ?? '');
+  const signed = form.get('signed_body') ?? '';
+  return JSON.parse(signed.slice(signed.indexOf('.') + 1)) as Record<string, unknown>;
+}
 
 function clientReturning(body: unknown): { client: PrivateClient; transport: FakeTransport } {
   const transport = new FakeTransport(() => ({
@@ -37,5 +44,49 @@ describe('getMediaInfo', () => {
   it('throws a typed schema error on a shape mismatch', async () => {
     const { client } = clientReturning({ status: 'ok', items: [{ pk: 1, like_count: 'many' }] });
     await expect(getMediaInfo(client, '1_9')).rejects.toBeInstanceOf(ClientSchemaError);
+  });
+});
+
+describe('media actions', () => {
+  it('likes a media, posting media_id in the signed body', async () => {
+    const { client, transport } = clientReturning({ status: 'ok' });
+
+    await expect(likeMedia(client, '1_9')).resolves.toBeUndefined();
+    expect(transport.requests[0]?.url).toBe('https://i.instagram.com/api/v1/media/1_9/like/');
+    expect(transport.requests[0]?.method).toBe('POST');
+    expect(signedPayload(transport.requests[0]?.body)['media_id']).toBe('1_9');
+  });
+
+  it('unlikes a media against the unlike endpoint', async () => {
+    const { client, transport } = clientReturning({ status: 'ok' });
+    await unlikeMedia(client, '1_9');
+    expect(transport.requests[0]?.url).toContain('/api/v1/media/1_9/unlike/');
+  });
+
+  it('comments on a media and returns the created comment', async () => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      comment: { pk: 77, text: 'nice', user: { pk: 2, username: 'me' } },
+    });
+
+    const comment = await commentMedia(client, '1_9', 'nice');
+
+    expect(comment.pk).toBe('77');
+    expect(comment.text).toBe('nice');
+    expect(transport.requests[0]?.url).toContain('/api/v1/media/1_9/comment/');
+    const payload = signedPayload(transport.requests[0]?.body);
+    expect(payload['comment_text']).toBe('nice');
+    expect(payload['idempotence_token']).toMatch(/[0-9a-f-]{36}/);
+  });
+
+  it('throws a typed schema error when the comment has the wrong shape', async () => {
+    const { client } = clientReturning({ status: 'ok', comment: { pk: 1, text: 42 } });
+    await expect(commentMedia(client, '1_9', 'x')).rejects.toBeInstanceOf(ClientSchemaError);
+  });
+
+  it('deletes a comment by id against the delete endpoint', async () => {
+    const { client, transport } = clientReturning({ status: 'ok' });
+    await deleteComment(client, '1_9', '77');
+    expect(transport.requests[0]?.url).toContain('/api/v1/media/1_9/comment/77/delete/');
   });
 });

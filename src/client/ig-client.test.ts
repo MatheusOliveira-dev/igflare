@@ -100,6 +100,20 @@ describe('IgClient facade', () => {
     expect(transport.requests[0]?.url).toContain('/api/v1/media/1_9/info/');
   });
 
+  it('delegates media actions to the media endpoints', async () => {
+    const { ig, transport } = clientWith((req) =>
+      req.url.includes('/comment/')
+        ? json({ status: 'ok', comment: { pk: 5, text: 'hi' } })
+        : json({ status: 'ok' }),
+    );
+
+    await ig.media.like('1_9');
+    const comment = await ig.media.comment('1_9', 'hi');
+
+    expect(transport.requests[0]?.url).toContain('/api/v1/media/1_9/like/');
+    expect(comment.text).toBe('hi');
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();

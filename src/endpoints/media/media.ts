@@ -1,6 +1,8 @@
+import { randomUUID } from 'node:crypto';
 import type { PrivateClient } from '../../core/http/private-client';
 import { endpoints } from '../../generated/endpoints';
 import { mediaSchema, type Media } from '../../schemas/media';
+import { commentSchema, type Comment } from '../../schemas/comment';
 import { ClientSchemaError } from '../../errors/api-errors';
 
 /**
@@ -25,4 +27,71 @@ export async function getMediaInfo(client: PrivateClient, mediaId: string): Prom
     });
   }
   return parsed.data;
+}
+
+/** The common fields a media action POST carries, over the signed default data. */
+function mediaActionPayload(client: PrivateClient): Record<string, unknown> {
+  return {
+    ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),
+    radio_type: 'wifi-none',
+    module_name: 'feed_timeline',
+  };
+}
+
+/** Likes a media by its full id. Resolves on success; throws a typed error otherwise. */
+export async function likeMedia(client: PrivateClient, mediaId: string): Promise<void> {
+  await client.request({
+    method: endpoints.mediaLike.method,
+    endpoint: endpoints.mediaLike.path.replace('{id}', mediaId),
+    payload: { ...mediaActionPayload(client), media_id: mediaId },
+  });
+}
+
+/** Removes a like from a media by its full id. */
+export async function unlikeMedia(client: PrivateClient, mediaId: string): Promise<void> {
+  await client.request({
+    method: endpoints.mediaUnlike.method,
+    endpoint: endpoints.mediaUnlike.path.replace('{id}', mediaId),
+    payload: { ...mediaActionPayload(client), media_id: mediaId },
+  });
+}
+
+/** Posts a comment on a media and returns the created comment. */
+export async function commentMedia(
+  client: PrivateClient,
+  mediaId: string,
+  text: string,
+): Promise<Comment> {
+  const json = await client.request({
+    method: endpoints.mediaComment.method,
+    endpoint: endpoints.mediaComment.path.replace('{id}', mediaId),
+    payload: {
+      ...mediaActionPayload(client),
+      comment_text: text,
+      idempotence_token: randomUUID(),
+    },
+  });
+  const comment = json['comment'];
+  const parsed = commentSchema.safeParse(comment);
+  if (!parsed.success) {
+    throw new ClientSchemaError('comment response did not match the comment schema', comment, {
+      cause: parsed.error,
+    });
+  }
+  return parsed.data;
+}
+
+/** Deletes a comment from a media by the comment's id. */
+export async function deleteComment(
+  client: PrivateClient,
+  mediaId: string,
+  commentId: string,
+): Promise<void> {
+  await client.request({
+    method: endpoints.mediaCommentDelete.method,
+    endpoint: endpoints.mediaCommentDelete.path
+      .replace('{id}', mediaId)
+      .replace('{comment_id}', commentId),
+    payload: mediaActionPayload(client),
+  });
 }

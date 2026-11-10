@@ -20,10 +20,17 @@ import {
 import type { FollowListOptions } from '../endpoints/friendship/friendship';
 import { getUserFeed, paginateUserFeed } from '../endpoints/feed/feed';
 import type { FeedOptions } from '../endpoints/feed/feed';
-import { getMediaInfo } from '../endpoints/media/media';
+import {
+  getMediaInfo,
+  likeMedia,
+  unlikeMedia,
+  commentMedia,
+  deleteComment,
+} from '../endpoints/media/media';
 import type { User } from '../schemas/user';
 import type { FriendshipStatus } from '../schemas/friendship';
 import type { Media } from '../schemas/media';
+import type { Comment } from '../schemas/comment';
 
 /** The logged-in account itself. */
 export interface AccountApi {
@@ -54,9 +61,13 @@ export interface FeedApi {
   paginateUser(pk: string): AsyncGenerator<Media>;
 }
 
-/** Single media reads. */
+/** Single media reads and actions. */
 export interface MediaApi {
   info(mediaId: string): Promise<Media>;
+  like(mediaId: string): Promise<void>;
+  unlike(mediaId: string): Promise<void>;
+  comment(mediaId: string, text: string): Promise<Comment>;
+  deleteComment(mediaId: string, commentId: string): Promise<void>;
 }
 
 /**
@@ -147,6 +158,10 @@ export class IgClient {
     const client = this.#client;
     return {
       info: (mediaId) => getMediaInfo(client, mediaId),
+      like: (mediaId) => likeMedia(client, mediaId),
+      unlike: (mediaId) => unlikeMedia(client, mediaId),
+      comment: (mediaId, text) => commentMedia(client, mediaId, text),
+      deleteComment: (mediaId, commentId) => deleteComment(client, mediaId, commentId),
     };
   }
 }

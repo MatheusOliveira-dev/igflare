@@ -30,7 +30,15 @@
     { "name": "friendshipsDestroy", "method": "POST", "path": "/api/v1/friendships/destroy/{pk}/" },
     { "name": "friendshipsShow", "method": "GET", "path": "/api/v1/friendships/show/{pk}/" },
     { "name": "launcherSync", "method": "POST", "path": "/api/v1/launcher/sync/" },
+    { "name": "mediaComment", "method": "POST", "path": "/api/v1/media/{id}/comment/" },
+    {
+      "name": "mediaCommentDelete",
+      "method": "POST",
+      "path": "/api/v1/media/{id}/comment/{comment_id}/delete/"
+    },
     { "name": "mediaInfo", "method": "GET", "path": "/api/v1/media/{id}/info/" },
+    { "name": "mediaLike", "method": "POST", "path": "/api/v1/media/{id}/like/" },
+    { "name": "mediaUnlike", "method": "POST", "path": "/api/v1/media/{id}/unlike/" },
     { "name": "userInfo", "method": "GET", "path": "/api/v1/users/{pk}/info/" },
     {
       "name": "userInfoByUsername",

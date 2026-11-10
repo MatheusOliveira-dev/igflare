@@ -74,7 +74,15 @@ export { PrivateClient } from './core/http/private-client';
 export type { PrivateClientOptions, PrivateRequestOptions } from './core/http/private-client';
 export { IgClient } from './client/ig-client';
 export type { AccountApi, UserApi, FriendshipApi, FeedApi, MediaApi } from './client/ig-client';
-export { getMediaInfo } from './endpoints/media/media';
+export {
+  getMediaInfo,
+  likeMedia,
+  unlikeMedia,
+  commentMedia,
+  deleteComment,
+} from './endpoints/media/media';
+export { commentSchema } from './schemas/comment';
+export type { Comment } from './schemas/comment';
 export { getUserFeed, paginateUserFeed } from './endpoints/feed/feed';
 export type { FeedOptions } from './endpoints/feed/feed';
 export { mediaSchema } from './schemas/media';
