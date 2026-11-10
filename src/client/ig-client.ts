@@ -35,8 +35,8 @@ import {
   deleteComment,
   deleteMedia,
 } from '../endpoints/media/media';
-import { uploadPhoto } from '../endpoints/upload/upload';
-import type { PhotoUploadOptions } from '../endpoints/upload/upload';
+import { uploadPhoto, uploadVideo } from '../endpoints/upload/upload';
+import type { PhotoUploadOptions, VideoUploadOptions } from '../endpoints/upload/upload';
 import {
   getInbox,
   paginateInbox,
@@ -104,6 +104,7 @@ export interface MediaApi {
 /** Publishing media. */
 export interface UploadApi {
   photo(jpeg: Uint8Array, options?: PhotoUploadOptions): Promise<Media>;
+  video(mp4: Uint8Array, coverJpeg: Uint8Array, options?: VideoUploadOptions): Promise<Media>;
 }
 
 /** Construction options for {@link IgClient}. */
@@ -229,6 +230,7 @@ export class IgClient {
     const client = this.#client;
     return {
       photo: (jpeg, options) => uploadPhoto(client, jpeg, options),
+      video: (mp4, coverJpeg, options) => uploadVideo(client, mp4, coverJpeg, options),
     };
   }
 

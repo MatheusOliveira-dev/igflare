@@ -179,6 +179,18 @@ describe('IgClient facade', () => {
     expect(transport.requests.at(-1)?.url).toContain('/api/v1/media/1_9/delete/');
   });
 
+  it('delegates video upload', async () => {
+    const mp4 = new Uint8Array([0, 1, 2, 3]);
+    const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90]);
+    const { ig } = clientWith((req) =>
+      req.url.includes('rupload')
+        ? json({ upload_id: 'V1', status: 'ok' })
+        : json({ status: 'ok', media: { pk: 1, code: 'vv' } }),
+    );
+    const media = await ig.upload.video(mp4, jpeg, { durationMs: 5000, width: 720, height: 1280 });
+    expect(media.code).toBe('vv');
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();
