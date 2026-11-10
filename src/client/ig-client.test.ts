@@ -197,8 +197,11 @@ describe('IgFlare facade', () => {
         return json({ status: 'ok', users: [{ pk: 1, username: 'a' }] });
       if (req.url.includes('/tags/search/'))
         return json({ status: 'ok', results: [{ id: 5, name: 'sun' }] });
-      if (req.url.includes('/feed/tag/'))
-        return json({ status: 'ok', items: [{ pk: 9, code: 't' }] });
+      if (req.url.includes('/sections/'))
+        return json({
+          status: 'ok',
+          sections: [{ layout_content: { medias: [{ media: { pk: 9, code: 't' } }] } }],
+        });
       if (req.url.includes('/comments/'))
         return json({ status: 'ok', comments: [{ pk: 3, text: 'hi' }] });
       return json({ status: 'ok', users: [{ pk: 2, username: 'b' }] }); // likers
@@ -216,9 +219,16 @@ describe('IgFlare facade', () => {
     const { ig } = clientWith((req) => {
       if (req.url.includes('/fbsearch/places/'))
         return json({ status: 'ok', items: [{ location: { pk: 7, name: 'Park' } }] });
-      if (req.url.includes('/feed/location/'))
-        return json({ status: 'ok', items: [{ pk: 1, code: 'l' }] });
-      if (req.url.includes('/feed/tag/')) return json({ status: 'ok', items: [{ pk: 2 }] });
+      if (req.url.includes('/locations/'))
+        return json({
+          status: 'ok',
+          sections: [{ layout_content: { medias: [{ media: { pk: 1, code: 'l' } }] } }],
+        });
+      if (req.url.includes('/tags/'))
+        return json({
+          status: 'ok',
+          sections: [{ layout_content: { medias: [{ media: { pk: 2 } }] } }],
+        });
       return json({ status: 'ok', comments: [{ pk: 3, text: 'c' }] });
     });
 

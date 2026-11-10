@@ -163,40 +163,50 @@ describe('getTimelineFeed', () => {
   });
 });
 
+function sections(medias: unknown[], extra: Record<string, unknown> = {}): unknown {
+  return {
+    status: 'ok',
+    sections: [{ layout_content: { medias: medias.map((media) => ({ media })) } }],
+    ...extra,
+  };
+}
+
 describe('hashtag and location feeds', () => {
-  it('fetches a hashtag feed and honors more_available for the cursor', async () => {
-    const { client, transport } = clientReturning({
-      status: 'ok',
-      items: [{ pk: 1, code: 'a' }],
-      next_max_id: 'n1',
-      more_available: true,
-    });
+  it('posts to the tag sections endpoint and flattens the media', async () => {
+    const { client, transport } = clientReturning(
+      sections([{ pk: 1, code: 'a' }], { next_max_id: 'n1', more_available: true }),
+    );
 
     const page = await getHashtagFeed(client, 'sunset');
 
-    expect(transport.requests[0]?.url).toBe('https://i.instagram.com/api/v1/feed/tag/sunset/');
+    expect(transport.requests[0]?.url).toBe('https://i.instagram.com/api/v1/tags/sunset/sections/');
+    expect(transport.requests[0]?.method).toBe('POST');
+    expect(signedPayload(transport.requests[0]?.body)['tab']).toBe('recent');
     expect(page.items[0]?.code).toBe('a');
     expect(page.nextCursor).toBe('n1');
   });
 
-  it('url-encodes the tag and passes max_id', async () => {
-    const { client, transport } = clientReturning({ status: 'ok', items: [{ pk: 2 }] });
+  it('url-encodes the tag and sends max_id in the body', async () => {
+    const { client, transport } = clientReturning(sections([{ pk: 2 }]));
     await getHashtagFeed(client, 'new year', { maxId: 'n1' });
-    expect(transport.requests[0]?.url).toContain('/api/v1/feed/tag/new%20year/?max_id=n1');
+    expect(transport.requests[0]?.url).toContain('/api/v1/tags/new%20year/sections/');
+    expect(signedPayload(transport.requests[0]?.body)['max_id']).toBe('n1');
   });
 
-  it('fetches a location feed by id', async () => {
-    const { client, transport } = clientReturning({
-      status: 'ok',
-      items: [{ pk: 3 }],
-      more_available: false,
-      next_max_id: 'n2',
-    });
+  it('posts to the location sections endpoint', async () => {
+    const { client, transport } = clientReturning(
+      sections([{ pk: 3 }], { more_available: false, next_max_id: 'n2' }),
+    );
 
     const page = await getLocationFeed(client, '777');
 
-    expect(transport.requests[0]?.url).toContain('/api/v1/feed/location/777/');
+    expect(transport.requests[0]?.url).toContain('/api/v1/locations/777/sections/');
     expect(page.nextCursor).toBeUndefined();
+  });
+
+  it('throws when the response has no sections array', async () => {
+    const { client } = clientReturning({ status: 'ok' });
+    await expect(getHashtagFeed(client, 'x')).rejects.toBeInstanceOf(ClientSchemaError);
   });
 });
 
@@ -207,8 +217,8 @@ describe('discovery feed iterators', () => {
       call += 1;
       const body =
         call === 1
-          ? { status: 'ok', items: [{ pk: 1 }], next_max_id: 'p2', more_available: true }
-          : { status: 'ok', items: [{ pk: 2 }], more_available: false };
+          ? sections([{ pk: 1 }], { next_max_id: 'p2', more_available: true })
+          : sections([{ pk: 2 }], { more_available: false });
       return { status: 200, headers: {}, body: JSON.stringify(body) };
     });
     const client = new PrivateClient({ transport, session: createSession() });

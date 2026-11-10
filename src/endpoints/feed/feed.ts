@@ -110,13 +110,56 @@ export function paginateTimeline(client: PrivateClient): AsyncGenerator<Media> {
   return paginate((maxId) => getTimelineFeed(client, maxId !== undefined ? { maxId } : {}));
 }
 
-/** Builds a Page from a feed response's `items`, honoring `more_available`. */
-function mediaPage(json: Record<string, unknown>): Page<Media> {
-  const items = parseMediaList(json);
+/**
+ * Flattens the media out of a `sections` response. Hashtag and location feeds
+ * (the `tags/{tag}/sections/` and `locations/{id}/sections/` endpoints that
+ * replaced the retired `feed/tag` and `feed/location`) group media into sections;
+ * the grid media live under each section's `layout_content.medias[].media`.
+ */
+function sectionMedias(section: unknown): unknown[] {
+  const content = isRecord(section) ? section['layout_content'] : undefined;
+  const medias = isRecord(content) ? content['medias'] : undefined;
+  if (!Array.isArray(medias)) {
+    return [];
+  }
+  return medias
+    .map((entry) => (isRecord(entry) ? entry['media'] : undefined))
+    .filter((media) => media !== undefined);
+}
+
+function sectionsMediaCandidates(json: Record<string, unknown>): unknown[] {
+  const sections = json['sections'];
+  if (!Array.isArray(sections)) {
+    throw new ClientSchemaError('sections response did not include a sections array', json);
+  }
+  return sections.flatMap(sectionMedias);
+}
+
+/** Builds a Page<Media> from a sectioned feed response, honoring `more_available`. */
+function sectionsPage(json: Record<string, unknown>): Page<Media> {
+  const items = sectionsMediaCandidates(json).map((candidate) => {
+    const parsed = mediaSchema.safeParse(candidate);
+    if (!parsed.success) {
+      throw new ClientSchemaError('a sectioned media did not match the schema', candidate, {
+        cause: parsed.error,
+      });
+    }
+    return parsed.data;
+  });
   const next = readNextCursor(json);
   return next !== undefined && json['more_available'] !== false
     ? { items, nextCursor: next }
     : { items };
+}
+
+/** The POST body a `sections` feed takes: the recent tab, plus the cursor if any. */
+function sectionsBody(maxId: string | undefined): Record<string, unknown> {
+  return {
+    tab: 'recent',
+    supported_tabs: JSON.stringify(['top', 'recent']),
+    include_persistent: true,
+    ...(maxId !== undefined ? { max_id: maxId, page: maxId } : {}),
+  };
 }
 
 /** One page of a hashtag's recent media. Pass `maxId` to continue. */
@@ -126,11 +169,11 @@ export async function getHashtagFeed(
   options: FeedOptions = {},
 ): Promise<Page<Media>> {
   const json = await client.request({
-    method: endpoints.feedTag.method,
-    endpoint: endpoints.feedTag.path.replace('{tag}', encodeURIComponent(tag)),
-    ...(options.maxId !== undefined ? { query: { max_id: options.maxId } } : {}),
+    method: endpoints.tagsSections.method,
+    endpoint: endpoints.tagsSections.path.replace('{tag}', encodeURIComponent(tag)),
+    payload: sectionsBody(options.maxId),
   });
-  return mediaPage(json);
+  return sectionsPage(json);
 }
 
 /** Walks a hashtag's media, yielding one at a time across pages. */
@@ -145,11 +188,11 @@ export async function getLocationFeed(
   options: FeedOptions = {},
 ): Promise<Page<Media>> {
   const json = await client.request({
-    method: endpoints.feedLocation.method,
-    endpoint: endpoints.feedLocation.path.replace('{id}', locationId),
-    ...(options.maxId !== undefined ? { query: { max_id: options.maxId } } : {}),
+    method: endpoints.locationsSections.method,
+    endpoint: endpoints.locationsSections.path.replace('{id}', locationId),
+    payload: sectionsBody(options.maxId),
   });
-  return mediaPage(json);
+  return sectionsPage(json);
 }
 
 /** Walks a location's media, yielding one at a time across pages. */
