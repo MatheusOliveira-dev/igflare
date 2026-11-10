@@ -50,12 +50,15 @@ function requireContext(result: PrivateResponseJson, appId: string, step: string
  * Completes a CAA login that stopped at the two-factor step by driving the Bloks
  * code-entry screens and submitting the code. On success the session carries the
  * user id and the authorization, exactly as after a login with no second factor.
- * Pass the error `caaLogin` threw and the code to submit.
+ * Pass the error `caaLogin` threw and the code to submit, or a source for it. A
+ * source is asked only after the code-entry screen has opened: when the code is
+ * delivered out of band (an email or SMS), opening that screen is what makes the
+ * server send it, so it cannot be known earlier.
  */
 export async function resolveCaaTwoFactor(
   client: PrivateClient,
   error: CaaTwoFactorRequiredError,
-  code: string,
+  code: string | TwoFactorSource,
 ): Promise<PrivateResponseJson> {
   const { device } = client.session;
   const machineId = client.session.auth.mid ?? '';
@@ -81,12 +84,13 @@ export async function resolveCaaTwoFactor(
   );
 
   const submitContext = requireContext(codeResult, AP_2SV_CODE_ENTRY_ASYNC, 'code submission');
+  const submittedCode = await resolveTwoFactorCode(typeof code === 'string' ? { code } : code);
   const submitResult = await bloksAsyncAction(
     client,
     AP_2SV_CODE_ENTRY_ASYNC,
     buildTwoFactorSubmitParams(device, {
       aac: error.aac,
-      code,
+      code: submittedCode,
       machineId,
       contextData: submitContext,
       now: Date.now(),

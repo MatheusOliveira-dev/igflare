@@ -18,7 +18,7 @@ import {
   type SendLoginParams,
 } from './caa-params';
 import { applyCaaResult } from './caa-result';
-import { resolveCaaTwoFactor, resolveTwoFactorCode, type TwoFactorSource } from './caa-two-factor';
+import { resolveCaaTwoFactor, type TwoFactorSource } from './caa-two-factor';
 import { fetchPasswordPublicKey } from './login';
 import { endpoints } from '../../generated/endpoints';
 import { IgError } from '../../errors/ig-error';
@@ -231,7 +231,7 @@ export async function caaLogin(
     return await applyCaaResult(client, result, aac);
   } catch (error) {
     if (error instanceof CaaTwoFactorRequiredError && options.twoFactor !== undefined) {
-      return resolveCaaTwoFactor(client, error, await resolveTwoFactorCode(options.twoFactor));
+      return resolveCaaTwoFactor(client, error, options.twoFactor);
     }
     throw error;
   }

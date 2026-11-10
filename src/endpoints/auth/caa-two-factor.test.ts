@@ -141,6 +141,42 @@ describe('resolveCaaTwoFactor', () => {
   });
 });
 
+describe('resolveCaaTwoFactor code source timing', () => {
+  it('asks a source only after the code-entry screen opened, so an out-of-band code exists', async () => {
+    const { client, transport } = scripted();
+    const error = stoppedAt2fa(withContext(ENTRYPOINT, 'CTX_ENTRY'));
+    let requestsWhenAsked = -1;
+
+    await resolveCaaTwoFactor(client, error, {
+      provider: () => {
+        requestsWhenAsked = transport.requests.length;
+        return '135790';
+      },
+    });
+
+    // entrypoint + code entry have already been sent; the submit has not.
+    expect(requestsWhenAsked).toBe(2);
+    expect(paramsOf(transport.requests[2]).client_input_params['code']).toBe('135790');
+  });
+
+  it('does not ask the source when an earlier step fails', async () => {
+    const transport = new FakeTransport(() => json({ status: 'ok', layout: {} }));
+    const client = new PrivateClient({ transport, session: createSession() });
+    const error = stoppedAt2fa(withContext(ENTRYPOINT, 'CTX_ENTRY'));
+    let asked = false;
+
+    await expect(
+      resolveCaaTwoFactor(client, error, {
+        provider: () => {
+          asked = true;
+          return '1';
+        },
+      }),
+    ).rejects.toThrow(/code entry/);
+    expect(asked).toBe(false);
+  });
+});
+
 describe('resolveTwoFactorCode', () => {
   it('returns a literal code as given', async () => {
     expect(await resolveTwoFactorCode({ code: '654321' })).toBe('654321');

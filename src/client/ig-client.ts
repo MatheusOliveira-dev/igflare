@@ -306,7 +306,10 @@ export class IgFlare {
   }
 
   /** Finishes a login that stopped at the two-factor step by submitting the code. */
-  resolveTwoFactor(error: CaaTwoFactorRequiredError, code: string): Promise<PrivateResponseJson> {
+  resolveTwoFactor(
+    error: CaaTwoFactorRequiredError,
+    code: string | TwoFactorSource,
+  ): Promise<PrivateResponseJson> {
     return resolveCaaTwoFactor(this.#client, error, code);
   }
 
