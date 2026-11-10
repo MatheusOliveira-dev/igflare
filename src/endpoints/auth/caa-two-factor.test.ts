@@ -5,7 +5,7 @@ import { FakeTransport } from '../../core/transport/adapters/fake';
 import type { HttpRequest, HttpResponse } from '../../core/transport/http-transport';
 import { createSession } from '../../core/session/session';
 import { generateTotp } from '../../core/crypto/totp';
-import { CaaTwoFactorRequiredError } from '../../errors/api-errors';
+import { CaaTwoFactorRequiredError, InvalidVerificationCodeError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 
 const ENTRYPOINT = 'com.bloks.www.ap.two_step_verification.entrypoint_async';
@@ -130,6 +130,14 @@ describe('resolveCaaTwoFactor', () => {
     const { client } = scripted();
     const error = new CaaTwoFactorRequiredError('x', 200, {}, 'AAC1');
     await expect(resolveCaaTwoFactor(client, error, '1')).rejects.toBeInstanceOf(IgError);
+  });
+
+  it('types a refused code: the code-entry screen comes back instead of a session', async () => {
+    const { client } = scripted(() => withContext(CODE_ENTRY_ASYNC, 'CTX_AGAIN'));
+    const error = stoppedAt2fa(withContext(ENTRYPOINT, 'CTX_ENTRY'));
+    await expect(resolveCaaTwoFactor(client, error, '000000')).rejects.toBeInstanceOf(
+      InvalidVerificationCodeError,
+    );
   });
 
   it('surfaces a typed error when the submit does not return a session', async () => {

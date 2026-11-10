@@ -2,10 +2,17 @@ import type { PrivateClient } from '../../core/http/private-client';
 import type { PrivateResponseJson } from '../../core/http/response';
 import { mapError } from '../../core/http/response';
 import { extractLoginResponse, allText } from '../../core/bloks/parser';
-import { IgApiError, CaaTwoFactorRequiredError } from '../../errors/api-errors';
+import {
+  IgApiError,
+  CaaTwoFactorRequiredError,
+  InvalidVerificationCodeError,
+} from '../../errors/api-errors';
 
 /** The Bloks action the login routes to when the account needs a two-factor code. */
 export const AP_2SV_ENTRYPOINT = 'com.bloks.www.ap.two_step_verification.entrypoint_async';
+
+/** The code-submission screen; a response that shows it again means the code was refused. */
+export const AP_2SV_CODE_ENTRY_ASYNC = 'com.bloks.www.ap.two_step_verification.code_entry_async';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -38,6 +45,14 @@ const CAA_ERROR_MARKERS: readonly {
     marker: AP_2SV_ENTRYPOINT,
     make: (raw, aac) =>
       new CaaTwoFactorRequiredError('Two-factor verification required', 200, { raw }, aac),
+  },
+  {
+    // Seen live: a refused code re-renders the same code-entry screen instead of
+    // returning a session. It can be a wrong or an expired code, so the message
+    // says only that it was not accepted.
+    marker: AP_2SV_CODE_ENTRY_ASYNC,
+    make: (raw) =>
+      new InvalidVerificationCodeError('The verification code was not accepted', 200, { raw }),
   },
 ];
 

@@ -11,10 +11,9 @@ import {
   buildTwoFactorEntrypointParams,
   buildTwoFactorSubmitParams,
 } from './caa-params';
-import { AP_2SV_ENTRYPOINT, applyCaaResult } from './caa-result';
+import { AP_2SV_CODE_ENTRY_ASYNC, AP_2SV_ENTRYPOINT, applyCaaResult } from './caa-result';
 
 const AP_2SV_CODE_ENTRY = 'com.bloks.www.ap.two_step_verification.code_entry';
-const AP_2SV_CODE_ENTRY_ASYNC = 'com.bloks.www.ap.two_step_verification.code_entry_async';
 
 /**
  * Where the one-time code comes from: a literal code, a base32 TOTP secret the

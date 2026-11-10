@@ -10,6 +10,7 @@ export {
   SentryBlockError,
   RateLimitError,
   BadPasswordError,
+  InvalidVerificationCodeError,
   PleaseWaitError,
   ClientForbiddenError,
   ClientJsonError,

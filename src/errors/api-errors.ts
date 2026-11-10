@@ -53,6 +53,9 @@ export class FeedbackRequiredError extends IgApiError {}
 export class SentryBlockError extends IgApiError {}
 export class RateLimitError extends IgApiError {}
 export class BadPasswordError extends IgApiError {}
+
+/** The one-time code submitted at a login challenge or two-factor step was not accepted. */
+export class InvalidVerificationCodeError extends IgApiError {}
 export class PleaseWaitError extends IgApiError {}
 export class ClientForbiddenError extends IgApiError {}
 
