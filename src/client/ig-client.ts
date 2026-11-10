@@ -8,6 +8,9 @@ import type { PrivateResponseJson } from '../core/http/response';
 import type { Page } from '../core/pagination';
 import { caaLogin } from '../endpoints/auth/caa-login';
 import type { CaaLoginCredentials } from '../endpoints/auth/caa-login';
+import { resolveCaaTwoFactor } from '../endpoints/auth/caa-two-factor';
+import type { TwoFactorSource } from '../endpoints/auth/caa-two-factor';
+import type { CaaTwoFactorRequiredError } from '../errors/api-errors';
 import { getCurrentUser } from '../endpoints/user/current-user';
 import { getUserInfo, getUserInfoByUsername } from '../endpoints/user/user-info';
 import {
@@ -168,6 +171,9 @@ export interface StoryApi {
   user(pk: string): Promise<Media[]>;
 }
 
+/** What `login` takes: the account credentials and, optionally, the second-factor source. */
+export type IgFlareLogin = CaaLoginCredentials & { readonly twoFactor?: TwoFactorSource };
+
 /** Construction options for {@link IgFlare}. */
 export interface IgFlareOptions extends PrivateClientOptions {
   /**
@@ -226,9 +232,20 @@ export class IgFlare {
     return new IgFlare({ session: client.session, store, ...options });
   }
 
-  /** Logs in with username and password through the CAA/Bloks flow. */
-  login(credentials: CaaLoginCredentials): Promise<PrivateResponseJson> {
-    return caaLogin(this.#client, credentials);
+  /**
+   * Logs in with username and password through the CAA/Bloks flow. If the account
+   * asks for a second factor, pass `twoFactor` (a code, a TOTP secret, or a function
+   * that provides one) and the login resolves it; without it a
+   * `CaaTwoFactorRequiredError` is thrown, to finish with `resolveTwoFactor`.
+   */
+  login(credentials: IgFlareLogin): Promise<PrivateResponseJson> {
+    const { twoFactor, ...account } = credentials;
+    return caaLogin(this.#client, account, twoFactor !== undefined ? { twoFactor } : {});
+  }
+
+  /** Finishes a login that stopped at the two-factor step by submitting the code. */
+  resolveTwoFactor(error: CaaTwoFactorRequiredError, code: string): Promise<PrivateResponseJson> {
+    return resolveCaaTwoFactor(this.#client, error, code);
   }
 
   /** The current session (device, auth, location). */

@@ -27,6 +27,26 @@ export class IgApiError extends IgResponseError {
 // taken from new.target in the base, so no per-class body is needed.
 export class LoginRequiredError extends IgApiError {}
 export class TwoFactorRequiredError extends IgApiError {}
+
+/**
+ * A CAA/Bloks login that stopped at the two-factor step. Besides the raw response
+ * (in `payload.raw`) it carries the account access context the login obtained,
+ * which the code submission must echo back, so resolving it needs nothing else.
+ */
+export class CaaTwoFactorRequiredError extends TwoFactorRequiredError {
+  readonly aac: string;
+
+  constructor(
+    message: string,
+    statusCode: number,
+    payload: ApiErrorPayload,
+    aac: string,
+    options?: ErrorOptions,
+  ) {
+    super(message, statusCode, payload, options);
+    this.aac = aac;
+  }
+}
 export class ChallengeRequiredError extends IgApiError {}
 export class AccountSuspendedError extends IgApiError {}
 export class FeedbackRequiredError extends IgApiError {}

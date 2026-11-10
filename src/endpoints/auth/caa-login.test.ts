@@ -8,6 +8,7 @@ import { createSession } from '../../core/session/session';
 import { generateUsdidIdentity } from '../../core/crypto/usdid';
 import {
   TwoFactorRequiredError,
+  CaaTwoFactorRequiredError,
   BadPasswordError,
   ChallengeRequiredError,
   IgApiError,
@@ -243,5 +244,87 @@ describe('caaLogin', () => {
     await expect(caaLogin(client(fake), { username: 'u', password: 'p' })).rejects.toBeInstanceOf(
       IgApiError,
     );
+  });
+});
+
+describe('caaLogin two-factor', () => {
+  const ENTRYPOINT = 'com.bloks.www.ap.two_step_verification.entrypoint_async';
+  const CODE_ENTRY = 'com.bloks.www.ap.two_step_verification.code_entry';
+  const CODE_ENTRY_ASYNC = 'com.bloks.www.ap.two_step_verification.code_entry_async';
+
+  function withContext(appId: string, context: string): HttpResponse {
+    return json({
+      status: 'ok',
+      layout: {
+        bloks_payload: { action: `"${appId}" (f4i (dkc "context_data") (dkc "${context}"))` },
+      },
+    });
+  }
+
+  /** A login that stops at the two-factor step, then walks the code-entry screens. */
+  function twoFactorTransport(): FakeTransport {
+    return caaTransport((req) => {
+      if (req.url.includes('code_entry_async/')) {
+        return json({
+          status: 'ok',
+          layout: { bloks_payload: { action: loginBundleAction(77, 'Bearer IGT:2:z', 'SS') } },
+        });
+      }
+      if (req.url.includes('/bloks/apps/')) {
+        return withContext(CODE_ENTRY_ASYNC, 'CTX_SUBMIT');
+      }
+      if (req.url.includes('entrypoint_async/')) {
+        return withContext(CODE_ENTRY, 'CTX_CODE_ENTRY');
+      }
+      return withContext(ENTRYPOINT, 'CTX_ENTRY'); // send_login_request stops at 2FA
+    });
+  }
+
+  function submittedCode(fake: FakeTransport): string {
+    const submit = fake.requests.find((r) => r.url.includes('code_entry_async/'));
+    const body = new URLSearchParams(typeof submit?.body === 'string' ? submit.body : '');
+    const params = JSON.parse(body.get('params') ?? '{}') as {
+      client_input_params: { code: string; aac: string };
+    };
+    expect(params.client_input_params.aac).toBe('AAC1');
+    return params.client_input_params.code;
+  }
+
+  it('resolves the second factor itself from a literal code', async () => {
+    const fake = twoFactorTransport();
+    const privateClient = client(fake);
+
+    const response = await caaLogin(
+      privateClient,
+      { username: 'u', password: 'p' },
+      { twoFactor: { code: '123456' } },
+    );
+
+    expect(response).toMatchObject({ logged_in_user: { pk: 77 } });
+    expect(privateClient.session.auth.userId).toBe('77');
+    expect(submittedCode(fake)).toBe('123456');
+  });
+
+  it('generates the code from a TOTP secret', async () => {
+    const fake = twoFactorTransport();
+
+    await caaLogin(
+      client(fake),
+      { username: 'u', password: 'p' },
+      { twoFactor: { totpSecret: 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ' } },
+    );
+
+    expect(submittedCode(fake)).toMatch(/^\d{6}$/);
+  });
+
+  it('throws an error carrying the aac when no code source is given', async () => {
+    const error = await caaLogin(client(twoFactorTransport()), {
+      username: 'u',
+      password: 'p',
+    }).catch((caught: unknown) => caught);
+
+    expect(error).toBeInstanceOf(CaaTwoFactorRequiredError);
+    expect(error).toBeInstanceOf(TwoFactorRequiredError);
+    expect((error as CaaTwoFactorRequiredError).aac).toBe('AAC1');
   });
 });

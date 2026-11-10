@@ -14,6 +14,7 @@
       "method": "POST",
       "path": "/api/v1/attestation/create_android_keystore/"
     },
+    { "name": "bloksApps", "method": "POST", "path": "/api/v1/bloks/apps/" },
     { "name": "bloksAsyncAction", "method": "POST", "path": "/api/v1/bloks/async_action/" },
     { "name": "directInbox", "method": "GET", "path": "/api/v1/direct_v2/inbox/" },
     {

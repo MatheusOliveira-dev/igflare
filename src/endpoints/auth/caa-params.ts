@@ -9,6 +9,9 @@ import { caaDeviceNetworkInfo } from '../../core/bloks/payload';
  * are documented at their definition.
  */
 
+/** The domain the CAA/Bloks login flow talks to. */
+export const CAA_API_DOMAIN = 'b.i.instagram.com';
+
 /**
  * The offline experiment bucket the current app build reports on every CAA step.
  * It is an opaque server-side cohort label from the capture, sent unchanged.
@@ -202,6 +205,81 @@ export function buildSendLoginParams(
       is_from_assistive_id: 0,
       access_flow_version: 'pre_mt_behavior',
       is_from_logged_in_switcher: 0,
+    },
+  };
+}
+
+/** Params that open the two-factor entrypoint, echoing the context the login returned. */
+export function buildTwoFactorEntrypointParams(
+  device: DeviceState,
+  machineId: string,
+  contextData: string,
+  now: number,
+): Record<string, unknown> {
+  return {
+    client_input_params: {
+      auth_secure_device_id: '',
+      accounts_list: [],
+      has_whatsapp_installed: 0,
+      family_device_id: device.phoneId,
+      machine_id: machineId,
+    },
+    server_params: {
+      use_open_instead_of_push: 0,
+      context_data: contextData,
+      INTERNAL__latency_qpl_marker_id: LATENCY_QPL_MARKER_ID,
+      INTERNAL__latency_qpl_instance_id: now,
+      device_id: device.uuid,
+      use_close_instead_of_back: 0,
+    },
+  };
+}
+
+/** Params that open the code-entry screen and obtain the submit context. */
+export function buildTwoFactorCodeEntryParams(
+  device: DeviceState,
+  aac: string,
+  contextData: string,
+): Record<string, unknown> {
+  return {
+    client_input_params: { aac },
+    server_params: {
+      context_data: contextData,
+      show_close_button: 0,
+      device_id: device.uuid,
+      INTERNAL_INFRA_screen_id: 'generic_code_entry',
+      is_dismissable: 1,
+    },
+  };
+}
+
+export interface TwoFactorSubmitInput {
+  readonly aac: string;
+  readonly code: string;
+  readonly machineId: string;
+  readonly contextData: string;
+  readonly now: number;
+}
+
+/** Params that submit the one-time code and return the terminal login response. */
+export function buildTwoFactorSubmitParams(
+  device: DeviceState,
+  input: TwoFactorSubmitInput,
+): Record<string, unknown> {
+  return {
+    client_input_params: {
+      auth_secure_device_id: '',
+      aac: input.aac,
+      code: input.code,
+      family_device_id: device.phoneId,
+      device_id: device.androidDeviceId,
+      machine_id: input.machineId,
+    },
+    server_params: {
+      context_data: input.contextData,
+      INTERNAL__latency_qpl_marker_id: LATENCY_QPL_MARKER_ID,
+      INTERNAL__latency_qpl_instance_id: input.now,
+      device_id: device.uuid,
     },
   };
 }

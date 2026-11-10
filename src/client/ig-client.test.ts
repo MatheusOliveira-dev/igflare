@@ -5,10 +5,64 @@ import { FakeTransport } from '../core/transport/adapters/fake';
 import type { HttpRequest, HttpResponse } from '../core/transport/http-transport';
 import { MemorySessionStore } from '../core/session/adapters/memory';
 import { createSession } from '../core/session/session';
-import { IgApiError } from '../errors/api-errors';
+import { IgApiError, CaaTwoFactorRequiredError } from '../errors/api-errors';
 
 function json(body: unknown): HttpResponse {
   return { status: 200, headers: {}, body: JSON.stringify(body) };
+}
+
+const { publicKey: caaPublicKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
+const caaPubKeyB64 = Buffer.from(caaPublicKey.export({ type: 'spki', format: 'pem' })).toString(
+  'base64',
+);
+
+/** A send-login response that embeds a successful login bundle. */
+function loginResponse(pk: number): HttpResponse {
+  const bundle = JSON.stringify({
+    login_response: JSON.stringify({ logged_in_user: { pk } }),
+    headers: JSON.stringify({ 'IG-Set-Authorization': 'Bearer IGT:2:tok' }),
+    cookies: '',
+  });
+  return json({
+    status: 'ok',
+    layout: { bloks_payload: { action: `(x, ${JSON.stringify(bundle)})` } },
+  });
+}
+
+/**
+ * Serves the CAA preflight (password key, USDID, aac, keystore); `rest` handles every
+ * later step and returns undefined to fall through to a bare ok response.
+ */
+function caaFlowTransport(rest: (req: HttpRequest) => HttpResponse | undefined): FakeTransport {
+  return new FakeTransport((req) => {
+    if (req.url.includes('launcher/sync')) {
+      return {
+        status: 200,
+        headers: {
+          'ig-set-password-encryption-key-id': '173',
+          'ig-set-password-encryption-pub-key': caaPubKeyB64,
+        },
+        body: '{"status":"ok"}',
+      };
+    }
+    if (req.url.includes('graphql_www')) {
+      return json({ data: { xfb_usdid_registration: { success: true } } });
+    }
+    if (req.url.includes('process_client_data_and_redirect')) {
+      return json({
+        status: 'ok',
+        layout: {
+          bloks_payload: {
+            data: [{ data: { key: 'CAA_ACCOUNT_ACCESS_CONTEXT:aac', initial: 'AAC1' } }],
+          },
+        },
+      });
+    }
+    if (req.url.includes('attestation/create_android_keystore')) {
+      return json({ status: 'ok', challenge_nonce: 'N1' });
+    }
+    return rest(req) ?? json({ status: 'ok' });
+  });
 }
 
 function clientWith(handler: (req: HttpRequest) => HttpResponse): {
@@ -300,6 +354,46 @@ describe('IgFlare facade', () => {
     expect(transport.requests.some((r) => r.url.includes('/media/1_9/save/'))).toBe(true);
   });
 
+  /** A CAA login that stops at the two-factor step, then walks the code-entry screens. */
+  function twoFactorFlow(): FakeTransport {
+    const context = (appId: string, value: string): HttpResponse =>
+      json({
+        status: 'ok',
+        layout: {
+          bloks_payload: {
+            action: `"com.bloks.www.ap.two_step_verification.${appId}" (f4i (dkc "context_data") (dkc "${value}"))`,
+          },
+        },
+      });
+    return caaFlowTransport((req) => {
+      if (req.url.includes('code_entry_async/')) return loginResponse(42);
+      if (req.url.includes('/bloks/apps/')) return context('code_entry_async', 'C3');
+      if (req.url.includes('entrypoint_async/')) return context('code_entry', 'C2');
+      if (req.url.includes('send_login_request')) return context('entrypoint_async', 'C1');
+      return undefined;
+    });
+  }
+
+  it('resolves the second factor from the login twoFactor option', async () => {
+    const ig = new IgFlare({ transport: twoFactorFlow(), session: createSession(), retry: false });
+
+    await ig.login({ username: 'u', password: 'p', twoFactor: { code: '123456' } });
+
+    expect(ig.session.auth.userId).toBe('42');
+  });
+
+  it('throws a typed error without a code source, then finishes with resolveTwoFactor', async () => {
+    const ig = new IgFlare({ transport: twoFactorFlow(), session: createSession(), retry: false });
+
+    const error = await ig
+      .login({ username: 'u', password: 'p' })
+      .catch((caught: unknown) => caught);
+    expect(error).toBeInstanceOf(CaaTwoFactorRequiredError);
+
+    await ig.resolveTwoFactor(error as CaaTwoFactorRequiredError, '654321');
+    expect(ig.session.auth.userId).toBe('42');
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();
@@ -307,49 +401,9 @@ describe('IgFlare facade', () => {
   });
 
   it('logs in through the CAA flow and returns the logged-in user', async () => {
-    const { publicKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
-    const pub = Buffer.from(publicKey.export({ type: 'spki', format: 'pem' })).toString('base64');
-    const bundle = JSON.stringify({
-      login_response: JSON.stringify({ logged_in_user: { pk: 999 } }),
-      headers: JSON.stringify({ 'IG-Set-Authorization': 'Bearer IGT:2:tok' }),
-      cookies: '',
-    });
-
-    const transport = new FakeTransport((req) => {
-      if (req.url.includes('launcher/sync')) {
-        return {
-          status: 200,
-          headers: {
-            'ig-set-password-encryption-key-id': '173',
-            'ig-set-password-encryption-pub-key': pub,
-          },
-          body: '{"status":"ok"}',
-        };
-      }
-      if (req.url.includes('graphql_www')) {
-        return json({ data: { xfb_usdid_registration: { success: true } } });
-      }
-      if (req.url.includes('process_client_data_and_redirect')) {
-        return json({
-          status: 'ok',
-          layout: {
-            bloks_payload: {
-              data: [{ data: { key: 'CAA_ACCOUNT_ACCESS_CONTEXT:aac', initial: 'AAC1' } }],
-            },
-          },
-        });
-      }
-      if (req.url.includes('attestation/create_android_keystore')) {
-        return json({ status: 'ok', challenge_nonce: 'N1' });
-      }
-      if (req.url.includes('send_login_request')) {
-        return json({
-          status: 'ok',
-          layout: { bloks_payload: { action: `(x, ${JSON.stringify(bundle)})` } },
-        });
-      }
-      return json({ status: 'ok' });
-    });
+    const transport = caaFlowTransport((req) =>
+      req.url.includes('send_login_request') ? loginResponse(999) : undefined,
+    );
     const ig = new IgFlare({
       transport,
       store: new MemorySessionStore(),

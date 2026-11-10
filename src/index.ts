@@ -3,6 +3,7 @@ export {
   IgApiError,
   LoginRequiredError,
   TwoFactorRequiredError,
+  CaaTwoFactorRequiredError,
   ChallengeRequiredError,
   AccountSuspendedError,
   FeedbackRequiredError,
@@ -76,6 +77,7 @@ export { PrivateClient } from './core/http/private-client';
 export type { PrivateClientOptions, PrivateRequestOptions } from './core/http/private-client';
 export { IgFlare } from './client/ig-client';
 export type {
+  IgFlareLogin,
   IgFlareOptions,
   AccountApi,
   UserApi,
@@ -148,7 +150,11 @@ export type { LoginCredentials } from './endpoints/auth/login';
 export { bloksAsyncAction } from './endpoints/auth/bloks';
 export type { BloksActionOptions } from './endpoints/auth/bloks';
 export { caaLogin, CAA_API_DOMAIN } from './endpoints/auth/caa-login';
-export type { CaaLoginCredentials } from './endpoints/auth/caa-login';
+export type { CaaLoginCredentials, CaaLoginOptions } from './endpoints/auth/caa-login';
+export { resolveCaaTwoFactor, resolveTwoFactorCode } from './endpoints/auth/caa-two-factor';
+export type { TwoFactorSource } from './endpoints/auth/caa-two-factor';
+export { generateTotp } from './core/crypto/totp';
+export type { TotpOptions } from './core/crypto/totp';
 export { getCurrentUser } from './endpoints/user/current-user';
 export { getUserInfo, getUserInfoByUsername } from './endpoints/user/user-info';
 export { userSchema } from './schemas/user';

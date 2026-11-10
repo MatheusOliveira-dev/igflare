@@ -7,26 +7,26 @@ import {
   type UsdidIdentity,
 } from '../../core/crypto/usdid';
 import { buildAttestationParams } from '../../core/crypto/attestation';
-import { extractAac, extractLoginResponse, allText } from '../../core/bloks/parser';
+import { extractAac } from '../../core/bloks/parser';
 import { encryptPassword } from '../../core/crypto/password';
 import { bloksAsyncAction } from './bloks';
 import {
+  CAA_API_DOMAIN,
   buildProcessClientDataParams,
   buildOauthTokenFetchParams,
   buildSendLoginParams,
   type SendLoginParams,
 } from './caa-params';
+import { applyCaaResult } from './caa-result';
+import { resolveCaaTwoFactor, resolveTwoFactorCode, type TwoFactorSource } from './caa-two-factor';
 import { fetchPasswordPublicKey } from './login';
 import { endpoints } from '../../generated/endpoints';
 import { IgError } from '../../errors/ig-error';
-import { IgApiError, TwoFactorRequiredError } from '../../errors/api-errors';
-import { mapError } from '../../core/http/response';
+import { CaaTwoFactorRequiredError } from '../../errors/api-errors';
 
-/** The domain the CAA/Bloks login flow talks to. */
-export const CAA_API_DOMAIN = 'b.i.instagram.com';
+export { CAA_API_DOMAIN };
 
 const USDID_REGISTRATION_CLIENT_DOC_ID = '124930351917786857261002920888';
-const AP_2SV_ENTRYPOINT = 'com.bloks.www.ap.two_step_verification.entrypoint_async';
 
 const PROCESS_CLIENT_DATA = 'com.bloks.www.bloks.caa.login.process_client_data_and_redirect';
 const OAUTH_TOKEN_FETCH = 'com.bloks.www.caa.login.oauth.token.fetch.async';
@@ -35,6 +35,11 @@ const SEND_LOGIN_REQUEST = 'com.bloks.www.bloks.caa.login.async.send_login_reque
 export interface CaaLoginCredentials {
   readonly username: string;
   readonly password: string;
+}
+
+export interface CaaLoginOptions {
+  /** Where to get the two-factor code if the account asks for one. */
+  readonly twoFactor?: TwoFactorSource;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -49,14 +54,6 @@ function hasNonAscii(value: string): boolean {
     }
   }
   return false;
-}
-
-function extractUserId(loginResponse: Record<string, unknown>): string | undefined {
-  const user = loginResponse['logged_in_user'];
-  if (isRecord(user) && (typeof user['pk'] === 'number' || typeof user['pk'] === 'string')) {
-    return String(user['pk']);
-  }
-  return undefined;
 }
 
 /** Ensures the session has a USDID identity, creating and persisting one if absent. */
@@ -188,12 +185,15 @@ async function sendLoginRequest(
  * retired `accounts/login/` endpoint. Registers the device's USDID key, runs the
  * CAA preflight (account access context + keystore attestation), then sends the
  * encrypted password. On success the session carries the user id and the
- * authorization token. A two-factor response surfaces as a typed error; its
- * resolution is handled separately.
+ * authorization token. When the account needs a two-factor code, the login
+ * resolves it itself if `options.twoFactor` says where the code comes from;
+ * otherwise a `CaaTwoFactorRequiredError` is thrown, to be resolved with
+ * `resolveCaaTwoFactor`.
  */
 export async function caaLogin(
   client: PrivateClient,
   credentials: CaaLoginCredentials,
+  options: CaaLoginOptions = {},
 ): Promise<PrivateResponseJson> {
   const publicKey = await fetchPasswordPublicKey(client);
 
@@ -227,60 +227,12 @@ export async function caaLogin(
     now,
   });
 
-  return applyCaaResult(client, result);
-}
-
-/** Whether a decoded login_response is a successful login rather than an error payload. */
-function isSuccessLogin(loginResponse: Record<string, unknown>): boolean {
-  return isRecord(loginResponse['logged_in_user']);
-}
-
-/**
- * Bloks error states that carry no login_response bundle are surfaced as action
- * markers. Each entry maps a marker string to the typed error it raises. Only the
- * markers with a captured response are listed; others await a real sample (the
- * flow still fails with a typed IgApiError until then).
- */
-const CAA_ERROR_MARKERS: readonly {
-  readonly marker: string;
-  readonly make: (raw: PrivateResponseJson) => IgApiError;
-}[] = [
-  {
-    marker: AP_2SV_ENTRYPOINT,
-    make: (raw) => new TwoFactorRequiredError('Two-factor verification required', 200, { raw }),
-  },
-];
-
-/** Applies a CAA send-login response: session on success, typed error otherwise. */
-async function applyCaaResult(
-  client: PrivateClient,
-  result: PrivateResponseJson,
-): Promise<PrivateResponseJson> {
-  const bundle = extractLoginResponse(result);
-  if (bundle === null) {
-    const text = allText(result);
-    for (const { marker, make } of CAA_ERROR_MARKERS) {
-      if (text.includes(marker)) {
-        throw make(result);
-      }
+  try {
+    return await applyCaaResult(client, result, aac);
+  } catch (error) {
+    if (error instanceof CaaTwoFactorRequiredError && options.twoFactor !== undefined) {
+      return resolveCaaTwoFactor(client, error, await resolveTwoFactorCode(options.twoFactor));
     }
-    throw new IgApiError('CAA login did not return a session', 200, { raw: result });
+    throw error;
   }
-
-  if (!isSuccessLogin(bundle.loginResponse)) {
-    // The embedded login_response is an error payload (bad password, challenge,
-    // rate limit, ...). It shares the REST error shape, so reuse that taxonomy.
-    throw mapError(200, bundle.loginResponse);
-  }
-
-  const authorization =
-    bundle.headers['IG-Set-Authorization'] ?? bundle.headers['ig-set-authorization'];
-  const userId = extractUserId(bundle.loginResponse);
-  client.patchAuth({
-    ...(authorization !== undefined && authorization !== '' ? { authorization } : {}),
-    ...(userId !== undefined ? { userId, lastLogin: Date.now() } : {}),
-    ...(Object.keys(bundle.cookies).length > 0 ? { cookies: bundle.cookies } : {}),
-  });
-  await client.persist();
-  return bundle.loginResponse;
 }
