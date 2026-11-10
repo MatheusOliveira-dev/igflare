@@ -3,6 +3,7 @@ import type { PrivateResponseJson } from '../../core/http/response';
 import type { TwoFactorRequiredError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 import { generateUuid } from '../../core/transport/device';
+import { endpoints } from '../../generated/endpoints';
 import { finalizeLogin } from './login';
 
 export interface TwoFactorOptions {
@@ -50,8 +51,8 @@ export async function twoFactorLogin(
   };
 
   const json = await client.request({
-    method: 'POST',
-    endpoint: 'accounts/two_factor_login/',
+    method: endpoints.accountsTwoFactorLogin.method,
+    endpoint: endpoints.accountsTwoFactorLogin.path,
     payload,
     withDefaultData: false,
   });

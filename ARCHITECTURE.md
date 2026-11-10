@@ -51,7 +51,7 @@ Every endpoint follows one shape, so a caller learns it once:
   an error value.
 - **Responses are validated at the boundary with zod, leniently.** A schema types
   and validates only the fields the SDK exposes; everything else passes through
-  (`.passthrough()`), and the API's own fields are `optional`/`nullable` so a
+  (`z.looseObject` / `.loose()`), and the API's own fields are `optional`/`nullable` so a
   benign upstream change does not break callers. The types tell the truth about
   nullability rather than overpromising.
 - **A response that fails its schema is a typed error too** (carrying the raw body),

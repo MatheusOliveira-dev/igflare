@@ -38,3 +38,17 @@ export class ClientForbiddenError extends IgApiError {}
 
 /** The response body could not be parsed as JSON. */
 export class ClientJsonError extends IgError {}
+
+/**
+ * A response parsed as JSON but did not match the endpoint's schema. Carries the
+ * raw decoded body so a caller can inspect what drifted, instead of leaking a
+ * raw zod error.
+ */
+export class ClientSchemaError extends IgError {
+  readonly raw: unknown;
+
+  constructor(message: string, raw: unknown, options?: ErrorOptions) {
+    super(message, options);
+    this.raw = raw;
+  }
+}

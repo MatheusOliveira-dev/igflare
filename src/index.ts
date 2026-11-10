@@ -13,6 +13,7 @@ export {
   ClientForbiddenError,
   ClientJsonError,
 } from './errors/api-errors';
+export { ClientSchemaError } from './errors/api-errors';
 export type { ApiErrorPayload } from './errors/api-errors';
 export { parsePrivateResponse } from './core/http/response';
 export type { PrivateResponseJson } from './core/http/response';
@@ -78,6 +79,9 @@ export type { BloksActionOptions } from './endpoints/auth/bloks';
 export { caaLogin, CAA_API_DOMAIN } from './endpoints/auth/caa-login';
 export type { CaaLoginCredentials } from './endpoints/auth/caa-login';
 export { getCurrentUser } from './endpoints/user/current-user';
+export { getUserInfo } from './endpoints/user/user-info';
+export { userSchema } from './schemas/user';
+export type { User } from './schemas/user';
 export { twoFactorLogin } from './endpoints/auth/two-factor';
 export type { TwoFactorOptions } from './endpoints/auth/two-factor';
 export {

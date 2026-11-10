@@ -6,13 +6,15 @@ export interface EndpointDefinition {
   readonly path: string;
 }
 
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'launcherSync';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'launcherSync' | 'userInfo';
 
 export const endpoints: Record<EndpointName, EndpointDefinition> = {
   accountsCurrentUser: { method: 'GET', path: '/api/v1/accounts/current_user/' },
   accountsLogin: { method: 'POST', path: '/api/v1/accounts/login/' },
+  accountsTwoFactorLogin: { method: 'POST', path: '/api/v1/accounts/two_factor_login/' },
   attestationCreateAndroidKeystore: { method: 'POST', path: '/api/v1/attestation/create_android_keystore/' },
   bloksAsyncAction: { method: 'POST', path: '/api/v1/bloks/async_action/' },
   feedTimeline: { method: 'POST', path: '/api/v1/feed/timeline/' },
   launcherSync: { method: 'POST', path: '/api/v1/launcher/sync/' },
+  userInfo: { method: 'GET', path: '/api/v1/users/{pk}/info/' },
 };

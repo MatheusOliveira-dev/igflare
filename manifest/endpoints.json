@@ -2,6 +2,11 @@
   "version": 1,
   "endpoints": [
     { "name": "accountsLogin", "method": "POST", "path": "/api/v1/accounts/login/" },
+    {
+      "name": "accountsTwoFactorLogin",
+      "method": "POST",
+      "path": "/api/v1/accounts/two_factor_login/"
+    },
     { "name": "accountsCurrentUser", "method": "GET", "path": "/api/v1/accounts/current_user/" },
     {
       "name": "attestationCreateAndroidKeystore",
@@ -10,6 +15,7 @@
     },
     { "name": "bloksAsyncAction", "method": "POST", "path": "/api/v1/bloks/async_action/" },
     { "name": "feedTimeline", "method": "POST", "path": "/api/v1/feed/timeline/" },
-    { "name": "launcherSync", "method": "POST", "path": "/api/v1/launcher/sync/" }
+    { "name": "launcherSync", "method": "POST", "path": "/api/v1/launcher/sync/" },
+    { "name": "userInfo", "method": "GET", "path": "/api/v1/users/{pk}/info/" }
   ]
 }
