@@ -33,6 +33,23 @@ export const mediaSchema = z
       .loose()
       .optional(),
     video_versions: z.array(mediaVersionSchema).nullable().optional(),
+    /**
+     * The people tagged in the post. `null` or empty when nobody is. (`fb_user_tags` is
+     * a different field and stays empty even for a tagged post.)
+     */
+    usertags: z
+      .object({
+        in: z
+          .array(
+            z
+              .object({ position: z.array(z.number()).optional(), user: userSchema.optional() })
+              .loose(),
+          )
+          .optional(),
+      })
+      .loose()
+      .nullable()
+      .optional(),
   })
   .loose();
 

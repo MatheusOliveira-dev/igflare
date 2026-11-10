@@ -38,6 +38,86 @@ describe('editMedia', () => {
     expect(media.caption?.text).toBe('novo');
   });
 
+  it('does not send usertags on a caption-only edit, so existing tags are kept', async () => {
+    const { client, transport } = clientReturning(EDITED);
+    await editMedia(client, MEDIA, { caption: 'novo' });
+    expect(signedPayload(transport.requests[0])).not.toHaveProperty('usertags');
+  });
+
+  it('tags people with exact ids and positions', async () => {
+    const { client, transport } = clientReturning(EDITED);
+    await editMedia(client, MEDIA, {
+      caption: 'x',
+      tag: [{ userId: '10000000001', x: 0.5, y: 0.25 }],
+    });
+    expect(signedPayload(transport.requests[0])['usertags']).toBe(
+      '{"in":[{"user_id":10000000001,"position":[0.5,0.25]}]}',
+    );
+  });
+
+  it('keeps a 64-bit user id exact in the tag JSON', async () => {
+    const { client, transport } = clientReturning(EDITED);
+    await editMedia(client, MEDIA, {
+      caption: 'x',
+      tag: [{ userId: '9007199254740993', x: 0, y: 1 }],
+    });
+    expect(signedPayload(transport.requests[0])['usertags']).toContain(
+      '"user_id":9007199254740993',
+    );
+  });
+
+  it('untags by id with the removed list (an empty tag list alone removes nothing)', async () => {
+    const { client, transport } = clientReturning(EDITED);
+    await editMedia(client, MEDIA, { caption: 'x', untag: ['10000000001'] });
+    expect(signedPayload(transport.requests[0])['usertags']).toBe(
+      '{"in":[],"removed":[10000000001]}',
+    );
+  });
+
+  it('can tag and untag in one edit', async () => {
+    const { client, transport } = clientReturning(EDITED);
+    await editMedia(client, MEDIA, {
+      caption: 'x',
+      tag: [{ userId: '1', x: 0.1, y: 0.2 }],
+      untag: ['2', '3'],
+    });
+    expect(signedPayload(transport.requests[0])['usertags']).toBe(
+      '{"in":[{"user_id":1,"position":[0.1,0.2]}],"removed":[2,3]}',
+    );
+  });
+
+  it('rejects a bad tag position or a non-numeric id before any request', async () => {
+    const { client, transport } = clientReturning(EDITED);
+    await expect(
+      editMedia(client, MEDIA, { caption: 'x', tag: [{ userId: '1', x: 2, y: 0 }] }),
+    ).rejects.toBeInstanceOf(IgError);
+    await expect(
+      editMedia(client, MEDIA, { caption: 'x', tag: [{ userId: 'a', x: 0, y: 0 }] }),
+    ).rejects.toBeInstanceOf(IgError);
+    await expect(
+      editMedia(client, MEDIA, { caption: 'x', untag: ['../x'] }),
+    ).rejects.toBeInstanceOf(IgError);
+    expect(transport.requests).toHaveLength(0);
+  });
+
+  it('reads the applied tags back from usertags on the returned media', async () => {
+    const { client } = clientReturning({
+      status: 'ok',
+      media: {
+        pk: 1,
+        usertags: {
+          in: [{ position: [0.5, 0.5], user: { pk: 10000000001, username: 'matheus' } }],
+        },
+      },
+    });
+    const media = await editMedia(client, MEDIA, {
+      caption: 'x',
+      tag: [{ userId: '10000000001', x: 0.5, y: 0.5 }],
+    });
+    expect(media.usertags?.in?.[0]?.user?.username).toBe('matheus');
+    expect(media.usertags?.in?.[0]?.position).toEqual([0.5, 0.5]);
+  });
+
   it('throws a typed error when the response has no media', async () => {
     const { client } = clientReturning({ status: 'ok' });
     await expect(editMedia(client, MEDIA, { caption: 'x' })).rejects.toBeInstanceOf(

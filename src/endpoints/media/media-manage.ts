@@ -4,7 +4,7 @@ import type { EndpointDefinition } from '../../generated/endpoints';
 import { mediaSchema, type Media } from '../../schemas/media';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
-import { isRecord } from '../direct/direct-wire';
+import { assertIds, isRecord } from '../direct/direct-wire';
 import { mediaActionPayload } from './media';
 
 function mediaPathId(mediaId: string): string {
@@ -19,12 +19,53 @@ function mediaPk(mediaId: string): string {
   return mediaPathId(mediaId).split('_')[0] ?? mediaId;
 }
 
+/** Where on the photo a person is tagged, as fractions of its width and height. */
+export interface UserTag {
+  readonly userId: string;
+  readonly x: number;
+  readonly y: number;
+}
+
 export interface EditMediaOptions {
   /** The new caption. */
   readonly caption: string;
+  /**
+   * People to tag, or to move if they are already tagged. Tags not listed are
+   * left alone. On a private account the server only applies a tag for someone who can
+   * see the post (a follower); for anyone else it answers ok and tags nobody, so read
+   * the result back from `usertags`.
+   */
+  readonly tag?: readonly UserTag[];
+  /** Ids of people to remove from the post's tags. An empty list of `tag` does not remove. */
+  readonly untag?: readonly string[];
 }
 
-/** Edits the caption of one of the account's posts and returns the updated media. */
+/**
+ * The usertags JSON the edit endpoint takes: `in` adds or moves tags and `removed`
+ * lists the user ids to untag. Built by hand because user ids can exceed what a JS
+ * number holds exactly, so they must not round-trip through one.
+ */
+function usertagsJson(tag: readonly UserTag[], untag: readonly string[] | undefined): string {
+  const entries = tag.map((entry) => {
+    assertIds([entry.userId], 'A tagged user id');
+    if (!(entry.x >= 0 && entry.x <= 1 && entry.y >= 0 && entry.y <= 1)) {
+      throw new IgError('A tag position is a pair of fractions between 0 and 1');
+    }
+    return `{"user_id":${entry.userId},"position":[${String(entry.x)},${String(entry.y)}]}`;
+  });
+  let json = `"in":[${entries.join(',')}]`;
+  if (untag !== undefined && untag.length > 0) {
+    assertIds(untag, 'Untagged user ids');
+    json += `,"removed":[${untag.join(',')}]`;
+  }
+  return `{${json}}`;
+}
+
+/**
+ * Edits the caption of one of the account's posts, and optionally tags or untags people.
+ * Returns the updated media. Tags are only sent when asked for, so a caption edit never
+ * changes them.
+ */
 export async function editMedia(
   client: PrivateClient,
   mediaId: string,
@@ -38,6 +79,9 @@ export async function editMedia(
       container_module: 'edit_media_info',
       feed_position: '0',
       is_carousel_bumped_post: 'false',
+      ...(options.tag !== undefined || options.untag !== undefined
+        ? { usertags: usertagsJson(options.tag ?? [], options.untag) }
+        : {}),
     },
   });
   const media = json['media'];

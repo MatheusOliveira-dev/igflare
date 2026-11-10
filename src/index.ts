@@ -124,7 +124,7 @@ export {
   pinMedia,
   unpinMedia,
 } from './endpoints/media/media-manage';
-export type { EditMediaOptions } from './endpoints/media/media-manage';
+export type { EditMediaOptions, UserTag } from './endpoints/media/media-manage';
 export { uploadPhoto, uploadVideo, uploadStoryPhoto } from './endpoints/upload/upload';
 export { getReelsTray, getUserStories, markStoriesSeen } from './endpoints/story/story';
 export { reelSchema } from './schemas/reel';
