@@ -4,6 +4,7 @@ import { mediaSchema, type Media } from '../../schemas/media';
 import { paginate } from '../../core/pagination';
 import type { Page } from '../../core/pagination';
 import { ClientSchemaError } from '../../errors/api-errors';
+import { IgError } from '../../errors/ig-error';
 
 export interface FeedOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
@@ -146,19 +147,67 @@ function sectionsPage(json: Record<string, unknown>): Page<Media> {
     }
     return parsed.data;
   });
-  const next = readNextCursor(json);
+  const next = encodeSectionsCursor(json);
   return next !== undefined && json['more_available'] !== false
     ? { items, nextCursor: next }
     : { items };
 }
 
+/** What a `sections` page needs echoed back to return the page after it. */
+interface SectionsCursor {
+  readonly maxId: string;
+  readonly page: number;
+  readonly mediaIds: readonly string[];
+}
+
+/**
+ * Packs the three values a sections response gives for the next page into one opaque
+ * cursor. Sending only `max_id` (as the first version did) is answered with a 500;
+ * the server also wants `page` and `next_media_ids` back.
+ */
+function encodeSectionsCursor(json: Record<string, unknown>): string | undefined {
+  const maxId = json['next_max_id'];
+  if (typeof maxId !== 'string' || maxId === '') {
+    return undefined;
+  }
+  const page = typeof json['next_page'] === 'number' ? json['next_page'] : 0;
+  const ids = json['next_media_ids'];
+  const mediaIds = Array.isArray(ids) ? ids.map(String) : [];
+  const cursor: SectionsCursor = { maxId, page, mediaIds };
+  return Buffer.from(JSON.stringify(cursor)).toString('base64url');
+}
+
+function decodeSectionsCursor(value: string): SectionsCursor {
+  try {
+    const parsed = JSON.parse(Buffer.from(value, 'base64url').toString('utf8')) as unknown;
+    if (
+      isRecord(parsed) &&
+      typeof parsed['maxId'] === 'string' &&
+      typeof parsed['page'] === 'number' &&
+      Array.isArray(parsed['mediaIds'])
+    ) {
+      return {
+        maxId: parsed['maxId'],
+        page: parsed['page'],
+        mediaIds: parsed['mediaIds'].map(String),
+      };
+    }
+  } catch {
+    // fall through to the typed error below
+  }
+  throw new IgError('The cursor does not come from a hashtag or location feed page');
+}
+
 /** The POST body a `sections` feed takes: the recent tab, plus the cursor if any. */
-function sectionsBody(maxId: string | undefined): Record<string, unknown> {
+function sectionsBody(cursor: string | undefined): Record<string, unknown> {
+  const next = cursor !== undefined ? decodeSectionsCursor(cursor) : undefined;
   return {
     tab: 'recent',
     supported_tabs: JSON.stringify(['top', 'recent']),
     include_persistent: true,
-    ...(maxId !== undefined ? { max_id: maxId, page: maxId } : {}),
+    ...(next !== undefined
+      ? { max_id: next.maxId, page: next.page, next_media_ids: JSON.stringify(next.mediaIds) }
+      : {}),
   };
 }
 

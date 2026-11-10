@@ -12,6 +12,7 @@ import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
 import { createSession } from '../../core/session/session';
 import { ClientSchemaError } from '../../errors/api-errors';
+import { IgError } from '../../errors/ig-error';
 
 /** Recovers the JSON payload from a signed_body form request. */
 function signedPayload(body: string | Uint8Array | undefined): Record<string, unknown> {
@@ -172,25 +173,58 @@ function sections(medias: unknown[], extra: Record<string, unknown> = {}): unkno
 }
 
 describe('hashtag and location feeds', () => {
+  const NEXT = {
+    next_max_id: 'n1',
+    next_page: 2,
+    next_media_ids: ['111', '222'],
+    more_available: true,
+  };
+
   it('posts to the tag sections endpoint and flattens the media', async () => {
-    const { client, transport } = clientReturning(
-      sections([{ pk: 1, code: 'a' }], { next_max_id: 'n1', more_available: true }),
-    );
+    const { client, transport } = clientReturning(sections([{ pk: 1, code: 'a' }], NEXT));
 
     const page = await getHashtagFeed(client, 'sunset');
 
     expect(transport.requests[0]?.url).toBe('https://i.instagram.com/api/v1/tags/sunset/sections/');
     expect(transport.requests[0]?.method).toBe('POST');
-    expect(signedPayload(transport.requests[0]?.body)['tab']).toBe('recent');
+    const first = signedPayload(transport.requests[0]?.body);
+    expect(first['tab']).toBe('recent');
+    expect(first).not.toHaveProperty('max_id');
     expect(page.items[0]?.code).toBe('a');
-    expect(page.nextCursor).toBe('n1');
+    expect(page.nextCursor).toBeTypeOf('string');
   });
 
-  it('url-encodes the tag and sends max_id in the body', async () => {
+  it('echoes max_id, page and next_media_ids back to get the next page', async () => {
+    // Sending only max_id was answered with a 500 live; the server wants all three.
+    const { client, transport } = clientReturning(sections([{ pk: 1 }], NEXT));
+    const first = await getHashtagFeed(client, 'sunset');
+
+    await getHashtagFeed(client, 'sunset', { maxId: first.nextCursor ?? '' });
+
+    const second = signedPayload(transport.requests[1]?.body);
+    expect(second['max_id']).toBe('n1');
+    expect(second['page']).toBe(2); // a number, not the cursor string
+    expect(second['next_media_ids']).toBe('["111","222"]');
+  });
+
+  it('url-encodes the tag', async () => {
     const { client, transport } = clientReturning(sections([{ pk: 2 }]));
-    await getHashtagFeed(client, 'new year', { maxId: 'n1' });
+    await getHashtagFeed(client, 'new year');
     expect(transport.requests[0]?.url).toContain('/api/v1/tags/new%20year/sections/');
-    expect(signedPayload(transport.requests[0]?.body)['max_id']).toBe('n1');
+  });
+
+  it('rejects a cursor that did not come from a sections page, before any request', async () => {
+    const { client, transport } = clientReturning(sections([{ pk: 2 }]));
+    await expect(getHashtagFeed(client, 'x', { maxId: 'not-a-cursor' })).rejects.toBeInstanceOf(
+      IgError,
+    );
+    await expect(getLocationFeed(client, '1', { maxId: 'n1' })).rejects.toBeInstanceOf(IgError);
+    expect(transport.requests).toHaveLength(0);
+  });
+
+  it('has no next cursor when the response gives no next_max_id', async () => {
+    const { client } = clientReturning(sections([{ pk: 2 }], { more_available: true }));
+    expect((await getHashtagFeed(client, 'x')).nextCursor).toBeUndefined();
   });
 
   it('posts to the location sections endpoint', async () => {
