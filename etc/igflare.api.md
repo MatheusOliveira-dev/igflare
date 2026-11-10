@@ -349,11 +349,21 @@ export interface DirectApi {
     // (undocumented)
     pending(options?: CursorOptions): Promise<Page<Thread>>;
     // (undocumented)
+    react(threadId: string, itemId: string, options?: ReactionOptions): Promise<void>;
+    // (undocumented)
     searchRecipients(query: string, mode?: RecipientSearchMode): Promise<User[]>;
+    // (undocumented)
+    sendLink(text: string, target: SendTarget): Promise<DirectSendResult>;
+    // (undocumented)
+    sendPhoto(jpeg: Uint8Array, target: SendTarget): Promise<DirectSendResult>;
     // (undocumented)
     sendText(text: string, target: SendTarget): Promise<DirectSendResult>;
     // (undocumented)
     setTitle(threadId: string, title: string): Promise<void>;
+    // (undocumented)
+    shareMedia(mediaId: string, target: SendTarget, options?: ShareMediaOptions): Promise<DirectSendResult>;
+    // (undocumented)
+    shareProfile(userId: string, target: SendTarget): Promise<DirectSendResult>;
     // (undocumented)
     spam(options?: CursorOptions): Promise<Page<Thread>>;
     // (undocumented)
@@ -406,7 +416,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastReaction' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -1051,6 +1061,15 @@ export class RateLimitError extends IgApiError {
 }
 
 // @public (undocumented)
+export interface ReactionOptions {
+    readonly emoji?: string;
+    readonly remove?: boolean;
+}
+
+// @public
+export function reactToMessage(client: PrivateClient, threadId: string, itemId: string, options?: ReactionOptions): Promise<void>;
+
+// @public (undocumented)
 export type RecipientSearchMode = 'universal' | 'raven';
 
 // @public (undocumented)
@@ -1173,6 +1192,12 @@ export function searchUsers(client: PrivateClient, query: string): Promise<User[
 export function selectChallengeMethod(client: PrivateClient, challenge: Challenge, choice: number): Promise<PrivateResponseJson>;
 
 // @public
+export function sendLink(client: PrivateClient, text: string, target: SendTarget): Promise<DirectSendResult>;
+
+// @public
+export function sendPhoto(client: PrivateClient, jpeg: Uint8Array, target: SendTarget): Promise<DirectSendResult>;
+
+// @public
 export type SendTarget = {
     readonly threadId: string;
 } | {
@@ -1213,6 +1238,17 @@ export function setBiography(client: PrivateClient, text: string): Promise<User>
 
 // @public
 export function setThreadTitle(client: PrivateClient, threadId: string, title: string): Promise<void>;
+
+// @public
+export function shareMedia(client: PrivateClient, mediaId: string, target: SendTarget, options?: ShareMediaOptions): Promise<DirectSendResult>;
+
+// @public (undocumented)
+export interface ShareMediaOptions {
+    readonly mediaType?: 'photo' | 'video';
+}
+
+// @public
+export function shareProfile(client: PrivateClient, userId: string, target: SendTarget): Promise<DirectSendResult>;
 
 // @public
 export interface Signer {
