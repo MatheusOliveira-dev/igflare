@@ -213,6 +213,11 @@ export interface CreateSessionOptions {
 export function createSigner(): Signer;
 
 // @public (undocumented)
+export interface CursorOptions {
+    readonly cursor?: string;
+}
+
+// @public (undocumented)
 export const DEFAULT_DEVICE_PROFILE: DeviceProfile;
 
 // @public (undocumented)
@@ -272,6 +277,42 @@ export interface DeviceState {
 }
 
 // @public
+export interface DirectApi {
+    // (undocumented)
+    inbox(options?: CursorOptions): Promise<Page<Thread>>;
+    // (undocumented)
+    paginateInbox(): AsyncGenerator<Thread>;
+    // (undocumented)
+    paginateThread(threadId: string): AsyncGenerator<DirectMessage>;
+    // (undocumented)
+    sendText(text: string, target: SendTarget): Promise<DirectSendResult>;
+    // (undocumented)
+    thread(threadId: string, options?: CursorOptions): Promise<Page<DirectMessage>>;
+}
+
+// @public (undocumented)
+export type DirectMessage = z.infer<typeof directMessageSchema>;
+
+// @public
+export const directMessageSchema: z.ZodObject<{
+    item_id: z.ZodOptional<z.ZodString>;
+    item_type: z.ZodOptional<z.ZodString>;
+    user_id: z.ZodOptional<z.ZodCoercedString<unknown>>;
+    timestamp: z.ZodOptional<z.ZodCoercedString<unknown>>;
+    text: z.ZodOptional<z.ZodString>;
+}, z.core.$loose>;
+
+// @public (undocumented)
+export type DirectSendResult = z.infer<typeof directSendResultSchema>;
+
+// @public
+export const directSendResultSchema: z.ZodObject<{
+    item_id: z.ZodOptional<z.ZodString>;
+    thread_id: z.ZodOptional<z.ZodString>;
+    timestamp: z.ZodOptional<z.ZodCoercedString<unknown>>;
+}, z.core.$loose>;
+
+// @public
 export function encryptPassword(password: string, key: PasswordPublicKey, options?: EncryptPasswordOptions): string;
 
 // @public (undocumented)
@@ -293,7 +334,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaComment' | 'mediaCommentDelete' | 'mediaInfo' | 'mediaLike' | 'mediaUnlike' | 'userInfo' | 'userInfoByUsername';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaComment' | 'mediaCommentDelete' | 'mediaInfo' | 'mediaLike' | 'mediaUnlike' | 'userInfo' | 'userInfoByUsername';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -424,7 +465,13 @@ export function getFollowing(client: PrivateClient, pk: string, options?: Follow
 export function getFriendshipStatus(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
 
 // @public
+export function getInbox(client: PrivateClient, options?: CursorOptions): Promise<Page<Thread>>;
+
+// @public
 export function getMediaInfo(client: PrivateClient, mediaId: string): Promise<Media>;
+
+// @public
+export function getThread(client: PrivateClient, threadId: string, options?: CursorOptions): Promise<Page<DirectMessage>>;
 
 // @public
 export function getTimelineFeed(client: PrivateClient, options?: FeedOptions): Promise<Page<Media>>;
@@ -488,6 +535,8 @@ export class IgClient {
     // (undocumented)
     readonly account: AccountApi;
     get client(): PrivateClient;
+    // (undocumented)
+    readonly direct: DirectApi;
     // (undocumented)
     readonly feed: FeedApi;
     // (undocumented)
@@ -632,6 +681,12 @@ export function paginateFollowers(client: PrivateClient, pk: string): AsyncGener
 export function paginateFollowing(client: PrivateClient, pk: string): AsyncGenerator<User>;
 
 // @public
+export function paginateInbox(client: PrivateClient): AsyncGenerator<Thread>;
+
+// @public
+export function paginateThread(client: PrivateClient, threadId: string): AsyncGenerator<DirectMessage>;
+
+// @public
 export function paginateTimeline(client: PrivateClient): AsyncGenerator<Media>;
 
 // @public
@@ -765,6 +820,16 @@ export class RetryTransport implements HttpTransport {
 // @public
 export function selectChallengeMethod(client: PrivateClient, challenge: Challenge, choice: number): Promise<PrivateResponseJson>;
 
+// @public
+export type SendTarget = {
+    readonly threadId: string;
+} | {
+    readonly userIds: readonly string[];
+};
+
+// @public
+export function sendText(client: PrivateClient, text: string, target: SendTarget): Promise<DirectSendResult>;
+
 // @public (undocumented)
 export class SentryBlockError extends IgApiError {
 }
@@ -805,6 +870,43 @@ export function startChallenge(client: PrivateClient, error: ChallengeRequiredEr
 
 // @public
 export function submitChallengeCode(client: PrivateClient, challenge: Challenge, code: string): Promise<PrivateResponseJson>;
+
+// @public (undocumented)
+export type Thread = z.infer<typeof threadSchema>;
+
+// @public
+export const threadSchema: z.ZodObject<{
+    thread_id: z.ZodOptional<z.ZodString>;
+    thread_title: z.ZodOptional<z.ZodString>;
+    is_group: z.ZodOptional<z.ZodBoolean>;
+    last_activity_at: z.ZodOptional<z.ZodCoercedString<unknown>>;
+    users: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+        username: z.ZodOptional<z.ZodString>;
+        full_name: z.ZodOptional<z.ZodString>;
+        is_private: z.ZodOptional<z.ZodBoolean>;
+        is_verified: z.ZodOptional<z.ZodBoolean>;
+        profile_pic_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        biography: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>>>;
+    items: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        item_id: z.ZodOptional<z.ZodString>;
+        item_type: z.ZodOptional<z.ZodString>;
+        user_id: z.ZodOptional<z.ZodCoercedString<unknown>>;
+        timestamp: z.ZodOptional<z.ZodCoercedString<unknown>>;
+        text: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>>>;
+    last_permanent_item: z.ZodOptional<z.ZodObject<{
+        item_id: z.ZodOptional<z.ZodString>;
+        item_type: z.ZodOptional<z.ZodString>;
+        user_id: z.ZodOptional<z.ZodCoercedString<unknown>>;
+        timestamp: z.ZodOptional<z.ZodCoercedString<unknown>>;
+        text: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>>;
+}, z.core.$loose>;
 
 // @public
 export function twoFactorLogin(client: PrivateClient, error: TwoFactorRequiredError, options: TwoFactorOptions): Promise<PrivateResponseJson>;
