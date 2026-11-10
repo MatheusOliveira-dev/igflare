@@ -227,6 +227,9 @@ export const DEFAULT_LOCATION: LocationState;
 export function deleteComment(client: PrivateClient, mediaId: string, commentId: string): Promise<void>;
 
 // @public
+export function deleteMedia(client: PrivateClient, mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL'): Promise<void>;
+
+// @public
 export interface DeviceProfile {
     // (undocumented)
     readonly androidRelease: string;
@@ -334,7 +337,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaComment' | 'mediaCommentDelete' | 'mediaInfo' | 'mediaLike' | 'mediaUnlike' | 'userInfo' | 'userInfoByUsername';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaComment' | 'mediaCommentDelete' | 'mediaConfigure' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaUnlike' | 'userInfo' | 'userInfoByUsername';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -491,7 +494,7 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 // @public (undocumented)
 export interface HttpRequest {
     // (undocumented)
-    readonly body?: string;
+    readonly body?: string | Uint8Array;
     // (undocumented)
     readonly headers: Record<string, string>;
     // (undocumented)
@@ -547,6 +550,8 @@ export class IgClient {
     readonly media: MediaApi;
     get session(): SessionData;
     // (undocumented)
+    readonly upload: UploadApi;
+    // (undocumented)
     readonly user: UserApi;
 }
 
@@ -565,6 +570,14 @@ export class IgResponseError extends IgError {
     constructor(message: string, statusCode: number, options?: ErrorOptions);
     // (undocumented)
     readonly statusCode: number;
+}
+
+// @public (undocumented)
+export interface ImageSize {
+    // (undocumented)
+    readonly height: number;
+    // (undocumented)
+    readonly width: number;
 }
 
 // @public
@@ -606,6 +619,8 @@ export type Media = z.infer<typeof mediaSchema>;
 export interface MediaApi {
     // (undocumented)
     comment(mediaId: string, text: string): Promise<Comment>;
+    // (undocumented)
+    delete(mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL'): Promise<void>;
     // (undocumented)
     deleteComment(mediaId: string, commentId: string): Promise<void>;
     // (undocumented)
@@ -693,6 +708,9 @@ export function paginateTimeline(client: PrivateClient): AsyncGenerator<Media>;
 export function paginateUserFeed(client: PrivateClient, pk: string): AsyncGenerator<Media>;
 
 // @public
+export function parseJpegSize(bytes: Uint8Array): ImageSize;
+
+// @public
 export function parsePrivateResponse(response: HttpResponse): PrivateResponseJson;
 
 // @public
@@ -703,6 +721,12 @@ export interface PasswordPublicKey {
     // (undocumented)
     readonly keyId: number;
     readonly publicKey: string;
+}
+
+// @public (undocumented)
+export interface PhotoUploadOptions {
+    // (undocumented)
+    readonly caption?: string;
 }
 
 // @public (undocumented)
@@ -754,6 +778,7 @@ export interface PrivateRequestInput {
     readonly payload?: Record<string, unknown>;
     // (undocumented)
     readonly query?: Record<string, string>;
+    readonly rawBody?: Uint8Array;
     readonly rawUrl?: string;
     // (undocumented)
     readonly session: SessionData;
@@ -929,6 +954,15 @@ export function unfollowUser(client: PrivateClient, pk: string): Promise<Friends
 
 // @public
 export function unlikeMedia(client: PrivateClient, mediaId: string): Promise<void>;
+
+// @public
+export interface UploadApi {
+    // (undocumented)
+    photo(jpeg: Uint8Array, options?: PhotoUploadOptions): Promise<Media>;
+}
+
+// @public
+export function uploadPhoto(client: PrivateClient, jpeg: Uint8Array, options?: PhotoUploadOptions): Promise<Media>;
 
 // @public
 export const USDID_TOKEN_TTL = 3600;
