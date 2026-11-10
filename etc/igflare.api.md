@@ -661,6 +661,7 @@ export type IgFlareLogin = CaaLoginCredentials & {
 
 // @public
 export interface IgFlareOptions extends PrivateClientOptions {
+    readonly autoRelogin?: boolean;
     readonly retry?: false | RetryOptions;
 }
 
@@ -909,6 +910,7 @@ export class PrivateClient {
 
 // @public (undocumented)
 export interface PrivateClientOptions {
+    readonly onSessionExpired?: (error: LoginRequiredError) => Promise<void>;
     // (undocumented)
     readonly session?: SessionData;
     // (undocumented)
