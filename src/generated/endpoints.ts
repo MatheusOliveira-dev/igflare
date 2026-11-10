@@ -6,7 +6,7 @@ export interface EndpointDefinition {
   readonly path: string;
 }
 
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastReaction' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastReaction' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
 
 export const endpoints: Record<EndpointName, EndpointDefinition> = {
   accountsCurrentUser: { method: 'GET', path: '/api/v1/accounts/current_user/' },
@@ -57,21 +57,32 @@ export const endpoints: Record<EndpointName, EndpointDefinition> = {
   friendshipsUnmute: { method: 'POST', path: '/api/v1/friendships/unmute_posts_or_story_from_follow/' },
   launcherSync: { method: 'POST', path: '/api/v1/launcher/sync/' },
   locationsSections: { method: 'POST', path: '/api/v1/locations/{id}/sections/' },
+  mediaArchive: { method: 'POST', path: '/api/v1/media/{id}/only_me/' },
   mediaComment: { method: 'POST', path: '/api/v1/media/{id}/comment/' },
+  mediaCommentBulkDelete: { method: 'POST', path: '/api/v1/media/{id}/comment/bulk_delete/' },
   mediaCommentDelete: { method: 'POST', path: '/api/v1/media/{id}/comment/{comment_id}/delete/' },
+  mediaCommentLike: { method: 'POST', path: '/api/v1/media/{comment_id}/comment_like/' },
+  mediaCommentPin: { method: 'POST', path: '/api/v1/media/{id}/pin_comment/{comment_id}/' },
+  mediaCommentReplies: { method: 'GET', path: '/api/v1/media/{id}/comments/{comment_id}/inline_child_comments/' },
   mediaComments: { method: 'GET', path: '/api/v1/media/{id}/comments/' },
+  mediaCommentUnlike: { method: 'POST', path: '/api/v1/media/{comment_id}/comment_unlike/' },
+  mediaCommentUnpin: { method: 'POST', path: '/api/v1/media/{id}/unpin_comment/{comment_id}/' },
   mediaConfigure: { method: 'POST', path: '/api/v1/media/configure/' },
   mediaConfigureToStory: { method: 'POST', path: '/api/v1/media/configure_to_story/' },
   mediaDelete: { method: 'POST', path: '/api/v1/media/{id}/delete/' },
+  mediaEdit: { method: 'POST', path: '/api/v1/media/{id}/edit_media/' },
   mediaInfo: { method: 'GET', path: '/api/v1/media/{id}/info/' },
   mediaLike: { method: 'POST', path: '/api/v1/media/{id}/like/' },
   mediaLikers: { method: 'GET', path: '/api/v1/media/{id}/likers/' },
   mediaSave: { method: 'POST', path: '/api/v1/media/{id}/save/' },
+  mediaUnarchive: { method: 'POST', path: '/api/v1/media/{id}/undo_only_me/' },
   mediaUnlike: { method: 'POST', path: '/api/v1/media/{id}/unlike/' },
   mediaUnsave: { method: 'POST', path: '/api/v1/media/{id}/unsave/' },
   tagsSearch: { method: 'GET', path: '/api/v1/tags/search/' },
   tagsSections: { method: 'POST', path: '/api/v1/tags/{tag}/sections/' },
   userInfo: { method: 'GET', path: '/api/v1/users/{pk}/info/' },
   userInfoByUsername: { method: 'GET', path: '/api/v1/users/{username}/usernameinfo/' },
+  usersPinTimelineMedia: { method: 'POST', path: '/api/v1/users/pin_timeline_media/' },
   usersSearch: { method: 'GET', path: '/api/v1/users/search/' },
+  usersUnpinTimelineMedia: { method: 'POST', path: '/api/v1/users/unpin_timeline_media/' },
 };

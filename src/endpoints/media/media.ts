@@ -39,7 +39,7 @@ export async function getMediaInfo(client: PrivateClient, mediaId: string): Prom
 }
 
 /** The common fields a media action POST carries, over the signed default data. */
-function mediaActionPayload(client: PrivateClient): Record<string, unknown> {
+export function mediaActionPayload(client: PrivateClient): Record<string, unknown> {
   return {
     ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),
     radio_type: 'wifi-none',
@@ -65,11 +65,17 @@ export async function unlikeMedia(client: PrivateClient, mediaId: string): Promi
   });
 }
 
-/** Posts a comment on a media and returns the created comment. */
+export interface CommentOptions {
+  /** The id of the comment this one replies to. Omit for a top-level comment. */
+  readonly repliedToCommentId?: string;
+}
+
+/** Posts a comment (or a reply, with `repliedToCommentId`) and returns the created comment. */
 export async function commentMedia(
   client: PrivateClient,
   mediaId: string,
   text: string,
+  options: CommentOptions = {},
 ): Promise<Comment> {
   const json = await client.request({
     method: endpoints.mediaComment.method,
@@ -78,6 +84,9 @@ export async function commentMedia(
       ...mediaActionPayload(client),
       comment_text: text,
       idempotence_token: randomUUID(),
+      ...(options.repliedToCommentId !== undefined
+        ? { replied_to_comment_id: options.repliedToCommentId }
+        : {}),
     },
   });
   const comment = json['comment'];

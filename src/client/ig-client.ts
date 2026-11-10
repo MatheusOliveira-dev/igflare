@@ -58,7 +58,25 @@ import {
   paginateSavedPosts,
 } from '../endpoints/media/media';
 import { setBiography } from '../endpoints/account/account';
-import type { CommentListOptions } from '../endpoints/media/media';
+import type { CommentListOptions, CommentOptions } from '../endpoints/media/media';
+import {
+  likeComment,
+  unlikeComment,
+  pinComment,
+  unpinComment,
+  deleteComments,
+  getCommentReplies,
+  paginateCommentReplies,
+} from '../endpoints/media/comment';
+import type { ReplyListOptions } from '../endpoints/media/comment';
+import {
+  editMedia,
+  archiveMedia,
+  unarchiveMedia,
+  pinMedia,
+  unpinMedia,
+} from '../endpoints/media/media-manage';
+import type { EditMediaOptions } from '../endpoints/media/media-manage';
 import { searchUsers, searchHashtags, searchPlaces } from '../endpoints/search/search';
 import { uploadPhoto, uploadVideo, uploadStoryPhoto } from '../endpoints/upload/upload';
 import type { PhotoUploadOptions, VideoUploadOptions } from '../endpoints/upload/upload';
@@ -196,7 +214,7 @@ export interface MediaApi {
   info(mediaId: string): Promise<Media>;
   like(mediaId: string): Promise<void>;
   unlike(mediaId: string): Promise<void>;
-  comment(mediaId: string, text: string): Promise<Comment>;
+  comment(mediaId: string, text: string, options?: CommentOptions): Promise<Comment>;
   deleteComment(mediaId: string, commentId: string): Promise<void>;
   delete(mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL' | 'STORY'): Promise<void>;
   comments(mediaId: string, options?: CommentListOptions): Promise<Page<Comment>>;
@@ -206,6 +224,18 @@ export interface MediaApi {
   unsave(mediaId: string): Promise<void>;
   saved(options?: CommentListOptions): Promise<Page<Media>>;
   paginateSaved(): AsyncGenerator<Media>;
+  likeComment(commentId: string): Promise<void>;
+  unlikeComment(commentId: string): Promise<void>;
+  pinComment(mediaId: string, commentId: string): Promise<void>;
+  unpinComment(mediaId: string, commentId: string): Promise<void>;
+  deleteComments(mediaId: string, commentIds: readonly string[]): Promise<void>;
+  replies(mediaId: string, commentId: string, options?: ReplyListOptions): Promise<Page<Comment>>;
+  paginateReplies(mediaId: string, commentId: string): AsyncGenerator<Comment>;
+  edit(mediaId: string, options: EditMediaOptions): Promise<Media>;
+  archive(mediaId: string): Promise<void>;
+  unarchive(mediaId: string): Promise<void>;
+  pin(mediaId: string): Promise<void>;
+  unpin(mediaId: string): Promise<void>;
 }
 
 /** Publishing media. */
@@ -397,7 +427,7 @@ export class IgFlare {
       info: (mediaId) => getMediaInfo(client, mediaId),
       like: (mediaId) => likeMedia(client, mediaId),
       unlike: (mediaId) => unlikeMedia(client, mediaId),
-      comment: (mediaId, text) => commentMedia(client, mediaId, text),
+      comment: (mediaId, text, options) => commentMedia(client, mediaId, text, options),
       deleteComment: (mediaId, commentId) => deleteComment(client, mediaId, commentId),
       delete: (mediaId, mediaType) => deleteMedia(client, mediaId, mediaType),
       comments: (mediaId, options) => getComments(client, mediaId, options),
@@ -407,6 +437,19 @@ export class IgFlare {
       unsave: (mediaId) => unsaveMedia(client, mediaId),
       saved: (options) => getSavedPosts(client, options),
       paginateSaved: () => paginateSavedPosts(client),
+      likeComment: (commentId) => likeComment(client, commentId),
+      unlikeComment: (commentId) => unlikeComment(client, commentId),
+      pinComment: (mediaId, commentId) => pinComment(client, mediaId, commentId),
+      unpinComment: (mediaId, commentId) => unpinComment(client, mediaId, commentId),
+      deleteComments: (mediaId, commentIds) => deleteComments(client, mediaId, commentIds),
+      replies: (mediaId, commentId, options) =>
+        getCommentReplies(client, mediaId, commentId, options),
+      paginateReplies: (mediaId, commentId) => paginateCommentReplies(client, mediaId, commentId),
+      edit: (mediaId, options) => editMedia(client, mediaId, options),
+      archive: (mediaId) => archiveMedia(client, mediaId),
+      unarchive: (mediaId) => unarchiveMedia(client, mediaId),
+      pin: (mediaId) => pinMedia(client, mediaId),
+      unpin: (mediaId) => unpinMedia(client, mediaId),
     };
   }
 

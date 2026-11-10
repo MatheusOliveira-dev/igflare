@@ -106,7 +106,25 @@ export {
   paginateSavedPosts,
 } from './endpoints/media/media';
 export { setBiography } from './endpoints/account/account';
-export type { CommentListOptions } from './endpoints/media/media';
+export type { CommentListOptions, CommentOptions } from './endpoints/media/media';
+export {
+  likeComment,
+  unlikeComment,
+  pinComment,
+  unpinComment,
+  deleteComments,
+  getCommentReplies,
+  paginateCommentReplies,
+} from './endpoints/media/comment';
+export type { ReplyListOptions } from './endpoints/media/comment';
+export {
+  editMedia,
+  archiveMedia,
+  unarchiveMedia,
+  pinMedia,
+  unpinMedia,
+} from './endpoints/media/media-manage';
+export type { EditMediaOptions } from './endpoints/media/media-manage';
 export { uploadPhoto, uploadVideo, uploadStoryPhoto } from './endpoints/upload/upload';
 export { getReelsTray, getUserStories } from './endpoints/story/story';
 export { reelSchema } from './schemas/reel';

@@ -1,21 +1,41 @@
 {
   "version": 1,
   "endpoints": [
-    { "name": "accountsLogin", "method": "POST", "path": "/api/v1/accounts/login/" },
+    {
+      "name": "accountsCurrentUser",
+      "method": "GET",
+      "path": "/api/v1/accounts/current_user/"
+    },
+    {
+      "name": "accountsLogin",
+      "method": "POST",
+      "path": "/api/v1/accounts/login/"
+    },
+    {
+      "name": "accountsSetBiography",
+      "method": "POST",
+      "path": "/api/v1/accounts/set_biography/"
+    },
     {
       "name": "accountsTwoFactorLogin",
       "method": "POST",
       "path": "/api/v1/accounts/two_factor_login/"
     },
-    { "name": "accountsCurrentUser", "method": "GET", "path": "/api/v1/accounts/current_user/" },
-    { "name": "accountsSetBiography", "method": "POST", "path": "/api/v1/accounts/set_biography/" },
     {
       "name": "attestationCreateAndroidKeystore",
       "method": "POST",
       "path": "/api/v1/attestation/create_android_keystore/"
     },
-    { "name": "bloksApps", "method": "POST", "path": "/api/v1/bloks/apps/" },
-    { "name": "bloksAsyncAction", "method": "POST", "path": "/api/v1/bloks/async_action/" },
+    {
+      "name": "bloksApps",
+      "method": "POST",
+      "path": "/api/v1/bloks/apps/"
+    },
+    {
+      "name": "bloksAsyncAction",
+      "method": "POST",
+      "path": "/api/v1/bloks/async_action/"
+    },
     {
       "name": "directBroadcastLink",
       "method": "POST",
@@ -46,7 +66,11 @@
       "method": "POST",
       "path": "/api/v1/direct_v2/create_group_thread/"
     },
-    { "name": "directInbox", "method": "GET", "path": "/api/v1/direct_v2/inbox/" },
+    {
+      "name": "directInbox",
+      "method": "GET",
+      "path": "/api/v1/direct_v2/inbox/"
+    },
     {
       "name": "directMessageDelete",
       "method": "POST",
@@ -57,7 +81,11 @@
       "method": "POST",
       "path": "/api/v1/direct_v2/threads/{thread_id}/items/{item_id}/seen/"
     },
-    { "name": "directPendingInbox", "method": "GET", "path": "/api/v1/direct_v2/pending_inbox/" },
+    {
+      "name": "directPendingInbox",
+      "method": "GET",
+      "path": "/api/v1/direct_v2/pending_inbox/"
+    },
     {
       "name": "directRankedRecipients",
       "method": "GET",
@@ -68,8 +96,16 @@
       "method": "POST",
       "path": "/api/v1/direct_v2/threads/broadcast/text/"
     },
-    { "name": "directSpamInbox", "method": "GET", "path": "/api/v1/direct_v2/spam_inbox/" },
-    { "name": "directThread", "method": "GET", "path": "/api/v1/direct_v2/threads/{thread_id}/" },
+    {
+      "name": "directSpamInbox",
+      "method": "GET",
+      "path": "/api/v1/direct_v2/spam_inbox/"
+    },
+    {
+      "name": "directThread",
+      "method": "GET",
+      "path": "/api/v1/direct_v2/threads/{thread_id}/"
+    },
     {
       "name": "directThreadAddUser",
       "method": "POST",
@@ -105,27 +141,55 @@
       "method": "POST",
       "path": "/api/v1/direct_v2/threads/{thread_id}/update_title/"
     },
-    { "name": "feedReelsTray", "method": "POST", "path": "/api/v1/feed/reels_tray/" },
-    { "name": "feedSaved", "method": "GET", "path": "/api/v1/feed/saved/posts/" },
-    { "name": "feedTimeline", "method": "POST", "path": "/api/v1/feed/timeline/" },
-    { "name": "feedUser", "method": "GET", "path": "/api/v1/feed/user/{pk}/" },
-    { "name": "feedUserStory", "method": "GET", "path": "/api/v1/feed/user/{pk}/story/" },
-    { "name": "fbsearchPlaces", "method": "GET", "path": "/api/v1/fbsearch/places/" },
-    { "name": "friendshipsApprove", "method": "POST", "path": "/api/v1/friendships/approve/{pk}/" },
-    { "name": "friendshipsBlock", "method": "POST", "path": "/api/v1/friendships/block/{pk}/" },
-    { "name": "friendshipsCreate", "method": "POST", "path": "/api/v1/friendships/create/{pk}/" },
-    { "name": "friendshipsIgnore", "method": "POST", "path": "/api/v1/friendships/ignore/{pk}/" },
     {
-      "name": "friendshipsMute",
-      "method": "POST",
-      "path": "/api/v1/friendships/mute_posts_or_story_from_follow/"
+      "name": "fbsearchPlaces",
+      "method": "GET",
+      "path": "/api/v1/fbsearch/places/"
     },
-    { "name": "friendshipsPending", "method": "GET", "path": "/api/v1/friendships/pending/" },
-    { "name": "friendshipsUnblock", "method": "POST", "path": "/api/v1/friendships/unblock/{pk}/" },
     {
-      "name": "friendshipsUnmute",
+      "name": "feedReelsTray",
       "method": "POST",
-      "path": "/api/v1/friendships/unmute_posts_or_story_from_follow/"
+      "path": "/api/v1/feed/reels_tray/"
+    },
+    {
+      "name": "feedSaved",
+      "method": "GET",
+      "path": "/api/v1/feed/saved/posts/"
+    },
+    {
+      "name": "feedTimeline",
+      "method": "POST",
+      "path": "/api/v1/feed/timeline/"
+    },
+    {
+      "name": "feedUser",
+      "method": "GET",
+      "path": "/api/v1/feed/user/{pk}/"
+    },
+    {
+      "name": "feedUserStory",
+      "method": "GET",
+      "path": "/api/v1/feed/user/{pk}/story/"
+    },
+    {
+      "name": "friendshipsApprove",
+      "method": "POST",
+      "path": "/api/v1/friendships/approve/{pk}/"
+    },
+    {
+      "name": "friendshipsBlock",
+      "method": "POST",
+      "path": "/api/v1/friendships/block/{pk}/"
+    },
+    {
+      "name": "friendshipsCreate",
+      "method": "POST",
+      "path": "/api/v1/friendships/create/{pk}/"
+    },
+    {
+      "name": "friendshipsDestroy",
+      "method": "POST",
+      "path": "/api/v1/friendships/destroy/{pk}/"
     },
     {
       "name": "friendshipsFollowers",
@@ -137,42 +201,185 @@
       "method": "GET",
       "path": "/api/v1/friendships/{pk}/following/"
     },
-    { "name": "friendshipsDestroy", "method": "POST", "path": "/api/v1/friendships/destroy/{pk}/" },
-    { "name": "friendshipsShow", "method": "GET", "path": "/api/v1/friendships/show/{pk}/" },
-    { "name": "launcherSync", "method": "POST", "path": "/api/v1/launcher/sync/" },
+    {
+      "name": "friendshipsIgnore",
+      "method": "POST",
+      "path": "/api/v1/friendships/ignore/{pk}/"
+    },
+    {
+      "name": "friendshipsMute",
+      "method": "POST",
+      "path": "/api/v1/friendships/mute_posts_or_story_from_follow/"
+    },
+    {
+      "name": "friendshipsPending",
+      "method": "GET",
+      "path": "/api/v1/friendships/pending/"
+    },
+    {
+      "name": "friendshipsShow",
+      "method": "GET",
+      "path": "/api/v1/friendships/show/{pk}/"
+    },
+    {
+      "name": "friendshipsUnblock",
+      "method": "POST",
+      "path": "/api/v1/friendships/unblock/{pk}/"
+    },
+    {
+      "name": "friendshipsUnmute",
+      "method": "POST",
+      "path": "/api/v1/friendships/unmute_posts_or_story_from_follow/"
+    },
+    {
+      "name": "launcherSync",
+      "method": "POST",
+      "path": "/api/v1/launcher/sync/"
+    },
     {
       "name": "locationsSections",
       "method": "POST",
       "path": "/api/v1/locations/{id}/sections/"
     },
-    { "name": "tagsSearch", "method": "GET", "path": "/api/v1/tags/search/" },
-    { "name": "tagsSections", "method": "POST", "path": "/api/v1/tags/{tag}/sections/" },
-    { "name": "mediaComment", "method": "POST", "path": "/api/v1/media/{id}/comment/" },
-    { "name": "mediaComments", "method": "GET", "path": "/api/v1/media/{id}/comments/" },
-    { "name": "mediaLikers", "method": "GET", "path": "/api/v1/media/{id}/likers/" },
-    { "name": "mediaSave", "method": "POST", "path": "/api/v1/media/{id}/save/" },
-    { "name": "mediaUnsave", "method": "POST", "path": "/api/v1/media/{id}/unsave/" },
-    { "name": "mediaConfigure", "method": "POST", "path": "/api/v1/media/configure/" },
     {
-      "name": "mediaConfigureToStory",
+      "name": "mediaArchive",
       "method": "POST",
-      "path": "/api/v1/media/configure_to_story/"
+      "path": "/api/v1/media/{id}/only_me/"
     },
-    { "name": "mediaDelete", "method": "POST", "path": "/api/v1/media/{id}/delete/" },
+    {
+      "name": "mediaComment",
+      "method": "POST",
+      "path": "/api/v1/media/{id}/comment/"
+    },
+    {
+      "name": "mediaCommentBulkDelete",
+      "method": "POST",
+      "path": "/api/v1/media/{id}/comment/bulk_delete/"
+    },
     {
       "name": "mediaCommentDelete",
       "method": "POST",
       "path": "/api/v1/media/{id}/comment/{comment_id}/delete/"
     },
-    { "name": "mediaInfo", "method": "GET", "path": "/api/v1/media/{id}/info/" },
-    { "name": "mediaLike", "method": "POST", "path": "/api/v1/media/{id}/like/" },
-    { "name": "mediaUnlike", "method": "POST", "path": "/api/v1/media/{id}/unlike/" },
-    { "name": "userInfo", "method": "GET", "path": "/api/v1/users/{pk}/info/" },
-    { "name": "usersSearch", "method": "GET", "path": "/api/v1/users/search/" },
+    {
+      "name": "mediaCommentLike",
+      "method": "POST",
+      "path": "/api/v1/media/{comment_id}/comment_like/"
+    },
+    {
+      "name": "mediaCommentPin",
+      "method": "POST",
+      "path": "/api/v1/media/{id}/pin_comment/{comment_id}/"
+    },
+    {
+      "name": "mediaCommentReplies",
+      "method": "GET",
+      "path": "/api/v1/media/{id}/comments/{comment_id}/inline_child_comments/"
+    },
+    {
+      "name": "mediaComments",
+      "method": "GET",
+      "path": "/api/v1/media/{id}/comments/"
+    },
+    {
+      "name": "mediaCommentUnlike",
+      "method": "POST",
+      "path": "/api/v1/media/{comment_id}/comment_unlike/"
+    },
+    {
+      "name": "mediaCommentUnpin",
+      "method": "POST",
+      "path": "/api/v1/media/{id}/unpin_comment/{comment_id}/"
+    },
+    {
+      "name": "mediaConfigure",
+      "method": "POST",
+      "path": "/api/v1/media/configure/"
+    },
+    {
+      "name": "mediaConfigureToStory",
+      "method": "POST",
+      "path": "/api/v1/media/configure_to_story/"
+    },
+    {
+      "name": "mediaDelete",
+      "method": "POST",
+      "path": "/api/v1/media/{id}/delete/"
+    },
+    {
+      "name": "mediaEdit",
+      "method": "POST",
+      "path": "/api/v1/media/{id}/edit_media/"
+    },
+    {
+      "name": "mediaInfo",
+      "method": "GET",
+      "path": "/api/v1/media/{id}/info/"
+    },
+    {
+      "name": "mediaLike",
+      "method": "POST",
+      "path": "/api/v1/media/{id}/like/"
+    },
+    {
+      "name": "mediaLikers",
+      "method": "GET",
+      "path": "/api/v1/media/{id}/likers/"
+    },
+    {
+      "name": "mediaSave",
+      "method": "POST",
+      "path": "/api/v1/media/{id}/save/"
+    },
+    {
+      "name": "mediaUnarchive",
+      "method": "POST",
+      "path": "/api/v1/media/{id}/undo_only_me/"
+    },
+    {
+      "name": "mediaUnlike",
+      "method": "POST",
+      "path": "/api/v1/media/{id}/unlike/"
+    },
+    {
+      "name": "mediaUnsave",
+      "method": "POST",
+      "path": "/api/v1/media/{id}/unsave/"
+    },
+    {
+      "name": "tagsSearch",
+      "method": "GET",
+      "path": "/api/v1/tags/search/"
+    },
+    {
+      "name": "tagsSections",
+      "method": "POST",
+      "path": "/api/v1/tags/{tag}/sections/"
+    },
+    {
+      "name": "userInfo",
+      "method": "GET",
+      "path": "/api/v1/users/{pk}/info/"
+    },
     {
       "name": "userInfoByUsername",
       "method": "GET",
       "path": "/api/v1/users/{username}/usernameinfo/"
+    },
+    {
+      "name": "usersPinTimelineMedia",
+      "method": "POST",
+      "path": "/api/v1/users/pin_timeline_media/"
+    },
+    {
+      "name": "usersSearch",
+      "method": "GET",
+      "path": "/api/v1/users/search/"
+    },
+    {
+      "name": "usersUnpinTimelineMedia",
+      "method": "POST",
+      "path": "/api/v1/users/unpin_timeline_media/"
     }
   ]
 }

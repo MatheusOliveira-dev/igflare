@@ -543,6 +543,37 @@ describe('IgFlare facade', () => {
     );
   });
 
+  it('delegates comment and media management extras', async () => {
+    const { ig, transport } = clientWith((req) => {
+      if (req.url.includes('/inline_child_comments/'))
+        return json({ status: 'ok', child_comments: [{ pk: 5, text: 'r' }] });
+      if (req.url.includes('/edit_media/'))
+        return json({ status: 'ok', media: { pk: 1, caption: { text: 'novo' } } });
+      if (req.url.includes('/comment/'))
+        return json({ status: 'ok', comment: { pk: 9, text: 'resp' } });
+      return json({ status: 'ok' });
+    });
+
+    await ig.media.likeComment('111');
+    await ig.media.unlikeComment('111');
+    await ig.media.pinComment('1_2', '111');
+    await ig.media.unpinComment('1_2', '111');
+    await ig.media.deleteComments('1_2', ['111', '222']);
+    expect((await ig.media.comment('1_2', 'resp', { repliedToCommentId: '111' })).text).toBe(
+      'resp',
+    );
+    expect((await ig.media.replies('1_2', '111')).items[0]?.text).toBe('r');
+    for await (const reply of ig.media.paginateReplies('1_2', '111')) expect(reply.text).toBe('r');
+    expect((await ig.media.edit('1_2', { caption: 'novo' })).caption?.text).toBe('novo');
+    await ig.media.archive('1_2');
+    await ig.media.unarchive('1_2');
+    await ig.media.pin('1_2');
+    await ig.media.unpin('1_2');
+
+    expect(transport.requests.some((r) => r.url.includes('/media/111/comment_like/'))).toBe(true);
+    expect(transport.requests.some((r) => r.url.includes('/users/pin_timeline_media/'))).toBe(true);
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();
