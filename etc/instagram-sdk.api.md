@@ -619,11 +619,11 @@ export interface Page<T> {
     // (undocumented)
     readonly items: readonly T[];
     // (undocumented)
-    readonly nextMaxId?: string;
+    readonly nextCursor?: string;
 }
 
 // @public
-export function paginate<T>(fetchPage: (maxId?: string) => Promise<Page<T>>): AsyncGenerator<T>;
+export function paginate<T>(fetchPage: (cursor?: string) => Promise<Page<T>>): AsyncGenerator<T>;
 
 // @public
 export function paginateFollowers(client: PrivateClient, pk: string): AsyncGenerator<User>;
