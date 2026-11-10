@@ -701,7 +701,7 @@ export class IgFlare {
     login(credentials: IgFlareLogin): Promise<PrivateResponseJson>;
     // (undocumented)
     readonly media: MediaApi;
-    resolveTwoFactor(error: CaaTwoFactorRequiredError, code: string): Promise<PrivateResponseJson>;
+    resolveTwoFactor(error: CaaTwoFactorRequiredError, code: string | TwoFactorSource): Promise<PrivateResponseJson>;
     // (undocumented)
     readonly search: SearchApi;
     get session(): SessionData;
@@ -1119,7 +1119,7 @@ export interface RegistrationTokenOptions {
 }
 
 // @public
-export function resolveCaaTwoFactor(client: PrivateClient, error: CaaTwoFactorRequiredError, code: string): Promise<PrivateResponseJson>;
+export function resolveCaaTwoFactor(client: PrivateClient, error: CaaTwoFactorRequiredError, code: string | TwoFactorSource): Promise<PrivateResponseJson>;
 
 // @public
 export function resolveTwoFactorCode(source: TwoFactorSource): Promise<string>;
