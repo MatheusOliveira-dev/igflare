@@ -16,7 +16,7 @@ core/http        orchestrates transport + signing + session: lossless JSON, type
 core/media       dependency-free JPEG/MP4 metadata parsers (upload)
 core/pagination  the Page<T> contract and the paginate() iterator
 schemas          hand-written zod schemas for API responses (User, Media, Thread, ...)
-endpoints/*      hand-written feature modules (auth, user, friendship, feed, media, direct, upload)
+endpoints/*      hand-written feature modules (auth, user, friendship, feed, media, direct, upload, search)
 client           public, ergonomic facade (IgFlare), retry-wrapped by default
 types / errors   shared models and typed errors
 generated        the endpoint registry (name -> method + path) from `npm run gen`; never edited
