@@ -238,7 +238,7 @@ export const DEFAULT_LOCATION: LocationState;
 export function deleteComment(client: PrivateClient, mediaId: string, commentId: string): Promise<void>;
 
 // @public
-export function deleteMedia(client: PrivateClient, mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL'): Promise<void>;
+export function deleteMedia(client: PrivateClient, mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL' | 'STORY'): Promise<void>;
 
 // @public
 export function denyRequest(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
@@ -711,7 +711,7 @@ export interface MediaApi {
     // (undocumented)
     comments(mediaId: string, options?: CommentListOptions): Promise<Page<Comment>>;
     // (undocumented)
-    delete(mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL'): Promise<void>;
+    delete(mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL' | 'STORY'): Promise<void>;
     // (undocumented)
     deleteComment(mediaId: string, commentId: string): Promise<void>;
     // (undocumented)
