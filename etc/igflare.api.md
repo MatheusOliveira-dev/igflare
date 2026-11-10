@@ -415,6 +415,8 @@ export function editMedia(client: PrivateClient, mediaId: string, options: EditM
 // @public (undocumented)
 export interface EditMediaOptions {
     readonly caption: string;
+    readonly tag?: readonly UserTag[];
+    readonly untag?: readonly string[];
 }
 
 // @public
@@ -935,6 +937,24 @@ export const mediaSchema: z.ZodObject<{
         width: z.ZodOptional<z.ZodNumber>;
         height: z.ZodOptional<z.ZodNumber>;
     }, z.core.$loose>>>>;
+    usertags: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        in: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            position: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+            user: z.ZodOptional<z.ZodObject<{
+                pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+                username: z.ZodOptional<z.ZodString>;
+                full_name: z.ZodOptional<z.ZodString>;
+                is_private: z.ZodOptional<z.ZodBoolean>;
+                is_verified: z.ZodOptional<z.ZodBoolean>;
+                profile_pic_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+                follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                biography: z.ZodOptional<z.ZodString>;
+                external_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+            }, z.core.$loose>>;
+        }, z.core.$loose>>>;
+    }, z.core.$loose>>>;
 }, z.core.$loose>;
 
 // @public
@@ -1199,6 +1219,24 @@ export const reelSchema: z.ZodObject<{
             width: z.ZodOptional<z.ZodNumber>;
             height: z.ZodOptional<z.ZodNumber>;
         }, z.core.$loose>>>>;
+        usertags: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+            in: z.ZodOptional<z.ZodArray<z.ZodObject<{
+                position: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+                user: z.ZodOptional<z.ZodObject<{
+                    pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+                    username: z.ZodOptional<z.ZodString>;
+                    full_name: z.ZodOptional<z.ZodString>;
+                    is_private: z.ZodOptional<z.ZodBoolean>;
+                    is_verified: z.ZodOptional<z.ZodBoolean>;
+                    profile_pic_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+                    follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                    following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                    media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                    biography: z.ZodOptional<z.ZodString>;
+                    external_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+                }, z.core.$loose>>;
+            }, z.core.$loose>>>;
+        }, z.core.$loose>>>;
     }, z.core.$loose>>>;
     seen: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     expiring_at: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
@@ -1524,6 +1562,16 @@ export const userSchema: z.ZodObject<{
     biography: z.ZodOptional<z.ZodString>;
     external_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
 }, z.core.$loose>;
+
+// @public
+export interface UserTag {
+    // (undocumented)
+    readonly userId: string;
+    // (undocumented)
+    readonly x: number;
+    // (undocumented)
+    readonly y: number;
+}
 
 // @public (undocumented)
 export interface VideoMeta {
