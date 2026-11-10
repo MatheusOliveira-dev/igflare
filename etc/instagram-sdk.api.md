@@ -263,7 +263,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'userInfo' | 'userInfoByUsername';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'userInfo' | 'userInfoByUsername';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -280,8 +280,21 @@ export class FakeTransport implements HttpTransport {
     readonly requests: HttpRequest[];
 }
 
+// @public
+export interface FeedApi {
+    // (undocumented)
+    paginateUser(pk: string): AsyncGenerator<Media>;
+    // (undocumented)
+    user(pk: string, options?: FeedOptions): Promise<Page<Media>>;
+}
+
 // @public (undocumented)
 export class FeedbackRequiredError extends IgApiError {
+}
+
+// @public (undocumented)
+export interface FeedOptions {
+    readonly maxId?: string;
 }
 
 // @public
@@ -377,6 +390,9 @@ export function getFollowing(client: PrivateClient, pk: string, options?: Follow
 export function getFriendshipStatus(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
 
 // @public
+export function getUserFeed(client: PrivateClient, pk: string, options?: FeedOptions): Promise<Page<Media>>;
+
+// @public
 export function getUserInfo(client: PrivateClient, pk: string): Promise<User>;
 
 // @public
@@ -433,6 +449,8 @@ export class IgClient {
     readonly account: AccountApi;
     get client(): PrivateClient;
     // (undocumented)
+    readonly feed: FeedApi;
+    // (undocumented)
     readonly friendship: FriendshipApi;
     static fromStore(store: SessionStore, options?: {
         readonly transport?: HttpTransport;
@@ -484,6 +502,47 @@ export interface LoginCredentials {
 export class LoginRequiredError extends IgApiError {
 }
 
+// @public (undocumented)
+export type Media = z.infer<typeof mediaSchema>;
+
+// @public
+export const mediaSchema: z.ZodObject<{
+    pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+    id: z.ZodOptional<z.ZodString>;
+    code: z.ZodOptional<z.ZodString>;
+    media_type: z.ZodOptional<z.ZodNumber>;
+    taken_at: z.ZodOptional<z.ZodNumber>;
+    like_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    comment_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    caption: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        text: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>>>;
+    user: z.ZodOptional<z.ZodObject<{
+        pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+        username: z.ZodOptional<z.ZodString>;
+        full_name: z.ZodOptional<z.ZodString>;
+        is_private: z.ZodOptional<z.ZodBoolean>;
+        is_verified: z.ZodOptional<z.ZodBoolean>;
+        profile_pic_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        biography: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>>;
+    image_versions2: z.ZodOptional<z.ZodObject<{
+        candidates: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            url: z.ZodOptional<z.ZodString>;
+            width: z.ZodOptional<z.ZodNumber>;
+            height: z.ZodOptional<z.ZodNumber>;
+        }, z.core.$loose>>>;
+    }, z.core.$loose>>;
+    video_versions: z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodObject<{
+        url: z.ZodOptional<z.ZodString>;
+        width: z.ZodOptional<z.ZodNumber>;
+        height: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$loose>>>>;
+}, z.core.$loose>;
+
 // @public
 export class MemorySessionStore implements SessionStore {
     constructor(initial?: SessionData | null);
@@ -509,6 +568,9 @@ export function paginateFollowers(client: PrivateClient, pk: string): AsyncGener
 
 // @public
 export function paginateFollowing(client: PrivateClient, pk: string): AsyncGenerator<User>;
+
+// @public
+export function paginateUserFeed(client: PrivateClient, pk: string): AsyncGenerator<Media>;
 
 // @public
 export function parsePrivateResponse(response: HttpResponse): PrivateResponseJson;
