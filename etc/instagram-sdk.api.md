@@ -258,7 +258,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'launcherSync' | 'userInfo';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsShow' | 'launcherSync' | 'userInfo' | 'userInfoByUsername';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -297,6 +297,26 @@ export class FileSessionStore implements SessionStore {
     save(data: SessionData): Promise<void>;
 }
 
+// @public
+export function followUser(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
+
+// @public (undocumented)
+export type FriendshipStatus = z.infer<typeof friendshipStatusSchema>;
+
+// @public
+export const friendshipStatusSchema: z.ZodObject<{
+    following: z.ZodOptional<z.ZodBoolean>;
+    followed_by: z.ZodOptional<z.ZodBoolean>;
+    blocking: z.ZodOptional<z.ZodBoolean>;
+    is_private: z.ZodOptional<z.ZodBoolean>;
+    incoming_request: z.ZodOptional<z.ZodBoolean>;
+    outgoing_request: z.ZodOptional<z.ZodBoolean>;
+    is_bestie: z.ZodOptional<z.ZodBoolean>;
+    is_restricted: z.ZodOptional<z.ZodBoolean>;
+    muting: z.ZodOptional<z.ZodBoolean>;
+    is_muting_reel: z.ZodOptional<z.ZodBoolean>;
+}, z.core.$loose>;
+
 // @public (undocumented)
 export function generateAndroidDeviceId(seed?: string): string;
 
@@ -320,7 +340,13 @@ export function generateUuid(): string;
 export function getCurrentUser(client: PrivateClient): Promise<Record<string, unknown>>;
 
 // @public
+export function getFriendshipStatus(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
+
+// @public
 export function getUserInfo(client: PrivateClient, pk: string): Promise<User>;
+
+// @public
+export function getUserInfoByUsername(client: PrivateClient, username: string): Promise<User>;
 
 // @public (undocumented)
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -584,6 +610,9 @@ export interface TwoFactorOptions {
 // @public (undocumented)
 export class TwoFactorRequiredError extends IgApiError {
 }
+
+// @public
+export function unfollowUser(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
 
 // @public
 export const USDID_TOKEN_TTL = 3600;
