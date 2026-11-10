@@ -82,6 +82,7 @@ export type {
   FriendshipApi,
   FeedApi,
   MediaApi,
+  DirectApi,
 } from './client/ig-client';
 export {
   getMediaInfo,
@@ -92,6 +93,16 @@ export {
 } from './endpoints/media/media';
 export { commentSchema } from './schemas/comment';
 export type { Comment } from './schemas/comment';
+export {
+  getInbox,
+  paginateInbox,
+  getThread,
+  paginateThread,
+  sendText,
+} from './endpoints/direct/direct';
+export type { CursorOptions, SendTarget } from './endpoints/direct/direct';
+export { threadSchema, directMessageSchema, directSendResultSchema } from './schemas/direct';
+export type { Thread, DirectMessage, DirectSendResult } from './schemas/direct';
 export {
   getUserFeed,
   paginateUserFeed,

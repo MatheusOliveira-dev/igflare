@@ -149,6 +149,21 @@ describe('IgClient facade', () => {
     expect(transport.requests[0]?.url).toContain('/api/v1/feed/timeline/');
   });
 
+  it('delegates direct inbox and send to the direct endpoints', async () => {
+    const { ig, transport } = clientWith((req) =>
+      req.url.includes('broadcast/text')
+        ? json({ status: 'ok', payload: { item_id: 'i1', thread_id: 't1' } })
+        : json({ status: 'ok', inbox: { threads: [{ thread_id: 't1' }], has_older: false } }),
+    );
+
+    const inbox = await ig.direct.inbox();
+    const sent = await ig.direct.sendText('hi', { threadId: 't1' });
+
+    expect(inbox.items[0]?.thread_id).toBe('t1');
+    expect(sent.item_id).toBe('i1');
+    expect(transport.requests[0]?.url).toContain('/api/v1/direct_v2/inbox/');
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();

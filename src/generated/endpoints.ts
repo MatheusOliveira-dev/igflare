@@ -6,7 +6,7 @@ export interface EndpointDefinition {
   readonly path: string;
 }
 
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaComment' | 'mediaCommentDelete' | 'mediaInfo' | 'mediaLike' | 'mediaUnlike' | 'userInfo' | 'userInfoByUsername';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaComment' | 'mediaCommentDelete' | 'mediaInfo' | 'mediaLike' | 'mediaUnlike' | 'userInfo' | 'userInfoByUsername';
 
 export const endpoints: Record<EndpointName, EndpointDefinition> = {
   accountsCurrentUser: { method: 'GET', path: '/api/v1/accounts/current_user/' },
@@ -14,6 +14,9 @@ export const endpoints: Record<EndpointName, EndpointDefinition> = {
   accountsTwoFactorLogin: { method: 'POST', path: '/api/v1/accounts/two_factor_login/' },
   attestationCreateAndroidKeystore: { method: 'POST', path: '/api/v1/attestation/create_android_keystore/' },
   bloksAsyncAction: { method: 'POST', path: '/api/v1/bloks/async_action/' },
+  directInbox: { method: 'GET', path: '/api/v1/direct_v2/inbox/' },
+  directSendText: { method: 'POST', path: '/api/v1/direct_v2/threads/broadcast/text/' },
+  directThread: { method: 'GET', path: '/api/v1/direct_v2/threads/{thread_id}/' },
   feedTimeline: { method: 'POST', path: '/api/v1/feed/timeline/' },
   feedUser: { method: 'GET', path: '/api/v1/feed/user/{pk}/' },
   friendshipsCreate: { method: 'POST', path: '/api/v1/friendships/create/{pk}/' },

@@ -14,6 +14,13 @@
       "path": "/api/v1/attestation/create_android_keystore/"
     },
     { "name": "bloksAsyncAction", "method": "POST", "path": "/api/v1/bloks/async_action/" },
+    { "name": "directInbox", "method": "GET", "path": "/api/v1/direct_v2/inbox/" },
+    {
+      "name": "directSendText",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/broadcast/text/"
+    },
+    { "name": "directThread", "method": "GET", "path": "/api/v1/direct_v2/threads/{thread_id}/" },
     { "name": "feedTimeline", "method": "POST", "path": "/api/v1/feed/timeline/" },
     { "name": "feedUser", "method": "GET", "path": "/api/v1/feed/user/{pk}/" },
     { "name": "friendshipsCreate", "method": "POST", "path": "/api/v1/friendships/create/{pk}/" },

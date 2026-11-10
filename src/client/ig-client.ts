@@ -34,10 +34,19 @@ import {
   commentMedia,
   deleteComment,
 } from '../endpoints/media/media';
+import {
+  getInbox,
+  paginateInbox,
+  getThread,
+  paginateThread,
+  sendText,
+} from '../endpoints/direct/direct';
+import type { CursorOptions, SendTarget } from '../endpoints/direct/direct';
 import type { User } from '../schemas/user';
 import type { FriendshipStatus } from '../schemas/friendship';
 import type { Media } from '../schemas/media';
 import type { Comment } from '../schemas/comment';
+import type { Thread, DirectMessage, DirectSendResult } from '../schemas/direct';
 
 /** The logged-in account itself. */
 export interface AccountApi {
@@ -68,6 +77,15 @@ export interface FeedApi {
   paginateUser(pk: string): AsyncGenerator<Media>;
   timeline(options?: FeedOptions): Promise<Page<Media>>;
   paginateTimeline(): AsyncGenerator<Media>;
+}
+
+/** Direct messages: the inbox, a thread's messages, and sending. */
+export interface DirectApi {
+  inbox(options?: CursorOptions): Promise<Page<Thread>>;
+  paginateInbox(): AsyncGenerator<Thread>;
+  thread(threadId: string, options?: CursorOptions): Promise<Page<DirectMessage>>;
+  paginateThread(threadId: string): AsyncGenerator<DirectMessage>;
+  sendText(text: string, target: SendTarget): Promise<DirectSendResult>;
 }
 
 /** Single media reads and actions. */
@@ -104,6 +122,7 @@ export class IgClient {
   readonly friendship: FriendshipApi;
   readonly feed: FeedApi;
   readonly media: MediaApi;
+  readonly direct: DirectApi;
 
   constructor(options: IgClientOptions = {}) {
     const { retry, ...clientOptions } = options;
@@ -115,6 +134,7 @@ export class IgClient {
     this.friendship = this.#buildFriendshipApi();
     this.feed = this.#buildFeedApi();
     this.media = this.#buildMediaApi();
+    this.direct = this.#buildDirectApi();
   }
 
   /** Builds a client from a saved session in the given store. */
@@ -190,6 +210,17 @@ export class IgClient {
       unlike: (mediaId) => unlikeMedia(client, mediaId),
       comment: (mediaId, text) => commentMedia(client, mediaId, text),
       deleteComment: (mediaId, commentId) => deleteComment(client, mediaId, commentId),
+    };
+  }
+
+  #buildDirectApi(): DirectApi {
+    const client = this.#client;
+    return {
+      inbox: (options) => getInbox(client, options),
+      paginateInbox: () => paginateInbox(client),
+      thread: (threadId, options) => getThread(client, threadId, options),
+      paginateThread: (threadId) => paginateThread(client, threadId),
+      sendText: (text, target) => sendText(client, text, target),
     };
   }
 }
