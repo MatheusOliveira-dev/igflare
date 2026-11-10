@@ -91,7 +91,11 @@ export async function deleteMedia(
     method: endpoints.mediaDelete.method,
     endpoint: endpoints.mediaDelete.path.replace('{id}', mediaId),
     query: { media_type: mediaType },
-    payload: { media_id: mediaId },
+    payload: {
+      igtv_feed_preview: false,
+      media_id: mediaId,
+      ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),
+    },
   });
 }
 
