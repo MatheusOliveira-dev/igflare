@@ -91,6 +91,15 @@ describe('IgClient facade', () => {
     expect(ids).toEqual(['1', '2']);
   });
 
+  it('delegates media info to the media endpoint', async () => {
+    const { ig, transport } = clientWith(() =>
+      json({ status: 'ok', items: [{ pk: 1, code: 'abc' }] }),
+    );
+    const media = await ig.media.info('1_9');
+    expect(media.code).toBe('abc');
+    expect(transport.requests[0]?.url).toContain('/api/v1/media/1_9/info/');
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();

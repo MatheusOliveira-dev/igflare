@@ -6,7 +6,7 @@ export interface EndpointDefinition {
   readonly path: string;
 }
 
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'userInfo' | 'userInfoByUsername';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksAsyncAction' | 'feedTimeline' | 'feedUser' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsShow' | 'launcherSync' | 'mediaInfo' | 'userInfo' | 'userInfoByUsername';
 
 export const endpoints: Record<EndpointName, EndpointDefinition> = {
   accountsCurrentUser: { method: 'GET', path: '/api/v1/accounts/current_user/' },
@@ -22,6 +22,7 @@ export const endpoints: Record<EndpointName, EndpointDefinition> = {
   friendshipsFollowing: { method: 'GET', path: '/api/v1/friendships/{pk}/following/' },
   friendshipsShow: { method: 'GET', path: '/api/v1/friendships/show/{pk}/' },
   launcherSync: { method: 'POST', path: '/api/v1/launcher/sync/' },
+  mediaInfo: { method: 'GET', path: '/api/v1/media/{id}/info/' },
   userInfo: { method: 'GET', path: '/api/v1/users/{pk}/info/' },
   userInfoByUsername: { method: 'GET', path: '/api/v1/users/{username}/usernameinfo/' },
 };

@@ -20,6 +20,7 @@ import {
 import type { FollowListOptions } from '../endpoints/friendship/friendship';
 import { getUserFeed, paginateUserFeed } from '../endpoints/feed/feed';
 import type { FeedOptions } from '../endpoints/feed/feed';
+import { getMediaInfo } from '../endpoints/media/media';
 import type { User } from '../schemas/user';
 import type { FriendshipStatus } from '../schemas/friendship';
 import type { Media } from '../schemas/media';
@@ -53,6 +54,11 @@ export interface FeedApi {
   paginateUser(pk: string): AsyncGenerator<Media>;
 }
 
+/** Single media reads. */
+export interface MediaApi {
+  info(mediaId: string): Promise<Media>;
+}
+
 /**
  * The ergonomic entry point. Wraps the low-level engine and groups the endpoints
  * by domain (`ig.user.*`, `ig.friendship.*`). Persistence is pluggable: pass any
@@ -66,6 +72,7 @@ export class IgClient {
   readonly user: UserApi;
   readonly friendship: FriendshipApi;
   readonly feed: FeedApi;
+  readonly media: MediaApi;
 
   constructor(options: PrivateClientOptions = {}) {
     this.#client = new PrivateClient(options);
@@ -73,6 +80,7 @@ export class IgClient {
     this.user = this.#buildUserApi();
     this.friendship = this.#buildFriendshipApi();
     this.feed = this.#buildFeedApi();
+    this.media = this.#buildMediaApi();
   }
 
   /** Builds a client from a saved session in the given store. */
@@ -132,6 +140,13 @@ export class IgClient {
     return {
       user: (pk, options) => getUserFeed(client, pk, options),
       paginateUser: (pk) => paginateUserFeed(client, pk),
+    };
+  }
+
+  #buildMediaApi(): MediaApi {
+    const client = this.#client;
+    return {
+      info: (mediaId) => getMediaInfo(client, mediaId),
     };
   }
 }

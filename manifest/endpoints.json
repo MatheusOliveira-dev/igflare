@@ -30,6 +30,7 @@
     { "name": "friendshipsDestroy", "method": "POST", "path": "/api/v1/friendships/destroy/{pk}/" },
     { "name": "friendshipsShow", "method": "GET", "path": "/api/v1/friendships/show/{pk}/" },
     { "name": "launcherSync", "method": "POST", "path": "/api/v1/launcher/sync/" },
+    { "name": "mediaInfo", "method": "GET", "path": "/api/v1/media/{id}/info/" },
     { "name": "userInfo", "method": "GET", "path": "/api/v1/users/{pk}/info/" },
     {
       "name": "userInfoByUsername",
