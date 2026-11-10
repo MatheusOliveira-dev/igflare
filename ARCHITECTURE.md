@@ -7,17 +7,24 @@ mocked in tests.
 ## Layers
 
 ```
-core/transport   HTTP port + adapter (undici/fetch), device state, header injection
+core/transport   HTTP port + adapters (node https default, fetch, fake, retry), device state, headers
 core/signing     signing port + adapter, isolated, pinned by golden vectors
-core/crypto      password encryption for login (#PWD_INSTAGRAM envelope)
+core/crypto      password encryption, USDID identity, attestation (CAA login)
+core/bloks       Bloks payload builders and response parsers (CAA login)
 core/session     session/state port + adapters (memory, file)
-core/http        orchestrates transport + signing + session: retries, error mapping
-schemas          zod schemas for API responses, generated from the manifest
-endpoints/*      feature modules (auth, user, feed, media, direct), generated from the manifest
-client           public, ergonomic facade
+core/http        orchestrates transport + signing + session: lossless JSON, typed error mapping
+core/media       dependency-free JPEG/MP4 metadata parsers (upload)
+core/pagination  the Page<T> contract and the paginate() iterator
+schemas          hand-written zod schemas for API responses (User, Media, Thread, ...)
+endpoints/*      hand-written feature modules (auth, user, friendship, feed, media, direct, upload)
+client           public, ergonomic facade (IgClient), retry-wrapped by default
 types / errors   shared models and typed errors
-generated        output of `npm run gen`; never edited by hand
+generated        the endpoint registry (name -> method + path) from `npm run gen`; never edited
 ```
+
+Retry/backoff on transient failures lives in a `RetryTransport` decorator over the
+transport port, not in `core/http`. An endpoint's method and path come from the
+generated registry; everything else about the endpoint is hand-written.
 
 Folders appear as the code that fills them lands, not before — no empty scaffolding.
 
