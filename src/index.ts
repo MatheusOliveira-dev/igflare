@@ -92,7 +92,12 @@ export {
 } from './endpoints/media/media';
 export { commentSchema } from './schemas/comment';
 export type { Comment } from './schemas/comment';
-export { getUserFeed, paginateUserFeed } from './endpoints/feed/feed';
+export {
+  getUserFeed,
+  paginateUserFeed,
+  getTimelineFeed,
+  paginateTimeline,
+} from './endpoints/feed/feed';
 export type { FeedOptions } from './endpoints/feed/feed';
 export { mediaSchema } from './schemas/media';
 export type { Media } from './schemas/media';

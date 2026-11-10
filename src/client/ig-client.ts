@@ -20,7 +20,12 @@ import {
   paginateFollowing,
 } from '../endpoints/friendship/friendship';
 import type { FollowListOptions } from '../endpoints/friendship/friendship';
-import { getUserFeed, paginateUserFeed } from '../endpoints/feed/feed';
+import {
+  getUserFeed,
+  paginateUserFeed,
+  getTimelineFeed,
+  paginateTimeline,
+} from '../endpoints/feed/feed';
 import type { FeedOptions } from '../endpoints/feed/feed';
 import {
   getMediaInfo,
@@ -61,6 +66,8 @@ export interface FriendshipApi {
 export interface FeedApi {
   user(pk: string, options?: FeedOptions): Promise<Page<Media>>;
   paginateUser(pk: string): AsyncGenerator<Media>;
+  timeline(options?: FeedOptions): Promise<Page<Media>>;
+  paginateTimeline(): AsyncGenerator<Media>;
 }
 
 /** Single media reads and actions. */
@@ -170,6 +177,8 @@ export class IgClient {
     return {
       user: (pk, options) => getUserFeed(client, pk, options),
       paginateUser: (pk) => paginateUserFeed(client, pk),
+      timeline: (options) => getTimelineFeed(client, options),
+      paginateTimeline: () => paginateTimeline(client),
     };
   }
 

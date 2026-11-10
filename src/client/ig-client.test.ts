@@ -140,6 +140,15 @@ describe('IgClient facade', () => {
     await expect(ig.user.info('1')).rejects.toBeInstanceOf(IgApiError);
   });
 
+  it('delegates the home timeline to the timeline endpoint', async () => {
+    const { ig, transport } = clientWith(() =>
+      json({ status: 'ok', feed_items: [{ media_or_ad: { pk: 9, code: 't' } }] }),
+    );
+    const page = await ig.feed.timeline();
+    expect(page.items[0]?.code).toBe('t');
+    expect(transport.requests[0]?.url).toContain('/api/v1/feed/timeline/');
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();
