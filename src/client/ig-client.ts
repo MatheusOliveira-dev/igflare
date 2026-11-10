@@ -66,11 +66,29 @@ import { getReelsTray, getUserStories } from '../endpoints/story/story';
 import {
   getInbox,
   paginateInbox,
+  getPendingInbox,
+  paginatePendingInbox,
+  getSpamInbox,
+  paginateSpamInbox,
   getThread,
   paginateThread,
   sendText,
 } from '../endpoints/direct/direct';
 import type { CursorOptions, SendTarget } from '../endpoints/direct/direct';
+import {
+  approveThread,
+  hideThread,
+  setThreadTitle,
+  addThreadUsers,
+  muteThread,
+  unmuteThread,
+  deleteMessage,
+  markMessageSeen,
+  createGroupThread,
+  findThreadByParticipants,
+  searchRecipients,
+} from '../endpoints/direct/direct-manage';
+import type { HideThreadOptions, RecipientSearchMode } from '../endpoints/direct/direct-manage';
 import type { User } from '../schemas/user';
 import type { FriendshipStatus } from '../schemas/friendship';
 import type { Media } from '../schemas/media';
@@ -139,6 +157,21 @@ export interface DirectApi {
   thread(threadId: string, options?: CursorOptions): Promise<Page<DirectMessage>>;
   paginateThread(threadId: string): AsyncGenerator<DirectMessage>;
   sendText(text: string, target: SendTarget): Promise<DirectSendResult>;
+  pending(options?: CursorOptions): Promise<Page<Thread>>;
+  paginatePending(): AsyncGenerator<Thread>;
+  spam(options?: CursorOptions): Promise<Page<Thread>>;
+  paginateSpam(): AsyncGenerator<Thread>;
+  approve(threadId: string): Promise<void>;
+  hide(threadId: string, options?: HideThreadOptions): Promise<void>;
+  setTitle(threadId: string, title: string): Promise<void>;
+  addUsers(threadId: string, userIds: readonly string[]): Promise<void>;
+  mute(threadId: string): Promise<void>;
+  unmute(threadId: string): Promise<void>;
+  deleteMessage(threadId: string, itemId: string): Promise<void>;
+  markSeen(threadId: string, itemId: string): Promise<void>;
+  createGroup(userIds: readonly string[], title?: string): Promise<string>;
+  findThread(userIds: readonly string[]): Promise<Thread | undefined>;
+  searchRecipients(query: string, mode?: RecipientSearchMode): Promise<User[]>;
 }
 
 /** Single media reads and actions. */
@@ -382,6 +415,21 @@ export class IgFlare {
       thread: (threadId, options) => getThread(client, threadId, options),
       paginateThread: (threadId) => paginateThread(client, threadId),
       sendText: (text, target) => sendText(client, text, target),
+      pending: (options) => getPendingInbox(client, options),
+      paginatePending: () => paginatePendingInbox(client),
+      spam: (options) => getSpamInbox(client, options),
+      paginateSpam: () => paginateSpamInbox(client),
+      approve: (threadId) => approveThread(client, threadId),
+      hide: (threadId, options) => hideThread(client, threadId, options),
+      setTitle: (threadId, title) => setThreadTitle(client, threadId, title),
+      addUsers: (threadId, userIds) => addThreadUsers(client, threadId, userIds),
+      mute: (threadId) => muteThread(client, threadId),
+      unmute: (threadId) => unmuteThread(client, threadId),
+      deleteMessage: (threadId, itemId) => deleteMessage(client, threadId, itemId),
+      markSeen: (threadId, itemId) => markMessageSeen(client, threadId, itemId),
+      createGroup: (userIds, title) => createGroupThread(client, userIds, title),
+      findThread: (userIds) => findThreadByParticipants(client, userIds),
+      searchRecipients: (query, mode) => searchRecipients(client, query, mode),
     };
   }
 

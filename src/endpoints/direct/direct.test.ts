@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { getInbox, paginateInbox, getThread, sendText } from './direct';
+import {
+  getInbox,
+  paginateInbox,
+  getPendingInbox,
+  paginatePendingInbox,
+  getSpamInbox,
+  getThread,
+  sendText,
+} from './direct';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
 import { createSession } from '../../core/session/session';
@@ -122,5 +130,57 @@ describe('sendText', () => {
     await sendText(client, 'hey', { userIds: ['42', '43'] });
     const payload = signedPayload(transport.requests[0]?.body);
     expect(payload['recipient_users']).toBe('[["42","43"]]');
+  });
+});
+
+describe('pending and spam inboxes', () => {
+  it('reads the pending inbox with the app query and a request session id', async () => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      inbox: { threads: [{ thread_id: 'p1' }], has_older: true, oldest_cursor: 'pc1' },
+    });
+
+    const page = await getPendingInbox(client);
+
+    const url = transport.requests[0]?.url ?? '';
+    expect(url).toContain('/api/v1/direct_v2/pending_inbox/?');
+    expect(url).toContain('visual_message_return_type=unseen');
+    expect(url).toContain('request_session_id=');
+    expect(page.items[0]?.thread_id).toBe('p1');
+    expect(page.nextCursor).toBe('pc1');
+  });
+
+  it('passes the cursor to the spam inbox, which sends no request session id', async () => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      inbox: { threads: [], has_older: false },
+    });
+
+    const page = await getSpamInbox(client, { cursor: 'sc1' });
+
+    const url = transport.requests[0]?.url ?? '';
+    expect(url).toContain('/api/v1/direct_v2/spam_inbox/?');
+    expect(url).toContain('cursor=sc1');
+    expect(url).not.toContain('request_session_id');
+    expect(page.nextCursor).toBeUndefined();
+  });
+
+  it('walks the pending inbox across pages', async () => {
+    let call = 0;
+    const transport = new FakeTransport(() => {
+      call += 1;
+      const inbox =
+        call === 1
+          ? { threads: [{ thread_id: 'a' }], has_older: true, oldest_cursor: 'c1' }
+          : { threads: [{ thread_id: 'b' }], has_older: false };
+      return { status: 200, headers: {}, body: JSON.stringify({ status: 'ok', inbox }) };
+    });
+    const client = new PrivateClient({ transport, session: createSession() });
+
+    const ids: (string | undefined)[] = [];
+    for await (const thread of paginatePendingInbox(client)) {
+      ids.push(thread.thread_id);
+    }
+    expect(ids).toEqual(['a', 'b']);
   });
 });

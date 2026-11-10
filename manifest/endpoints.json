@@ -16,13 +16,70 @@
     },
     { "name": "bloksApps", "method": "POST", "path": "/api/v1/bloks/apps/" },
     { "name": "bloksAsyncAction", "method": "POST", "path": "/api/v1/bloks/async_action/" },
+    {
+      "name": "directCreateGroupThread",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/create_group_thread/"
+    },
     { "name": "directInbox", "method": "GET", "path": "/api/v1/direct_v2/inbox/" },
+    {
+      "name": "directMessageDelete",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/{thread_id}/items/{item_id}/delete/"
+    },
+    {
+      "name": "directMessageSeen",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/{thread_id}/items/{item_id}/seen/"
+    },
+    { "name": "directPendingInbox", "method": "GET", "path": "/api/v1/direct_v2/pending_inbox/" },
+    {
+      "name": "directRankedRecipients",
+      "method": "GET",
+      "path": "/api/v1/direct_v2/ranked_recipients/"
+    },
     {
       "name": "directSendText",
       "method": "POST",
       "path": "/api/v1/direct_v2/threads/broadcast/text/"
     },
+    { "name": "directSpamInbox", "method": "GET", "path": "/api/v1/direct_v2/spam_inbox/" },
     { "name": "directThread", "method": "GET", "path": "/api/v1/direct_v2/threads/{thread_id}/" },
+    {
+      "name": "directThreadAddUser",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/{thread_id}/add_user/"
+    },
+    {
+      "name": "directThreadApprove",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/{thread_id}/approve/"
+    },
+    {
+      "name": "directThreadByParticipants",
+      "method": "GET",
+      "path": "/api/v1/direct_v2/threads/get_by_participants/"
+    },
+    {
+      "name": "directThreadHide",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/{thread_id}/hide/"
+    },
+    {
+      "name": "directThreadMute",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/{thread_id}/mute/"
+    },
+    {
+      "name": "directThreadUnmute",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/{thread_id}/unmute/"
+    },
+    {
+      "name": "directThreadUpdateTitle",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/{thread_id}/update_title/"
+    },
     { "name": "feedReelsTray", "method": "POST", "path": "/api/v1/feed/reels_tray/" },
     { "name": "feedSaved", "method": "GET", "path": "/api/v1/feed/saved/posts/" },
     { "name": "feedTimeline", "method": "POST", "path": "/api/v1/feed/timeline/" },

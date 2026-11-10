@@ -486,6 +486,39 @@ describe('IgFlare facade', () => {
     expect(state.logins).toBe(1); // the hook, not a credential replay, restored the session
   });
 
+  it('delegates direct inbox variants and thread management', async () => {
+    const { ig, transport } = clientWith((req) => {
+      if (req.url.includes('/pending_inbox/') || req.url.includes('/spam_inbox/'))
+        return json({ status: 'ok', inbox: { threads: [{ thread_id: '1' }], has_older: false } });
+      if (req.url.includes('/ranked_recipients/'))
+        return json({ status: 'ok', ranked_recipients: [{ user: { pk: 1, username: 'a' } }] });
+      if (req.url.includes('/get_by_participants/'))
+        return json({ status: 'ok', thread: { thread_id: 't' } });
+      if (req.url.includes('/create_group_thread/')) return json({ status: 'ok', thread_id: '99' });
+      return json({ status: 'ok' });
+    });
+
+    expect((await ig.direct.pending()).items[0]?.thread_id).toBe('1');
+    expect((await ig.direct.spam()).items[0]?.thread_id).toBe('1');
+    for await (const t of ig.direct.paginatePending()) expect(t.thread_id).toBe('1');
+    for await (const t of ig.direct.paginateSpam()) expect(t.thread_id).toBe('1');
+    expect((await ig.direct.searchRecipients('a'))[0]?.username).toBe('a');
+    expect((await ig.direct.findThread(['5']))?.thread_id).toBe('t');
+    expect(await ig.direct.createGroup(['1', '2'], 'G')).toBe('99');
+
+    await ig.direct.approve('10');
+    await ig.direct.hide('10', { moveToSpam: true });
+    await ig.direct.setTitle('10', 'T');
+    await ig.direct.addUsers('10', ['3']);
+    await ig.direct.mute('10');
+    await ig.direct.unmute('10');
+    await ig.direct.deleteMessage('10', '20');
+    await ig.direct.markSeen('10', '20');
+
+    expect(transport.requests.some((r) => r.url.includes('/threads/10/approve/'))).toBe(true);
+    expect(transport.requests.some((r) => r.url.includes('/threads/10/items/20/seen/'))).toBe(true);
+  });
+
   it('exposes the session and the underlying engine', () => {
     const { ig } = clientWith(() => json({}));
     expect(ig.session.device.uuid).toBeDefined();

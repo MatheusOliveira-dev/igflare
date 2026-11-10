@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { PrivateClient } from '../../core/http/private-client';
 import { endpoints } from '../../generated/endpoints';
+import type { EndpointDefinition } from '../../generated/endpoints';
 import {
   threadSchema,
   directMessageSchema,
@@ -33,15 +34,16 @@ function nodeCursor(node: Record<string, unknown>): string | undefined {
   return cursor;
 }
 
-/** One page of the direct inbox (threads). Pass `cursor` to continue. */
-export async function getInbox(
+/** Fetches one page of an inbox-shaped endpoint (inbox, pending or spam). */
+async function fetchInboxPage(
   client: PrivateClient,
-  options: CursorOptions = {},
+  definition: EndpointDefinition,
+  query: Record<string, string>,
 ): Promise<Page<Thread>> {
   const json = await client.request({
-    method: endpoints.directInbox.method,
-    endpoint: endpoints.directInbox.path,
-    query: { ...(options.cursor !== undefined ? { cursor: options.cursor } : {}) },
+    method: definition.method,
+    endpoint: definition.path,
+    query,
   });
   const inbox = json['inbox'];
   if (!isRecord(inbox)) {
@@ -52,9 +54,58 @@ export async function getInbox(
   return nextCursor !== undefined ? { items, nextCursor } : { items };
 }
 
+function cursorQuery(options: CursorOptions): Record<string, string> {
+  return options.cursor !== undefined ? { cursor: options.cursor } : {};
+}
+
+/** One page of the direct inbox (threads). Pass `cursor` to continue. */
+export function getInbox(
+  client: PrivateClient,
+  options: CursorOptions = {},
+): Promise<Page<Thread>> {
+  return fetchInboxPage(client, endpoints.directInbox, cursorQuery(options));
+}
+
 /** Walks every thread in the inbox, yielding one at a time across pages. */
 export function paginateInbox(client: PrivateClient): AsyncGenerator<Thread> {
   return paginate((cursor) => getInbox(client, cursor !== undefined ? { cursor } : {}));
+}
+
+/** One page of the pending inbox (message requests). Pass `cursor` to continue. */
+export function getPendingInbox(
+  client: PrivateClient,
+  options: CursorOptions = {},
+): Promise<Page<Thread>> {
+  return fetchInboxPage(client, endpoints.directPendingInbox, {
+    visual_message_return_type: 'unseen',
+    persistentBadging: 'true',
+    is_prefetching: 'false',
+    request_session_id: client.session.device.requestId,
+    ...cursorQuery(options),
+  });
+}
+
+/** Walks every pending thread (message requests), one at a time across pages. */
+export function paginatePendingInbox(client: PrivateClient): AsyncGenerator<Thread> {
+  return paginate((cursor) => getPendingInbox(client, cursor !== undefined ? { cursor } : {}));
+}
+
+/** One page of the spam inbox (hidden requests). Pass `cursor` to continue. */
+export function getSpamInbox(
+  client: PrivateClient,
+  options: CursorOptions = {},
+): Promise<Page<Thread>> {
+  return fetchInboxPage(client, endpoints.directSpamInbox, {
+    visual_message_return_type: 'unseen',
+    persistentBadging: 'true',
+    is_prefetching: 'false',
+    ...cursorQuery(options),
+  });
+}
+
+/** Walks every spam thread (hidden requests), one at a time across pages. */
+export function paginateSpamInbox(client: PrivateClient): AsyncGenerator<Thread> {
+  return paginate((cursor) => getSpamInbox(client, cursor !== undefined ? { cursor } : {}));
 }
 
 /** One page of a thread's messages (newest first). Pass `cursor` to continue. */

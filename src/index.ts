@@ -120,10 +120,28 @@ export type { Comment } from './schemas/comment';
 export {
   getInbox,
   paginateInbox,
+  getPendingInbox,
+  paginatePendingInbox,
+  getSpamInbox,
+  paginateSpamInbox,
   getThread,
   paginateThread,
   sendText,
 } from './endpoints/direct/direct';
+export {
+  approveThread,
+  hideThread,
+  setThreadTitle,
+  addThreadUsers,
+  muteThread,
+  unmuteThread,
+  deleteMessage,
+  markMessageSeen,
+  createGroupThread,
+  findThreadByParticipants,
+  searchRecipients,
+} from './endpoints/direct/direct-manage';
+export type { HideThreadOptions, RecipientSearchMode } from './endpoints/direct/direct-manage';
 export type { CursorOptions, SendTarget } from './endpoints/direct/direct';
 export { threadSchema, directMessageSchema, directSendResultSchema } from './schemas/direct';
 export type { Thread, DirectMessage, DirectSendResult } from './schemas/direct';

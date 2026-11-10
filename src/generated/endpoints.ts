@@ -6,7 +6,7 @@ export interface EndpointDefinition {
   readonly path: string;
 }
 
-export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directInbox' | 'directSendText' | 'directThread' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
+export type EndpointName = 'accountsCurrentUser' | 'accountsLogin' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaComment' | 'mediaCommentDelete' | 'mediaComments' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaUnlike' | 'mediaUnsave' | 'tagsSearch' | 'tagsSections' | 'userInfo' | 'userInfoByUsername' | 'usersSearch';
 
 export const endpoints: Record<EndpointName, EndpointDefinition> = {
   accountsCurrentUser: { method: 'GET', path: '/api/v1/accounts/current_user/' },
@@ -16,9 +16,22 @@ export const endpoints: Record<EndpointName, EndpointDefinition> = {
   attestationCreateAndroidKeystore: { method: 'POST', path: '/api/v1/attestation/create_android_keystore/' },
   bloksApps: { method: 'POST', path: '/api/v1/bloks/apps/' },
   bloksAsyncAction: { method: 'POST', path: '/api/v1/bloks/async_action/' },
+  directCreateGroupThread: { method: 'POST', path: '/api/v1/direct_v2/create_group_thread/' },
   directInbox: { method: 'GET', path: '/api/v1/direct_v2/inbox/' },
+  directMessageDelete: { method: 'POST', path: '/api/v1/direct_v2/threads/{thread_id}/items/{item_id}/delete/' },
+  directMessageSeen: { method: 'POST', path: '/api/v1/direct_v2/threads/{thread_id}/items/{item_id}/seen/' },
+  directPendingInbox: { method: 'GET', path: '/api/v1/direct_v2/pending_inbox/' },
+  directRankedRecipients: { method: 'GET', path: '/api/v1/direct_v2/ranked_recipients/' },
   directSendText: { method: 'POST', path: '/api/v1/direct_v2/threads/broadcast/text/' },
+  directSpamInbox: { method: 'GET', path: '/api/v1/direct_v2/spam_inbox/' },
   directThread: { method: 'GET', path: '/api/v1/direct_v2/threads/{thread_id}/' },
+  directThreadAddUser: { method: 'POST', path: '/api/v1/direct_v2/threads/{thread_id}/add_user/' },
+  directThreadApprove: { method: 'POST', path: '/api/v1/direct_v2/threads/{thread_id}/approve/' },
+  directThreadByParticipants: { method: 'GET', path: '/api/v1/direct_v2/threads/get_by_participants/' },
+  directThreadHide: { method: 'POST', path: '/api/v1/direct_v2/threads/{thread_id}/hide/' },
+  directThreadMute: { method: 'POST', path: '/api/v1/direct_v2/threads/{thread_id}/mute/' },
+  directThreadUnmute: { method: 'POST', path: '/api/v1/direct_v2/threads/{thread_id}/unmute/' },
+  directThreadUpdateTitle: { method: 'POST', path: '/api/v1/direct_v2/threads/{thread_id}/update_title/' },
   fbsearchPlaces: { method: 'GET', path: '/api/v1/fbsearch/places/' },
   feedReelsTray: { method: 'POST', path: '/api/v1/feed/reels_tray/' },
   feedSaved: { method: 'GET', path: '/api/v1/feed/saved/posts/' },
