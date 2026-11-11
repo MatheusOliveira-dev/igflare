@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { setBiography, setName } from './account';
+import { getBioLinks, removeBioLinks, setBioLink, setBiography, setName } from './account';
 import { IgApiError, ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 import { PrivateClient } from '../../core/http/private-client';
@@ -108,5 +108,57 @@ describe('setName', () => {
     );
     const client = new PrivateClient({ transport, session: createSession() });
     await expect(setName(client, 'X')).rejects.toBeInstanceOf(IgApiError);
+  });
+});
+
+describe('profile links', () => {
+  const LINK = { link_id: '1000000000000001', url: 'https://example.com/a', title: 'a' };
+
+  function withLinks(links: unknown[]): { client: PrivateClient; transport: FakeTransport } {
+    return clientReturning({ status: 'ok', user: { pk: 1, username: 'me', bio_links: links } });
+  }
+
+  it('lists the links on the profile, empty when the field is absent', async () => {
+    expect(await getBioLinks(withLinks([LINK]).client)).toHaveLength(1);
+    expect(await getBioLinks(clientReturning({ status: 'ok', user: { pk: 1 } }).client)).toEqual(
+      [],
+    );
+  });
+
+  it('sets a link as an external entry and reads the list back', async () => {
+    const { client, transport } = withLinks([LINK]);
+
+    const links = await setBioLink(client, 'https://example.com/a', 'a');
+
+    expect(transport.requests[0]?.url).toContain('/api/v1/accounts/update_bio_links/');
+    const sent = signedPayload(transport.requests[0]?.body)['updated_links'] as string;
+    expect(JSON.parse(sent)).toEqual([
+      { url: 'https://example.com/a', title: 'a', link_type: 'external' },
+    ]);
+    expect(transport.requests[1]?.url).toContain('/api/v1/accounts/current_user/');
+    expect(links[0]?.link_id).toBe('1000000000000001');
+  });
+
+  it('refuses a link that is not http(s) without calling the server', async () => {
+    const { client, transport } = withLinks([]);
+    await expect(setBioLink(client, 'javascript:alert(1)')).rejects.toBeInstanceOf(IgError);
+    expect(transport.requests).toHaveLength(0);
+  });
+
+  it('removes links by id, sending the ids as numbers', async () => {
+    const { client, transport } = withLinks([]);
+
+    expect(await removeBioLinks(client, ['1000000000000001'])).toEqual([]);
+
+    expect(transport.requests[0]?.url).toContain('/api/v1/accounts/remove_bio_links/');
+    expect(signedPayload(transport.requests[0]?.body)['link_ids']).toEqual([1000000000000001]);
+  });
+
+  it('refuses ids that are not numeric or would be rounded', async () => {
+    const { client, transport } = withLinks([]);
+    await expect(removeBioLinks(client, ['1/../x'])).rejects.toBeInstanceOf(IgError);
+    await expect(removeBioLinks(client, [])).rejects.toBeInstanceOf(IgError);
+    await expect(removeBioLinks(client, ['9007199254740993'])).rejects.toBeInstanceOf(IgError);
+    expect(transport.requests).toHaveLength(0);
   });
 });

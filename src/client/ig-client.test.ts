@@ -352,6 +352,9 @@ describe('IgFlare facade', () => {
 
     expect((await ig.account.setBiography('hi')).biography).toBe('hi');
     expect((await ig.account.setName('New')).full_name).toBe('New');
+    expect(await ig.account.links()).toEqual([]);
+    expect(await ig.account.setLink('https://example.com')).toEqual([]);
+    expect(await ig.account.removeLinks(['1'])).toEqual([]);
     await ig.media.save('1_9');
     await ig.media.unsave('1_9');
     expect((await ig.media.saved()).items[0]?.code).toBe('s');

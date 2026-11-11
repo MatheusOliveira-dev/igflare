@@ -17,6 +17,11 @@
       "path": "/api/v1/accounts/login/"
     },
     {
+      "name": "accountsRemoveBioLinks",
+      "method": "POST",
+      "path": "/api/v1/accounts/remove_bio_links/"
+    },
+    {
       "name": "accountsSetBiography",
       "method": "POST",
       "path": "/api/v1/accounts/set_biography/"
@@ -25,6 +30,11 @@
       "name": "accountsTwoFactorLogin",
       "method": "POST",
       "path": "/api/v1/accounts/two_factor_login/"
+    },
+    {
+      "name": "accountsUpdateBioLinks",
+      "method": "POST",
+      "path": "/api/v1/accounts/update_bio_links/"
     },
     {
       "name": "attestationCreateAndroidKeystore",

@@ -3,6 +3,9 @@ import { endpoints } from '../../generated/endpoints';
 import { userSchema, type User } from '../../schemas/user';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
+import { bioLinkSchema, type BioLink } from '../../schemas/bio-link';
+import { parseSchemaList } from '../../schemas/parse-list';
+import { assertIds } from '../direct/direct-wire';
 import { getCurrentUser } from '../user/current-user';
 
 /** Sets the logged-in account's biography and returns the updated profile. */
@@ -64,4 +67,51 @@ export async function setName(client: PrivateClient, name: string): Promise<User
     );
   }
   return parsed.data;
+}
+
+/** The links listed on the logged-in profile (empty when there are none). */
+export async function getBioLinks(client: PrivateClient): Promise<BioLink[]> {
+  const current = await getCurrentUser(client);
+  return parseSchemaList<BioLink>(current['bio_links'] ?? [], bioLinkSchema, 'bio link');
+}
+
+/**
+ * Sets the profile link and returns the list as the profile now holds it. The profile
+ * keeps a list; this adds an external link to it. \`accounts/edit_profile/\` ignores
+ * \`external_url\`, which is why this goes through its own endpoint.
+ */
+export async function setBioLink(
+  client: PrivateClient,
+  url: string,
+  title = '',
+): Promise<BioLink[]> {
+  if (!/^https?:\/\//i.test(url)) {
+    throw new IgError('A profile link must start with http:// or https://');
+  }
+  await client.request({
+    method: endpoints.accountsUpdateBioLinks.method,
+    endpoint: endpoints.accountsUpdateBioLinks.path,
+    payload: { updated_links: JSON.stringify([{ url, title, link_type: 'external' }]) },
+  });
+  return getBioLinks(client);
+}
+
+/** Removes profile links by id (the `link_id` of each entry in {@link getBioLinks}). */
+export async function removeBioLinks(
+  client: PrivateClient,
+  linkIds: readonly string[],
+): Promise<BioLink[]> {
+  assertIds(linkIds, 'Link ids');
+  // The endpoint takes the ids as JSON numbers. Link ids seen so far fit in a double;
+  // one that does not would be rounded into a different link, so it is refused.
+  const numbers = linkIds.map(Number);
+  if (!numbers.every(Number.isSafeInteger)) {
+    throw new IgError('A link id is too large to send safely');
+  }
+  await client.request({
+    method: endpoints.accountsRemoveBioLinks.method,
+    endpoint: endpoints.accountsRemoveBioLinks.path,
+    payload: { link_ids: numbers },
+  });
+  return getBioLinks(client);
 }

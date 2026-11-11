@@ -25,6 +25,8 @@ describe('manifest coverage of the hand-written endpoints', () => {
       method: 'POST',
       path: '/api/v1/accounts/edit_profile/',
     });
+    expect(endpoints.accountsUpdateBioLinks.path).toBe('/api/v1/accounts/update_bio_links/');
+    expect(endpoints.accountsRemoveBioLinks.path).toBe('/api/v1/accounts/remove_bio_links/');
     expect(endpoints.attestationCreateAndroidKeystore).toEqual({
       method: 'POST',
       path: '/api/v1/attestation/create_android_keystore/',

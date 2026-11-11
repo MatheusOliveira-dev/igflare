@@ -60,7 +60,14 @@ import {
   getSavedPosts,
   paginateSavedPosts,
 } from '../endpoints/media/media';
-import { setBiography, setName } from '../endpoints/account/account';
+import {
+  getBioLinks,
+  removeBioLinks,
+  setBioLink,
+  setBiography,
+  setName,
+} from '../endpoints/account/account';
+import type { BioLink } from '../schemas/bio-link';
 import type { CommentListOptions, CommentOptions } from '../endpoints/media/media';
 import {
   likeComment,
@@ -135,6 +142,12 @@ export interface AccountApi {
   setBiography(text: string): Promise<User>;
   /** Changes the display name (Instagram limits this to a couple of changes per 14 days). */
   setName(name: string): Promise<User>;
+  /** The links listed on the profile. */
+  links(): Promise<BioLink[]>;
+  /** Sets the profile link, returning the list as the profile now holds it. */
+  setLink(url: string, title?: string): Promise<BioLink[]>;
+  /** Removes profile links by `link_id`, returning the list that remains. */
+  removeLinks(linkIds: string[]): Promise<BioLink[]>;
 }
 
 /** Reads about any user. */
@@ -397,6 +410,9 @@ export class IgFlare {
       me: () => getCurrentUser(client),
       setBiography: (text) => setBiography(client, text),
       setName: (name) => setName(client, name),
+      links: () => getBioLinks(client),
+      setLink: (url, title) => setBioLink(client, url, title),
+      removeLinks: (ids) => removeBioLinks(client, ids),
     };
   }
 
