@@ -1,10 +1,28 @@
 {
   "name": "igflare",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "TypeScript client for the Instagram mobile private API",
+  "keywords": [
+    "instagram",
+    "instagram-api",
+    "instagram-private-api",
+    "private-api",
+    "sdk",
+    "typescript"
+  ],
+  "homepage": "https://github.com/MatheusOliveira-dev/igflare#readme",
+  "bugs": {
+    "url": "https://github.com/MatheusOliveira-dev/igflare/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MatheusOliveira-dev/igflare.git"
+  },
+  "license": "MIT",
+  "author": "Matheus Oliveira",
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "packageManager": "npm@10.9.9",
   "main": "./dist/index.cjs",
@@ -21,6 +39,10 @@
     "dist"
   ],
   "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
@@ -45,9 +67,9 @@
     "live-check": "node scripts/live-check.mjs",
     "app-build": "node scripts/app-build.ts",
     "docs": "typedoc",
-    "docs:check": "typedoc --emit none"
+    "docs:check": "typedoc --emit none",
+    "prepublishOnly": "npm run ci"
   },
-  "license": "MIT",
   "devDependencies": {
     "@commitlint/cli": "21.2.4",
     "@commitlint/config-conventional": "21.2.4",
