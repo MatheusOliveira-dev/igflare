@@ -8,9 +8,7 @@ import { z } from 'zod';
 
 // @public
 export interface AccountApi {
-    // Warning: (ae-forgotten-export) The symbol "Activity" needs to be exported by the entry point index.d.ts
     activity(): Promise<Activity>;
-    // Warning: (ae-forgotten-export) The symbol "BioLink" needs to be exported by the entry point index.d.ts
     links(): Promise<BioLink[]>;
     me(): Promise<Record<string, unknown>>;
     removeLinks(linkIds: string[]): Promise<BioLink[]>;
@@ -22,6 +20,32 @@ export interface AccountApi {
 // @public (undocumented)
 export class AccountSuspendedError extends IgApiError {
 }
+
+// @public
+export interface Activity {
+    readonly friendRequestCount: number;
+    // (undocumented)
+    readonly newItems: ActivityItem[];
+    // (undocumented)
+    readonly oldItems: ActivityItem[];
+}
+
+// @public (undocumented)
+export type ActivityItem = z.infer<typeof activityItemSchema>;
+
+// @public
+export const activityItemSchema: z.ZodObject<{
+    pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+    type: z.ZodOptional<z.ZodNumber>;
+    story_type: z.ZodOptional<z.ZodNumber>;
+    args: z.ZodOptional<z.ZodObject<{
+        profile_id: z.ZodOptional<z.ZodCoercedString<unknown>>;
+        profile_name: z.ZodOptional<z.ZodString>;
+        text: z.ZodOptional<z.ZodString>;
+        rich_text: z.ZodOptional<z.ZodString>;
+        timestamp: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$loose>>;
+}, z.core.$loose>;
 
 // @public
 export function addCloseFriend(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
@@ -124,6 +148,17 @@ export interface BaseHeadersInput {
     readonly wwwClaim?: string;
 }
 
+// @public (undocumented)
+export type BioLink = z.infer<typeof bioLinkSchema>;
+
+// @public
+export const bioLinkSchema: z.ZodObject<{
+    link_id: z.ZodOptional<z.ZodCoercedString<unknown>>;
+    url: z.ZodString;
+    title: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    link_type: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+}, z.core.$loose>;
+
 // @public
 export function blockUser(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
 
@@ -220,6 +255,36 @@ export class ClientSchemaError extends IgError {
 }
 
 // @public (undocumented)
+export type Collection = z.infer<typeof collectionSchema>;
+
+// @public
+export interface CollectionApi {
+    create(name: string, mediaIds?: readonly string[]): Promise<Collection>;
+    delete(collectionId: string): Promise<void>;
+    liked(options?: CursorOptions): Promise<Page<Media>>;
+    list(): Promise<Collection[]>;
+    // (undocumented)
+    medias(collectionId: string, options?: CursorOptions): Promise<Page<Media>>;
+    // (undocumented)
+    paginateLiked(): AsyncGenerator<Media>;
+    // (undocumented)
+    paginateMedias(collectionId: string): AsyncGenerator<Media>;
+}
+
+// @public (undocumented)
+export interface CollectionPageOptions {
+    readonly cursor?: string;
+}
+
+// @public
+export const collectionSchema: z.ZodObject<{
+    collection_id: z.ZodCoercedString<unknown>;
+    collection_name: z.ZodOptional<z.ZodString>;
+    collection_type: z.ZodOptional<z.ZodString>;
+    collection_media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+}, z.core.$loose>;
+
+// @public (undocumented)
 export type Comment = z.infer<typeof commentSchema>;
 
 // @public (undocumented)
@@ -258,10 +323,21 @@ export const commentSchema: z.ZodObject<{
 }, z.core.$loose>;
 
 // @public
+export function createCollection(client: PrivateClient, name: string, mediaIds?: readonly string[]): Promise<Collection>;
+
+// @public
 export function createDeviceState(overrides?: Partial<DeviceState>): DeviceState;
 
 // @public
 export function createGroupThread(client: PrivateClient, userIds: readonly string[], title?: string): Promise<string>;
+
+// @public
+export function createHighlight(client: PrivateClient, title: string, stories: readonly string[], options?: CreateHighlightOptions): Promise<Highlight>;
+
+// @public (undocumented)
+export interface CreateHighlightOptions {
+    readonly coverStoryId?: string;
+}
 
 // @public (undocumented)
 export function createSession(options?: CreateSessionOptions): SessionData;
@@ -293,10 +369,16 @@ export const DEFAULT_DEVICE_PROFILE: DeviceProfile;
 export const DEFAULT_LOCATION: LocationState;
 
 // @public
+export function deleteCollection(client: PrivateClient, collectionId: string): Promise<void>;
+
+// @public
 export function deleteComment(client: PrivateClient, mediaId: string, commentId: string): Promise<void>;
 
 // @public
 export function deleteComments(client: PrivateClient, mediaId: string, commentIds: readonly string[]): Promise<void>;
+
+// @public
+export function deleteHighlight(client: PrivateClient, id: string): Promise<void>;
 
 // @public
 export function deleteMedia(client: PrivateClient, mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL' | 'STORY'): Promise<void>;
@@ -398,7 +480,6 @@ export interface DirectApi {
     // (undocumented)
     sendText(text: string, target: SendTarget): Promise<DirectSendResult>;
     sendVideo(mp4: Uint8Array, target: SendTarget): Promise<DirectSendResult>;
-    // Warning: (ae-forgotten-export) The symbol "VoiceOptions" needs to be exported by the entry point index.d.ts
     sendVoice(m4a: Uint8Array, target: SendTarget, options?: VoiceOptions): Promise<DirectSendResult>;
     // (undocumented)
     setTitle(threadId: string, title: string): Promise<void>;
@@ -438,6 +519,19 @@ export const directSendResultSchema: z.ZodObject<{
 }, z.core.$loose>;
 
 // @public
+export function editHighlight(client: PrivateClient, id: string, options: EditHighlightOptions): Promise<Highlight>;
+
+// @public (undocumented)
+export interface EditHighlightOptions {
+    readonly addStoryIds?: readonly string[];
+    readonly coverJpeg?: Uint8Array;
+    readonly coverStoryId?: string;
+    readonly removeStoryIds?: readonly string[];
+    // (undocumented)
+    readonly title?: string;
+}
+
+// @public
 export function editMedia(client: PrivateClient, mediaId: string, options: EditMediaOptions): Promise<Media>;
 
 // @public (undocumented)
@@ -469,7 +563,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsEditProfile' | 'accountsLogin' | 'accountsRemoveBioLinks' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'accountsUpdateBioLinks' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'collectionsCreate' | 'collectionsDelete' | 'collectionsList' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastRavenAttachment' | 'directBroadcastReaction' | 'directBroadcastStoryShare' | 'directBroadcastVoiceAttachment' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedCollection' | 'feedLiked' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsRemoveFollower' | 'friendshipsSetBesties' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureSidecar' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaSeenV2' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'newsInbox' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
+export type EndpointName = 'accountsCurrentUser' | 'accountsEditProfile' | 'accountsLogin' | 'accountsRemoveBioLinks' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'accountsUpdateBioLinks' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'collectionsCreate' | 'collectionsDelete' | 'collectionsList' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastRavenAttachment' | 'directBroadcastReaction' | 'directBroadcastStoryShare' | 'directBroadcastVoiceAttachment' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedCollection' | 'feedLiked' | 'feedReelsMedia' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsRemoveFollower' | 'friendshipsSetBesties' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'highlightsCreateReel' | 'highlightsDeleteReel' | 'highlightsEditReel' | 'highlightsTray' | 'launcherSync' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureSidecar' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaSeenV2' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'newsInbox' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -624,6 +718,15 @@ export interface GenerateUsdidOptions {
 export function generateUuid(): string;
 
 // @public
+export function getActivity(client: PrivateClient): Promise<Activity>;
+
+// @public
+export function getBioLinks(client: PrivateClient): Promise<BioLink[]>;
+
+// @public
+export function getCollectionMedias(client: PrivateClient, collectionId: string, options?: CollectionPageOptions): Promise<Page<Media>>;
+
+// @public
 export function getCommentReplies(client: PrivateClient, mediaId: string, commentId: string, options?: ReplyListOptions): Promise<Page<Comment>>;
 
 // @public
@@ -645,7 +748,13 @@ export function getFriendshipStatus(client: PrivateClient, pk: string): Promise<
 export function getHashtagFeed(client: PrivateClient, tag: string, options?: FeedOptions): Promise<Page<Media>>;
 
 // @public
+export function getHighlight(client: PrivateClient, id: string): Promise<Highlight>;
+
+// @public
 export function getInbox(client: PrivateClient, options?: CursorOptions): Promise<Page<Thread>>;
+
+// @public
+export function getLikedMedias(client: PrivateClient, options?: CollectionPageOptions): Promise<Page<Media>>;
 
 // @public
 export function getLikers(client: PrivateClient, mediaId: string): Promise<User[]>;
@@ -709,6 +818,93 @@ export interface HideThreadOptions {
 }
 
 // @public (undocumented)
+export type Highlight = z.infer<typeof highlightSchema>;
+
+// @public
+export interface HighlightApi {
+    create(title: string, storyIds: readonly string[], options?: CreateHighlightOptions): Promise<Highlight>;
+    delete(highlightId: string): Promise<void>;
+    edit(highlightId: string, options: EditHighlightOptions): Promise<Highlight>;
+    info(highlightId: string): Promise<Highlight>;
+    list(userId: string): Promise<Highlight[]>;
+}
+
+// @public
+export const highlightSchema: z.ZodObject<{
+    id: z.ZodString;
+    title: z.ZodOptional<z.ZodString>;
+    media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    user: z.ZodOptional<z.ZodObject<{
+        pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+        username: z.ZodOptional<z.ZodString>;
+        full_name: z.ZodOptional<z.ZodString>;
+        is_private: z.ZodOptional<z.ZodBoolean>;
+        is_verified: z.ZodOptional<z.ZodBoolean>;
+        profile_pic_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        biography: z.ZodOptional<z.ZodString>;
+        external_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    }, z.core.$loose>>;
+    items: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+        id: z.ZodOptional<z.ZodString>;
+        code: z.ZodOptional<z.ZodString>;
+        media_type: z.ZodOptional<z.ZodNumber>;
+        taken_at: z.ZodOptional<z.ZodNumber>;
+        like_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        comment_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        caption: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+            text: z.ZodOptional<z.ZodString>;
+        }, z.core.$loose>>>;
+        user: z.ZodOptional<z.ZodObject<{
+            pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+            username: z.ZodOptional<z.ZodString>;
+            full_name: z.ZodOptional<z.ZodString>;
+            is_private: z.ZodOptional<z.ZodBoolean>;
+            is_verified: z.ZodOptional<z.ZodBoolean>;
+            profile_pic_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+            follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            biography: z.ZodOptional<z.ZodString>;
+            external_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        }, z.core.$loose>>;
+        image_versions2: z.ZodOptional<z.ZodObject<{
+            candidates: z.ZodOptional<z.ZodArray<z.ZodObject<{
+                url: z.ZodOptional<z.ZodString>;
+                width: z.ZodOptional<z.ZodNumber>;
+                height: z.ZodOptional<z.ZodNumber>;
+            }, z.core.$loose>>>;
+        }, z.core.$loose>>;
+        video_versions: z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodObject<{
+            url: z.ZodOptional<z.ZodString>;
+            width: z.ZodOptional<z.ZodNumber>;
+            height: z.ZodOptional<z.ZodNumber>;
+        }, z.core.$loose>>>>;
+        usertags: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+            in: z.ZodOptional<z.ZodArray<z.ZodObject<{
+                position: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+                user: z.ZodOptional<z.ZodObject<{
+                    pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+                    username: z.ZodOptional<z.ZodString>;
+                    full_name: z.ZodOptional<z.ZodString>;
+                    is_private: z.ZodOptional<z.ZodBoolean>;
+                    is_verified: z.ZodOptional<z.ZodBoolean>;
+                    profile_pic_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+                    follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                    following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                    media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                    biography: z.ZodOptional<z.ZodString>;
+                    external_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+                }, z.core.$loose>>;
+            }, z.core.$loose>>>;
+        }, z.core.$loose>>>;
+    }, z.core.$loose>>>;
+}, z.core.$loose>;
+
+// @public (undocumented)
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 // @public (undocumented)
@@ -763,8 +959,6 @@ export class IgFlare {
     // (undocumented)
     readonly account: AccountApi;
     get client(): PrivateClient;
-    // Warning: (ae-forgotten-export) The symbol "CollectionApi" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     readonly collection: CollectionApi;
     // (undocumented)
@@ -774,6 +968,8 @@ export class IgFlare {
     // (undocumented)
     readonly friendship: FriendshipApi;
     static fromStore(store: SessionStore, options?: Omit<IgFlareOptions, 'store' | 'session'>): Promise<IgFlare>;
+    // (undocumented)
+    readonly highlight: HighlightApi;
     login(credentials: IgFlareLogin): Promise<PrivateResponseJson>;
     // (undocumented)
     readonly media: MediaApi;
@@ -827,6 +1023,12 @@ export function likeComment(client: PrivateClient, commentId: string): Promise<v
 
 // @public
 export function likeMedia(client: PrivateClient, mediaId: string): Promise<void>;
+
+// @public
+export function listCollections(client: PrivateClient): Promise<Collection[]>;
+
+// @public
+export function listHighlights(client: PrivateClient, userId: string): Promise<Highlight[]>;
 
 // @public (undocumented)
 export type Location = z.infer<typeof locationSchema>;
@@ -914,7 +1116,6 @@ export interface MediaApi {
     pinComment(mediaId: string, commentId: string): Promise<void>;
     // (undocumented)
     replies(mediaId: string, commentId: string, options?: ReplyListOptions): Promise<Page<Comment>>;
-    // Warning: (ae-forgotten-export) The symbol "SaveOptions" needs to be exported by the entry point index.d.ts
     save(mediaId: string, options?: SaveOptions): Promise<void>;
     // (undocumented)
     saved(options?: CommentListOptions): Promise<Page<Media>>;
@@ -1024,6 +1225,9 @@ export interface Page<T> {
 export function paginate<T>(fetchPage: (cursor?: string) => Promise<Page<T>>): AsyncGenerator<T>;
 
 // @public
+export function paginateCollectionMedias(client: PrivateClient, collectionId: string): AsyncGenerator<Media>;
+
+// @public
 export function paginateCommentReplies(client: PrivateClient, mediaId: string, commentId: string): AsyncGenerator<Comment>;
 
 // @public
@@ -1040,6 +1244,9 @@ export function paginateHashtagFeed(client: PrivateClient, tag: string): AsyncGe
 
 // @public
 export function paginateInbox(client: PrivateClient): AsyncGenerator<Thread>;
+
+// @public
+export function paginateLikedMedias(client: PrivateClient): AsyncGenerator<Media>;
 
 // @public
 export function paginateLocationFeed(client: PrivateClient, locationId: string): AsyncGenerator<Media>;
@@ -1286,6 +1493,9 @@ export interface RegistrationTokenOptions {
 }
 
 // @public
+export function removeBioLinks(client: PrivateClient, linkIds: readonly string[]): Promise<BioLink[]>;
+
+// @public
 export function removeCloseFriend(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
 
 // @public
@@ -1320,6 +1530,11 @@ export class RetryTransport implements HttpTransport {
 
 // @public
 export function saveMedia(client: PrivateClient, mediaId: string, options?: SaveOptions): Promise<void>;
+
+// @public (undocumented)
+export interface SaveOptions {
+    readonly collectionId?: string;
+}
 
 // @public
 export interface SearchApi {
@@ -1362,6 +1577,12 @@ export type SendTarget = {
 // @public
 export function sendText(client: PrivateClient, text: string, target: SendTarget): Promise<DirectSendResult>;
 
+// @public
+export function sendVideo(client: PrivateClient, mp4: Uint8Array, target: SendTarget): Promise<DirectSendResult>;
+
+// @public
+export function sendVoice(client: PrivateClient, m4a: Uint8Array, target: SendTarget, options?: VoiceOptions): Promise<DirectSendResult>;
+
 // @public (undocumented)
 export class SentryBlockError extends IgApiError {
 }
@@ -1392,6 +1613,12 @@ export interface SessionStore {
 export function setBiography(client: PrivateClient, text: string): Promise<User>;
 
 // @public
+export function setBioLink(client: PrivateClient, url: string, title?: string): Promise<BioLink[]>;
+
+// @public
+export function setName(client: PrivateClient, name: string): Promise<User>;
+
+// @public
 export function setThreadTitle(client: PrivateClient, threadId: string, title: string): Promise<void>;
 
 // @public
@@ -1404,6 +1631,9 @@ export interface ShareMediaOptions {
 
 // @public
 export function shareProfile(client: PrivateClient, userId: string, target: SendTarget): Promise<DirectSendResult>;
+
+// @public
+export function shareStory(client: PrivateClient, storyId: string, target: SendTarget): Promise<DirectSendResult>;
 
 // @public
 export interface Signer {
@@ -1530,6 +1760,9 @@ export function unpinMedia(client: PrivateClient, mediaId: string): Promise<void
 export function unsaveMedia(client: PrivateClient, mediaId: string, options?: SaveOptions): Promise<void>;
 
 // @public
+export function uploadAlbum(client: PrivateClient, items: readonly AlbumItem[], options?: AlbumUploadOptions): Promise<Media>;
+
+// @public
 export interface UploadApi {
     album(items: readonly AlbumItem[], options?: AlbumUploadOptions): Promise<Media>;
     // (undocumented)
@@ -1625,6 +1858,11 @@ export interface VideoUploadOptions {
     readonly height?: number;
     // (undocumented)
     readonly width?: number;
+}
+
+// @public (undocumented)
+export interface VoiceOptions {
+    readonly waveform?: readonly number[];
 }
 
 // (No @packageDocumentation comment for this package)

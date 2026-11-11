@@ -207,7 +207,7 @@ function sectionsBody(cursor: string | undefined): Record<string, unknown> {
 /**
  * One page of the posts listed for a hashtag, ranked by relevance (there is no
  * chronological view). Posts come in the light form the search grid uses; see
- * {@link getHashtagSerpPage}. Pass `cursor` to continue.
+ * `getHashtagSerpPage`. Pass `cursor` to continue.
  */
 export function getHashtagFeed(
   client: PrivateClient,

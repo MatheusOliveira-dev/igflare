@@ -89,6 +89,8 @@ export type {
   UploadApi,
   SearchApi,
   StoryApi,
+  CollectionApi,
+  HighlightApi,
 } from './client/ig-client';
 export {
   getMediaInfo,
@@ -105,8 +107,15 @@ export {
   getSavedPosts,
   paginateSavedPosts,
 } from './endpoints/media/media';
-export { setBiography } from './endpoints/account/account';
-export type { CommentListOptions, CommentOptions } from './endpoints/media/media';
+export {
+  setBiography,
+  setName,
+  getBioLinks,
+  setBioLink,
+  removeBioLinks,
+  getActivity,
+} from './endpoints/account/account';
+export type { CommentListOptions, CommentOptions, SaveOptions } from './endpoints/media/media';
 export {
   likeComment,
   unlikeComment,
@@ -125,7 +134,7 @@ export {
   unpinMedia,
 } from './endpoints/media/media-manage';
 export type { EditMediaOptions, UserTag } from './endpoints/media/media-manage';
-export { uploadPhoto, uploadVideo, uploadStoryPhoto } from './endpoints/upload/upload';
+export { uploadPhoto, uploadVideo, uploadStoryPhoto, uploadAlbum } from './endpoints/upload/upload';
 export { getReelsTray, getUserStories, markStoriesSeen } from './endpoints/story/story';
 export { reelSchema } from './schemas/reel';
 export type { Reel } from './schemas/reel';
@@ -171,9 +180,12 @@ export {
   reactToMessage,
   shareMedia,
   shareProfile,
+  shareStory,
   sendPhoto,
 } from './endpoints/direct/direct-send';
 export type { ReactionOptions, ShareMediaOptions } from './endpoints/direct/direct-send';
+export { sendVideo, sendVoice } from './endpoints/direct/direct-attachments';
+export type { VoiceOptions } from './endpoints/direct/direct-attachments';
 export type { CursorOptions, SendTarget } from './endpoints/direct/direct';
 export { threadSchema, directMessageSchema, directSendResultSchema } from './schemas/direct';
 export type { Thread, DirectMessage, DirectSendResult } from './schemas/direct';
@@ -188,6 +200,32 @@ export {
   paginateLocationFeed,
 } from './endpoints/feed/feed';
 export { searchUsers, searchHashtags, searchPlaces } from './endpoints/search/search';
+export {
+  listCollections,
+  getCollectionMedias,
+  paginateCollectionMedias,
+  getLikedMedias,
+  paginateLikedMedias,
+  createCollection,
+  deleteCollection,
+} from './endpoints/collection/collection';
+export type { CollectionPageOptions } from './endpoints/collection/collection';
+export { collectionSchema } from './schemas/collection';
+export type { Collection } from './schemas/collection';
+export {
+  listHighlights,
+  getHighlight,
+  createHighlight,
+  editHighlight,
+  deleteHighlight,
+} from './endpoints/highlight/highlight';
+export type { CreateHighlightOptions, EditHighlightOptions } from './endpoints/highlight/highlight';
+export { highlightSchema } from './schemas/highlight';
+export type { Highlight } from './schemas/highlight';
+export { bioLinkSchema } from './schemas/bio-link';
+export type { BioLink } from './schemas/bio-link';
+export { activityItemSchema } from './schemas/activity';
+export type { Activity, ActivityItem } from './schemas/activity';
 export { hashtagSchema } from './schemas/hashtag';
 export type { Hashtag } from './schemas/hashtag';
 export { locationSchema } from './schemas/location';
