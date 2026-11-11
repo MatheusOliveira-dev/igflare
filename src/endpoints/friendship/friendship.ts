@@ -204,9 +204,15 @@ export interface MuteOptions {
 
 function muteTargets(pk: string, options: MuteOptions): Record<string, unknown> {
   const both = options.posts === undefined && options.stories === undefined;
+  const posts = both || options.posts === true;
+  const stories = both || options.stories === true;
+  if (!posts && !stories) {
+    // Sending neither target is accepted by the server and changes nothing.
+    throw new IgError('Choose posts, stories, or both to mute');
+  }
   return {
-    ...(both || options.posts === true ? { target_posts_author_id: pk } : {}),
-    ...(both || options.stories === true ? { target_reel_author_id: pk } : {}),
+    ...(posts ? { target_posts_author_id: checkedId(pk, 'A user id') } : {}),
+    ...(stories ? { target_reel_author_id: checkedId(pk, 'A user id') } : {}),
     container_module: 'media_mute_sheet',
   };
 }

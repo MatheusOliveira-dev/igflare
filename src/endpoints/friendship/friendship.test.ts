@@ -21,6 +21,7 @@ import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
 import { createSession } from '../../core/session/session';
 import { ClientSchemaError } from '../../errors/api-errors';
+import { IgError } from '../../errors/ig-error';
 
 function clientReturning(body: unknown): { client: PrivateClient; transport: FakeTransport } {
   const transport = new FakeTransport(() => ({
@@ -203,6 +204,17 @@ describe('relationship management', () => {
     expect(payload['target_reel_author_id']).toBe('42');
     expect(payload['target_posts_author_id']).toBeUndefined();
     expect(transport.requests[0]?.url).toContain('/unmute_posts_or_story_from_follow/');
+  });
+});
+
+describe('mute with nothing chosen', () => {
+  it('refuses to send a mute that would change nothing', async () => {
+    const { client, transport } = clientReturning({ status: 'ok' });
+    await expect(muteUser(client, '42', { posts: false })).rejects.toBeInstanceOf(IgError);
+    await expect(unmuteUser(client, '42', { posts: false, stories: false })).rejects.toBeInstanceOf(
+      IgError,
+    );
+    expect(transport.requests).toHaveLength(0);
   });
 });
 
