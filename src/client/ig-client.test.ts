@@ -398,6 +398,36 @@ describe('IgFlare facade', () => {
     expect((await ig.location.nearby(1, 2))[0]?.pk).toBe('9');
   });
 
+  it('delegates reels feeds and reel upload', async () => {
+    const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90]);
+    const { ig, transport } = clientWith((req) => {
+      if (req.url.includes('rupload_igphoto')) return json({ upload_id: 'R1', status: 'ok' });
+      if (req.url.includes('rupload_igvideo') || req.url.includes('upload_settings'))
+        return json({ status: 'ok' });
+      if (req.url.includes('configure_to_clips'))
+        return json({ status: 'ok', media: { pk: 1, code: 'rl' } });
+      return json({ status: 'ok', items: [{ media: { pk: 2, code: 'x' } }] });
+    });
+
+    expect((await ig.reels.user('7')).items[0]?.code).toBe('x');
+    expect((await ig.reels.feed()).items[0]?.code).toBe('x');
+    expect((await ig.reels.explore()).items[0]?.code).toBe('x');
+    expect((await ig.reels.friends()).items[0]?.code).toBe('x');
+    const codes: (string | undefined)[] = [];
+    for await (const media of ig.reels.paginateUser('7')) codes.push(media.code);
+    for await (const media of ig.reels.paginateFeed()) codes.push(media.code);
+    for await (const media of ig.reels.paginateExplore()) codes.push(media.code);
+    expect(codes).toEqual(['x', 'x', 'x']);
+
+    const reel = await ig.upload.reel(new Uint8Array([1, 2]), jpeg, {
+      durationMs: 3000,
+      width: 720,
+      height: 1280,
+    });
+    expect(reel.code).toBe('rl');
+    expect(transport.requests.some((r) => r.url.includes('/media/configure_to_clips/'))).toBe(true);
+  });
+
   it('delegates stories: tray, user stories and story upload', async () => {
     const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90]);
     const { ig } = clientWith((req) => {

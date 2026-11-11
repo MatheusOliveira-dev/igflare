@@ -1,6 +1,7 @@
 import { randomUUID, randomInt } from 'node:crypto';
 import type { PrivateClient } from '../../core/http/private-client';
 import { endpoints } from '../../generated/endpoints';
+import type { EndpointDefinition } from '../../generated/endpoints';
 import { parseJpegSize } from '../../core/media/jpeg';
 import { parseMp4Meta } from '../../core/media/mp4';
 import { mediaSchema, type Media } from '../../schemas/media';
@@ -201,32 +202,23 @@ function isTranscodePending(error: unknown): boolean {
   return error instanceof IgApiError && /transcode|not been uploaded/i.test(error.message);
 }
 
-async function configureVideo(
+/**
+ * Sends a configure call and returns the published media, trying again while the server
+ * is still transcoding a video. Every post kind that carries a video ends this way.
+ */
+async function configureMedia(
   client: PrivateClient,
-  uploadId: string,
-  caption: string,
-  meta: { durationMs: number; width: number; height: number },
+  definition: EndpointDefinition,
+  payload: Record<string, unknown>,
+  query?: Record<string, string>,
 ): Promise<Media> {
-  const lengthSec = meta.durationMs / 1000;
   for (let attempt = 0; ; attempt += 1) {
     try {
       const json = await client.request({
-        method: endpoints.mediaConfigure.method,
-        endpoint: endpoints.mediaConfigure.path,
-        query: { video: '1' },
-        payload: {
-          upload_id: uploadId,
-          caption,
-          source_type: '4',
-          length: lengthSec,
-          clips: [{ length: lengthSec, source_type: '4' }],
-          poster_frame_index: 0,
-          audio_muted: false,
-          filter_type: '0',
-          ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),
-          device: deviceBlock(client),
-          extra: { source_width: meta.width, source_height: meta.height },
-        },
+        method: definition.method,
+        endpoint: definition.path,
+        payload,
+        ...(query !== undefined ? { query } : {}),
       });
       return parseConfiguredMedia(json);
     } catch (error) {
@@ -236,6 +228,33 @@ async function configureVideo(
       await sleep(TRANSCODE_DELAY_MS);
     }
   }
+}
+
+async function configureVideo(
+  client: PrivateClient,
+  uploadId: string,
+  caption: string,
+  meta: { durationMs: number; width: number; height: number },
+): Promise<Media> {
+  const lengthSec = meta.durationMs / 1000;
+  return configureMedia(
+    client,
+    endpoints.mediaConfigure,
+    {
+      upload_id: uploadId,
+      caption,
+      source_type: '4',
+      length: lengthSec,
+      clips: [{ length: lengthSec, source_type: '4' }],
+      poster_frame_index: 0,
+      audio_muted: false,
+      filter_type: '0',
+      ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),
+      device: deviceBlock(client),
+      extra: { source_width: meta.width, source_height: meta.height },
+    },
+    { video: '1' },
+  );
 }
 
 /**
@@ -457,19 +476,238 @@ export async function uploadAlbum(
     ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),
   };
 
-  for (let attempt = 0; ; attempt += 1) {
-    try {
-      const json = await client.request({
-        method: endpoints.mediaConfigureSidecar.method,
-        endpoint: endpoints.mediaConfigureSidecar.path,
-        payload,
-      });
-      return parseConfiguredMedia(json);
-    } catch (error) {
-      if (attempt >= TRANSCODE_RETRIES || !isTranscodePending(error)) {
-        throw error;
-      }
-      await sleep(TRANSCODE_DELAY_MS);
-    }
-  }
+  return configureMedia(client, endpoints.mediaConfigureSidecar, payload);
+}
+
+export interface ReelUploadOptions {
+  readonly caption?: string;
+  /** Whether the reel also shows as a preview in the profile grid and feed. Defaults to true. */
+  readonly showInFeed?: boolean;
+  /** Overrides the value read from the MP4 when parsing fails or is undesired. */
+  readonly durationMs?: number;
+  readonly width?: number;
+  readonly height?: number;
+}
+
+interface ReelUpload {
+  readonly uploadId: string;
+  readonly composerSessionId: string;
+  readonly assetId: string;
+  readonly meta: { durationMs: number; width: number; height: number };
+}
+
+/** The settings the app posts before it sends a reel: what the video is and how to treat it. */
+async function sendReelUploadSettings(
+  client: PrivateClient,
+  upload: ReelUpload,
+  byteLength: number,
+): Promise<void> {
+  const { meta } = upload;
+  const owner = Number(client.session.auth.userId);
+  const settings = JSON.stringify({
+    composer_session_id: upload.composerSessionId,
+    upload_setting_properties: {
+      upload_settings_version: 'v0.1',
+      codec: {},
+      context: {
+        source_attribution: null,
+        enable_video_dimension_upscale: false,
+        source_type: 'clips',
+        quality: '',
+        ...(Number.isSafeInteger(owner) ? { target_id: owner } : {}),
+      },
+      video: {
+        video_height: meta.height,
+        video_gop_size_sec: 0,
+        video_rotation_angle: 0,
+        video_width: meta.width,
+        source_video_codec: null,
+        video_partial_frame_size_bytes: 0,
+        asset_id: upload.assetId,
+        video_key_frame_size_bytes: 0,
+        target_duration: Math.trunc(meta.durationMs / 1000),
+        video_original_file_size: byteLength,
+        video_duration_milliseconds: Math.trunc(meta.durationMs),
+        audio_bit_rate_bps: -1,
+        video_bit_rate_bps: 0,
+        audio_codec_type: null,
+        video_fps: 30,
+      },
+      creative_tools: { transmuxing_eligible: false, transcoding_required: true },
+      network: {
+        download_latency_connection_quality: 'ig_dummy',
+        network_connection_name: 'ig_dummy',
+        download_bandwidth_connection_quality: 'ig_dummy',
+      },
+    },
+    preview_spec: {
+      spec_version: 1,
+      video_dur_ms: Math.trunc(meta.durationMs),
+      audio_dur_ms: Math.trunc(meta.durationMs),
+    },
+  });
+  const body = new TextEncoder().encode(settings);
+  await client.request({
+    method: 'POST',
+    endpoint: 'upload_settings',
+    rawUrl: `${RUPLOAD_HOST}/upload_settings/${upload.composerSessionId}`,
+    rawBody: body,
+    withSignature: false,
+    withDefaultData: false,
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': String(body.length),
+      Offset: '0',
+      'X-Entity-Length': String(body.length),
+      'X-Entity-Name': 'upload_settings',
+      'X-Entity-Type': 'application/json',
+      X_FB_VIDEO_WATERFALL_ID: `${upload.composerSessionId}_settings`,
+    },
+  });
+}
+
+/** Sends the video the way the app sends a reel: ask for the offset, then upload from it. */
+async function ruploadReelVideo(
+  client: PrivateClient,
+  mp4: Uint8Array,
+  upload: ReelUpload,
+): Promise<void> {
+  const { meta } = upload;
+  const stamp = String(Date.now());
+  const name = `${randomUUID().replaceAll('-', '')}-0-${String(mp4.length)}-${stamp}-${stamp}`;
+  const url = `${RUPLOAD_HOST}/rupload_igvideo/${name}`;
+  const headers = {
+    'X-Instagram-Rupload-Params': JSON.stringify({
+      provenance_metadata: JSON.stringify({ origin: ['EXTERNAL'] }),
+      upload_media_height: String(meta.height),
+      share_type: 'reels',
+      debug_segment_id: '0',
+      extract_cover_frame: '1',
+      upload_engine_config_enum: '0',
+      xsharing_user_ids: '[]',
+      upload_media_width: String(meta.width),
+      stella_data: '{}',
+      is_clips_video: '1',
+      is_optimistic_upload: 'true',
+      upload_media_duration_ms: String(Math.trunc(meta.durationMs)),
+      content_tags: 'use_default_cover',
+      upload_id: upload.uploadId,
+      retry_context: RETRY_CONTEXT,
+      session_id: upload.uploadId,
+      media_type: '2',
+    }),
+    X_FB_VIDEO_WATERFALL_ID: `${upload.composerSessionId}_${upload.assetId}_Mixed_0`,
+    'X-Entity-Type': 'video/mp4',
+    'Segment-Start-Offset': '0',
+    'Segment-Type': '3',
+  };
+  await client.request({
+    method: 'GET',
+    endpoint: 'rupload_igvideo',
+    rawUrl: url,
+    withSignature: false,
+    withDefaultData: false,
+    headers,
+  });
+  await client.request({
+    method: 'POST',
+    endpoint: 'rupload_igvideo',
+    rawUrl: url,
+    rawBody: mp4,
+    withSignature: false,
+    withDefaultData: false,
+    headers: {
+      ...headers,
+      Offset: '0',
+      'X-Entity-Name': name,
+      'X-Entity-Length': String(mp4.length),
+      'Content-Length': String(mp4.length),
+      'Content-Type': 'application/octet-stream',
+    },
+  });
+}
+
+/**
+ * Publishes an MP4 as a reel. The caller supplies the cover JPEG (frame extraction needs
+ * a decoder, which the SDK does not bundle); duration and size are read from the MP4
+ * unless given. The steps are the app's: the upload settings, the video, the cover, then
+ * the configure call, retried while the server is still transcoding.
+ */
+export async function uploadReel(
+  client: PrivateClient,
+  mp4: Uint8Array,
+  coverJpeg: Uint8Array,
+  options: ReelUploadOptions = {},
+): Promise<Media> {
+  parseJpegSize(coverJpeg); // fail early on a bad cover, before anything is uploaded
+  const complete =
+    options.durationMs !== undefined && options.width !== undefined && options.height !== undefined;
+  const read = complete ? undefined : parseMp4Meta(mp4);
+  const meta = {
+    durationMs: options.durationMs ?? read?.durationMs ?? 0,
+    width: options.width ?? read?.width ?? 0,
+    height: options.height ?? read?.height ?? 0,
+  };
+  const upload: ReelUpload = {
+    uploadId: String(Date.now()),
+    composerSessionId: randomUUID(),
+    assetId: randomUUID().replaceAll('-', '').slice(0, 12).toUpperCase(),
+    meta,
+  };
+
+  await sendReelUploadSettings(client, upload, mp4.length);
+  await ruploadReelVideo(client, mp4, upload);
+  await ruploadPhoto(client, coverJpeg, upload.uploadId, '2');
+
+  const seconds = meta.durationMs / 1000;
+  const payload = {
+    filter_type: '0',
+    timezone_offset: '0',
+    location: '{}',
+    source_type: '4',
+    caption: options.caption ?? '',
+    usertags: JSON.stringify({ in: [] }),
+    clips_share_preview_to_feed: options.showInFeed === false ? '0' : '1',
+    upload_id: upload.uploadId,
+    device: deviceBlock(client),
+    length: seconds,
+    clips_segments_metadata: {
+      num_segments: 1,
+      clips_segments: [
+        {
+          index: 0,
+          face_effect_id: null,
+          speed: 100,
+          source_type: 4,
+          duration_ms: Math.trunc(meta.durationMs),
+          audio_type: 'original',
+          from_draft: 0,
+          camera_position: -1,
+          media_folder: null,
+          media_type: 'video',
+          original_media_type: 2,
+          original_segment_hash: null,
+          is_remix: false,
+          has_reusable_template_asset: false,
+        },
+      ],
+    },
+    clips_audio_metadata: { original: { volume_level: 1 } },
+    additional_audio_info: { has_voiceover_attribution: 0 },
+    edits: { filter_type: 0, filter_strength: 1 },
+    capture_type: 'clips_v2',
+    clips_creation_entry_point: 'clips',
+    camera_entry_point: '71',
+    audience: 'default',
+    include_e2ee_mentioned_user_list: '1',
+    hide_from_profile_grid: 'false',
+    original_width: meta.width,
+    original_height: meta.height,
+    extra: { source_width: meta.width, source_height: meta.height },
+    audio_muted: false,
+    poster_frame_index: 70,
+    ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),
+  };
+
+  return configureMedia(client, endpoints.mediaConfigureToClips, payload, { video: '1' });
 }

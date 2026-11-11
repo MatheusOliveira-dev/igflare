@@ -563,7 +563,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsEditProfile' | 'accountsLogin' | 'accountsRemoveBioLinks' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'accountsUpdateBioLinks' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'collectionsCreate' | 'collectionsDelete' | 'collectionsList' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastRavenAttachment' | 'directBroadcastReaction' | 'directBroadcastStoryShare' | 'directBroadcastVoiceAttachment' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedCollection' | 'feedLiked' | 'feedReelsMedia' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsRemoveFollower' | 'friendshipsSetBesties' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'highlightsCreateReel' | 'highlightsDeleteReel' | 'highlightsEditReel' | 'highlightsTray' | 'launcherSync' | 'locationSearch' | 'locationsInfo' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureSidecar' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaSeenV2' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'newsInbox' | 'tagsInfo' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
+export type EndpointName = 'accountsCurrentUser' | 'accountsEditProfile' | 'accountsLogin' | 'accountsRemoveBioLinks' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'accountsUpdateBioLinks' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'clipsConnected' | 'clipsDiscover' | 'clipsDiscoverSocial' | 'clipsUser' | 'collectionsCreate' | 'collectionsDelete' | 'collectionsList' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastRavenAttachment' | 'directBroadcastReaction' | 'directBroadcastStoryShare' | 'directBroadcastVoiceAttachment' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedCollection' | 'feedLiked' | 'feedReelsMedia' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsRemoveFollower' | 'friendshipsSetBesties' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'highlightsCreateReel' | 'highlightsDeleteReel' | 'highlightsEditReel' | 'highlightsTray' | 'launcherSync' | 'locationSearch' | 'locationsInfo' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureSidecar' | 'mediaConfigureToClips' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaSeenV2' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'newsInbox' | 'tagsInfo' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -736,6 +736,9 @@ export function getComments(client: PrivateClient, mediaId: string, options?: Co
 export function getCurrentUser(client: PrivateClient): Promise<Record<string, unknown>>;
 
 // @public
+export function getExploreReels(client: PrivateClient, options?: ReelsPageOptions): Promise<Page<Media>>;
+
+// @public
 export function getFollowers(client: PrivateClient, pk: string, options?: FollowListOptions): Promise<Page<User>>;
 
 // @public
@@ -743,6 +746,9 @@ export function getFollowing(client: PrivateClient, pk: string, options?: Follow
 
 // @public
 export function getFriendshipStatus(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
+
+// @public
+export function getFriendsReels(client: PrivateClient, options?: ReelsPageOptions): Promise<Page<Media>>;
 
 // @public
 export function getHashtagFeed(client: PrivateClient, tag: string, options?: FeedOptions): Promise<Page<Media>>;
@@ -778,6 +784,9 @@ export function getPendingInbox(client: PrivateClient, options?: CursorOptions):
 export function getPendingRequests(client: PrivateClient, options?: FollowListOptions): Promise<Page<User>>;
 
 // @public
+export function getReelsFeed(client: PrivateClient, options?: ReelsPageOptions): Promise<Page<Media>>;
+
+// @public
 export function getReelsTray(client: PrivateClient): Promise<Reel[]>;
 
 // @public
@@ -800,6 +809,9 @@ export function getUserInfo(client: PrivateClient, pk: string): Promise<User>;
 
 // @public
 export function getUserInfoByUsername(client: PrivateClient, username: string): Promise<User>;
+
+// @public
+export function getUserReels(client: PrivateClient, userId: string, options?: UserReelsOptions): Promise<Page<Media>>;
 
 // @public
 export function getUserStories(client: PrivateClient, pk: string): Promise<Media[]>;
@@ -988,6 +1000,8 @@ export class IgFlare {
     login(credentials: IgFlareLogin): Promise<PrivateResponseJson>;
     // (undocumented)
     readonly media: MediaApi;
+    // (undocumented)
+    readonly reels: ReelsApi;
     resolveTwoFactor(error: CaaTwoFactorRequiredError, code: string | TwoFactorSource): Promise<PrivateResponseJson>;
     // (undocumented)
     readonly search: SearchApi;
@@ -1276,6 +1290,9 @@ export function paginateCommentReplies(client: PrivateClient, mediaId: string, c
 export function paginateComments(client: PrivateClient, mediaId: string): AsyncGenerator<Comment>;
 
 // @public
+export function paginateExploreReels(client: PrivateClient): AsyncGenerator<Media>;
+
+// @public
 export function paginateFollowers(client: PrivateClient, pk: string): AsyncGenerator<User>;
 
 // @public
@@ -1300,6 +1317,9 @@ export function paginatePendingInbox(client: PrivateClient): AsyncGenerator<Thre
 export function paginatePendingRequests(client: PrivateClient): AsyncGenerator<User>;
 
 // @public
+export function paginateReelsFeed(client: PrivateClient): AsyncGenerator<Media>;
+
+// @public
 export function paginateSavedPosts(client: PrivateClient): AsyncGenerator<Media>;
 
 // @public
@@ -1313,6 +1333,9 @@ export function paginateTimeline(client: PrivateClient): AsyncGenerator<Media>;
 
 // @public
 export function paginateUserFeed(client: PrivateClient, pk: string): AsyncGenerator<Media>;
+
+// @public
+export function paginateUserReels(client: PrivateClient, userId: string): AsyncGenerator<Media>;
 
 // @public
 export function parseJpegSize(bytes: Uint8Array): ImageSize;
@@ -1449,6 +1472,20 @@ export type RecipientSearchMode = 'universal' | 'raven';
 export type Reel = z.infer<typeof reelSchema>;
 
 // @public
+export interface ReelsApi {
+    explore(options?: ReelsPageOptions): Promise<Page<Media>>;
+    feed(options?: ReelsPageOptions): Promise<Page<Media>>;
+    friends(options?: ReelsPageOptions): Promise<Page<Media>>;
+    // (undocumented)
+    paginateExplore(): AsyncGenerator<Media>;
+    // (undocumented)
+    paginateFeed(): AsyncGenerator<Media>;
+    // (undocumented)
+    paginateUser(userId: string): AsyncGenerator<Media>;
+    user(userId: string, options?: UserReelsOptions): Promise<Page<Media>>;
+}
+
+// @public
 export const reelSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodCoercedString<unknown>>;
     user: z.ZodOptional<z.ZodObject<{
@@ -1523,6 +1560,23 @@ export const reelSchema: z.ZodObject<{
     expiring_at: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     latest_reel_media: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
 }, z.core.$loose>;
+
+// @public (undocumented)
+export interface ReelsPageOptions {
+    readonly cursor?: string;
+}
+
+// @public (undocumented)
+export interface ReelUploadOptions {
+    // (undocumented)
+    readonly caption?: string;
+    readonly durationMs?: number;
+    // (undocumented)
+    readonly height?: number;
+    readonly showInFeed?: boolean;
+    // (undocumented)
+    readonly width?: number;
+}
 
 // @public (undocumented)
 export interface RegistrationTokenOptions {
@@ -1812,6 +1866,7 @@ export interface UploadApi {
     album(items: readonly AlbumItem[], options?: AlbumUploadOptions): Promise<Media>;
     // (undocumented)
     photo(jpeg: Uint8Array, options?: PhotoUploadOptions): Promise<Media>;
+    reel(mp4: Uint8Array, coverJpeg: Uint8Array, options?: ReelUploadOptions): Promise<Media>;
     // (undocumented)
     story(jpeg: Uint8Array): Promise<Media>;
     // (undocumented)
@@ -1820,6 +1875,9 @@ export interface UploadApi {
 
 // @public
 export function uploadPhoto(client: PrivateClient, jpeg: Uint8Array, options?: PhotoUploadOptions): Promise<Media>;
+
+// @public
+export function uploadReel(client: PrivateClient, mp4: Uint8Array, coverJpeg: Uint8Array, options?: ReelUploadOptions): Promise<Media>;
 
 // @public
 export function uploadStoryPhoto(client: PrivateClient, jpeg: Uint8Array): Promise<Media>;
@@ -1857,6 +1915,11 @@ export interface UserApi {
     info(pk: string): Promise<User>;
     // (undocumented)
     infoByUsername(username: string): Promise<User>;
+}
+
+// @public (undocumented)
+export interface UserReelsOptions extends ReelsPageOptions {
+    readonly pageSize?: number;
 }
 
 // @public

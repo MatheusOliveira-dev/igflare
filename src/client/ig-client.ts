@@ -73,6 +73,16 @@ import type { Activity } from '../schemas/activity';
 import type { Collection } from '../schemas/collection';
 import type { Highlight } from '../schemas/highlight';
 import {
+  getExploreReels,
+  getFriendsReels,
+  getReelsFeed,
+  getUserReels,
+  paginateExploreReels,
+  paginateReelsFeed,
+  paginateUserReels,
+} from '../endpoints/reels/reels';
+import type { ReelsPageOptions, UserReelsOptions } from '../endpoints/reels/reels';
+import {
   createHighlight,
   deleteHighlight,
   editHighlight,
@@ -122,6 +132,7 @@ import {
 import {
   uploadAlbum,
   uploadPhoto,
+  uploadReel,
   uploadVideo,
   uploadStoryPhoto,
 } from '../endpoints/upload/upload';
@@ -129,6 +140,7 @@ import type {
   AlbumItem,
   AlbumUploadOptions,
   PhotoUploadOptions,
+  ReelUploadOptions,
   VideoUploadOptions,
 } from '../endpoints/upload/upload';
 import { getReelsTray, getUserStories, markStoriesSeen } from '../endpoints/story/story';
@@ -319,6 +331,8 @@ export interface UploadApi {
   story(jpeg: Uint8Array): Promise<Media>;
   /** Publishes 2 to 10 photos and videos as one carousel post. */
   album(items: readonly AlbumItem[], options?: AlbumUploadOptions): Promise<Media>;
+  /** Publishes an MP4 as a reel, with a separate cover picture. */
+  reel(mp4: Uint8Array, coverJpeg: Uint8Array, options?: ReelUploadOptions): Promise<Media>;
 }
 
 /** The account's saved-posts collections and the posts it has liked. */
@@ -365,6 +379,21 @@ export interface LocationApi {
   info(locationId: string): Promise<LocationInfo>;
   /** The places near a latitude and longitude. Each one's `pk` works with `feed.location`. */
   nearby(latitude: number, longitude: number): Promise<Location[]>;
+}
+
+/** Reels: what a user posted, and the feeds of the Reels tab. */
+export interface ReelsApi {
+  /** A user's reels. */
+  user(userId: string, options?: UserReelsOptions): Promise<Page<Media>>;
+  paginateUser(userId: string): AsyncGenerator<Media>;
+  /** The Reels tab feed. */
+  feed(options?: ReelsPageOptions): Promise<Page<Media>>;
+  paginateFeed(): AsyncGenerator<Media>;
+  /** The reels Instagram suggests. Ads are left out. */
+  explore(options?: ReelsPageOptions): Promise<Page<Media>>;
+  paginateExplore(): AsyncGenerator<Media>;
+  /** The reels friends interacted with. */
+  friends(options?: ReelsPageOptions): Promise<Page<Media>>;
 }
 
 /** Stories. */
@@ -419,6 +448,7 @@ export class IgFlare {
   readonly story: StoryApi;
   readonly collection: CollectionApi;
   readonly highlight: HighlightApi;
+  readonly reels: ReelsApi;
   readonly hashtag: HashtagApi;
   readonly location: LocationApi;
 
@@ -445,6 +475,15 @@ export class IgFlare {
     this.story = this.#buildStoryApi();
     this.collection = this.#buildCollectionApi();
     this.highlight = this.#buildHighlightApi();
+    this.reels = {
+      user: (userId, options) => getUserReels(this.#client, userId, options),
+      paginateUser: (userId) => paginateUserReels(this.#client, userId),
+      feed: (options) => getReelsFeed(this.#client, options),
+      paginateFeed: () => paginateReelsFeed(this.#client),
+      explore: (options) => getExploreReels(this.#client, options),
+      paginateExplore: () => paginateExploreReels(this.#client),
+      friends: (options) => getFriendsReels(this.#client, options),
+    };
     this.hashtag = { info: (tag) => getHashtagInfo(this.#client, tag) };
     this.location = {
       info: (locationId) => getLocationInfo(this.#client, locationId),
@@ -614,6 +653,7 @@ export class IgFlare {
       video: (mp4, coverJpeg, options) => uploadVideo(client, mp4, coverJpeg, options),
       story: (jpeg) => uploadStoryPhoto(client, jpeg),
       album: (items, options) => uploadAlbum(client, items, options),
+      reel: (mp4, coverJpeg, options) => uploadReel(client, mp4, coverJpeg, options),
     };
   }
 

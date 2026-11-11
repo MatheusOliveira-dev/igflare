@@ -56,6 +56,11 @@ describe('manifest coverage of the hand-written endpoints', () => {
     expect(endpoints.tagsInfo.path).toBe('/api/v1/tags/{tag}/info/');
     expect(endpoints.locationsInfo.path).toBe('/api/v1/locations/{id}/location_info/');
     expect(endpoints.locationSearch.path).toBe('/api/v1/location_search/');
+    expect(endpoints.clipsUser).toEqual({ method: 'POST', path: '/api/v1/clips/user/' });
+    expect(endpoints.clipsDiscover.path).toBe('/api/v1/clips/discover/');
+    expect(endpoints.clipsDiscoverSocial.path).toBe('/api/v1/clips/discover/social/');
+    expect(endpoints.clipsConnected.path).toBe('/api/v1/clips/connected/');
+    expect(endpoints.mediaConfigureToClips.path).toBe('/api/v1/media/configure_to_clips/');
     expect(endpoints.attestationCreateAndroidKeystore).toEqual({
       method: 'POST',
       path: '/api/v1/attestation/create_android_keystore/',

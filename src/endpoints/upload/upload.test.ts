@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { uploadAlbum, uploadPhoto, uploadVideo, uploadStoryPhoto } from './upload';
+import { uploadAlbum, uploadPhoto, uploadReel, uploadVideo, uploadStoryPhoto } from './upload';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
 import type { HttpRequest } from '../../core/transport/http-transport';
@@ -7,6 +7,7 @@ import { createSession } from '../../core/session/session';
 import { ClientSchemaError, PleaseWaitError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 import { sampleMp4 } from '../../core/media/__fixtures__/mp4';
+import { parseMp4Meta } from '../../core/media/mp4';
 
 /** A minimal 400x300 JPEG marker stream. */
 const JPEG = new Uint8Array([
@@ -387,5 +388,181 @@ describe('uploadAlbum', () => {
     await expect(uploadAlbum(client, [{ photo: JPEG }, { photo: JPEG }])).rejects.toBeInstanceOf(
       ClientSchemaError,
     );
+  });
+});
+
+describe('uploadReel', () => {
+  const CONFIGURED = { status: 'ok', media: { pk: 1, code: 'rl', media_type: 2 } };
+
+  /** The upload hosts answer ok; the configure call answers as the test says. */
+  function reelClient(configure: (call: number) => { status: number; body: unknown }): {
+    client: PrivateClient;
+    transport: FakeTransport;
+    configures: () => number;
+  } {
+    let configures = 0;
+    const transport = new FakeTransport((req: HttpRequest) => {
+      if (req.url.includes('rupload_igphoto')) {
+        const params = JSON.parse(req.headers['X-Instagram-Rupload-Params'] ?? '{}') as {
+          upload_id: string;
+        };
+        return {
+          status: 200,
+          headers: {},
+          body: JSON.stringify({ upload_id: params.upload_id, status: 'ok' }),
+        };
+      }
+      if (req.url.includes('rupload_igvideo') || req.url.includes('upload_settings')) {
+        return { status: 200, headers: {}, body: JSON.stringify({ status: 'ok' }) };
+      }
+      configures += 1;
+      const answer = configure(configures);
+      return { status: answer.status, headers: {}, body: JSON.stringify(answer.body) };
+    });
+    return {
+      client: new PrivateClient({
+        transport,
+        session: createSession({ auth: { userId: '10000000001' } }),
+      }),
+      transport,
+      configures: () => configures,
+    };
+  }
+
+  const signed = (request: HttpRequest | undefined): Record<string, unknown> =>
+    signedPayload(request?.body);
+  const META = { durationMs: 4500, width: 720, height: 1280 };
+  const MP4 = new Uint8Array([1, 2, 3, 4, 5]);
+  const rParams = (request: HttpRequest | undefined): Record<string, string> =>
+    JSON.parse(request?.headers['X-Instagram-Rupload-Params'] ?? '{}') as Record<string, string>;
+
+  it('sends the settings, the video and the cover, then configures it as a reel', async () => {
+    const { client, transport } = reelClient(() => ({ status: 200, body: CONFIGURED }));
+
+    const media = await uploadReel(client, MP4, JPEG, { ...META, caption: 'my reel' });
+
+    const [settings, offset, video, cover, configure] = transport.requests;
+    expect(settings?.url).toMatch(/^https:\/\/i\.instagram\.com\/upload_settings\/[0-9a-f-]{36}$/);
+    expect(settings?.headers['X-Entity-Name']).toBe('upload_settings');
+    expect(settings?.headers['Content-Type']).toBe('application/json');
+    const sent = JSON.parse(new TextDecoder().decode(settings?.body as Uint8Array)) as {
+      composer_session_id: string;
+      upload_setting_properties: {
+        video: Record<string, unknown>;
+        context: Record<string, unknown>;
+      };
+    };
+    expect(settings?.url.endsWith(sent.composer_session_id)).toBe(true);
+    expect(sent.upload_setting_properties.video).toMatchObject({
+      video_width: 720,
+      video_height: 1280,
+      video_duration_milliseconds: 4500,
+      target_duration: 4,
+      video_original_file_size: MP4.length,
+    });
+    expect(sent.upload_setting_properties.context).toMatchObject({
+      source_type: 'clips',
+      target_id: 10000000001,
+    });
+
+    expect(offset?.method).toBe('GET');
+    expect(offset?.url).toMatch(/\/rupload_igvideo\/[0-9a-f]{32}-0-5-\d+-\d+$/);
+    expect(video?.method).toBe('POST');
+    expect(video?.url).toBe(offset?.url);
+    expect(video?.body).toEqual(MP4);
+    expect(video?.headers['X-Entity-Type']).toBe('video/mp4');
+    expect(video?.headers['Segment-Type']).toBe('3');
+    expect(video?.headers['Content-Length']).toBe(String(MP4.length));
+    expect(video?.headers['X_FB_VIDEO_WATERFALL_ID']).toMatch(
+      /^[0-9a-f-]{36}_[0-9A-F]{12}_Mixed_0$/,
+    );
+    const params = rParams(video);
+    expect(params).toMatchObject({
+      is_clips_video: '1',
+      share_type: 'reels',
+      media_type: '2',
+      upload_media_duration_ms: '4500',
+      upload_media_width: '720',
+      upload_media_height: '1280',
+    });
+
+    expect(cover?.url).toContain('/rupload_igphoto/');
+    expect(rParams(cover)['upload_id']).toBe(params['upload_id']);
+
+    expect(configure?.url).toBe('https://i.instagram.com/api/v1/media/configure_to_clips/?video=1');
+    const body = signed(configure);
+    expect(body).toMatchObject({
+      upload_id: params['upload_id'],
+      caption: 'my reel',
+      clips_share_preview_to_feed: '1',
+      length: 4.5,
+      capture_type: 'clips_v2',
+      original_width: 720,
+      original_height: 1280,
+      _uid: '10000000001',
+    });
+    expect(body).toMatchObject({
+      clips_segments_metadata: { num_segments: 1, clips_segments: [{ duration_ms: 4500 }] },
+    });
+    expect(media.code).toBe('rl');
+  });
+
+  it('can keep the preview out of the feed', async () => {
+    const { client, transport } = reelClient(() => ({ status: 200, body: CONFIGURED }));
+    await uploadReel(client, MP4, JPEG, { ...META, showInFeed: false });
+    expect(signed(transport.requests.at(-1))).toMatchObject({ clips_share_preview_to_feed: '0' });
+  });
+
+  it('reads the size and length from the file when they are not given', async () => {
+    const { client, transport } = reelClient(() => ({ status: 200, body: CONFIGURED }));
+    const meta = parseMp4Meta(sampleMp4());
+    await uploadReel(client, sampleMp4(), JPEG);
+    expect(signed(transport.requests.at(-1))).toMatchObject({
+      original_width: meta.width,
+      original_height: meta.height,
+      length: meta.durationMs / 1000,
+    });
+  });
+
+  it('rejects a bad cover or a file that is not an MP4 before any request', async () => {
+    const { client, transport } = reelClient(() => ({ status: 200, body: CONFIGURED }));
+    await expect(uploadReel(client, MP4, new Uint8Array([1, 2, 3]), META)).rejects.toBeInstanceOf(
+      IgError,
+    );
+    await expect(uploadReel(client, new Uint8Array([1, 2, 3]), JPEG)).rejects.toBeInstanceOf(
+      IgError,
+    );
+    expect(transport.requests).toHaveLength(0);
+  });
+
+  it('retries configure while the server is still transcoding', async () => {
+    vi.useFakeTimers();
+    try {
+      const { client, configures } = reelClient((call) =>
+        call < 3
+          ? { status: 400, body: { status: 'fail', message: 'Transcode not finished yet.' } }
+          : { status: 200, body: CONFIGURED },
+      );
+      const pending = uploadReel(client, MP4, JPEG, META);
+      await vi.runAllTimersAsync();
+      expect((await pending).code).toBe('rl');
+      expect(configures()).toBe(3);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('does not retry a throttling answer', async () => {
+    const { client, configures } = reelClient(() => ({
+      status: 400,
+      body: { status: 'fail', message: 'Please wait a few minutes before you try again.' },
+    }));
+    await expect(uploadReel(client, MP4, JPEG, META)).rejects.toBeInstanceOf(PleaseWaitError);
+    expect(configures()).toBe(1);
+  });
+
+  it('throws when the published media does not match the schema', async () => {
+    const { client } = reelClient(() => ({ status: 200, body: { status: 'ok', media: 'x' } }));
+    await expect(uploadReel(client, MP4, JPEG, META)).rejects.toBeInstanceOf(ClientSchemaError);
   });
 });

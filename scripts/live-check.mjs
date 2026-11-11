@@ -77,6 +77,7 @@ const checks = [
     },
   ],
   ['location.nearby', async () => some(await ig.location.nearby(40.7484, -73.9857), 'places')],
+  ['reels.explore', async () => some((await ig.reels.explore()).items, 'explore reels')],
   [
     'account.links',
     async () => {

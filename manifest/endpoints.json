@@ -52,6 +52,26 @@
       "path": "/api/v1/bloks/async_action/"
     },
     {
+      "name": "clipsConnected",
+      "method": "POST",
+      "path": "/api/v1/clips/connected/"
+    },
+    {
+      "name": "clipsDiscover",
+      "method": "POST",
+      "path": "/api/v1/clips/discover/"
+    },
+    {
+      "name": "clipsDiscoverSocial",
+      "method": "POST",
+      "path": "/api/v1/clips/discover/social/"
+    },
+    {
+      "name": "clipsUser",
+      "method": "POST",
+      "path": "/api/v1/clips/user/"
+    },
+    {
       "name": "collectionsCreate",
       "method": "POST",
       "path": "/api/v1/collections/create/"
@@ -405,6 +425,11 @@
       "name": "mediaConfigureSidecar",
       "method": "POST",
       "path": "/api/v1/media/configure_sidecar/"
+    },
+    {
+      "name": "mediaConfigureToClips",
+      "method": "POST",
+      "path": "/api/v1/media/configure_to_clips/"
     },
     {
       "name": "mediaDelete",

@@ -93,6 +93,7 @@ export type {
   HighlightApi,
   HashtagApi,
   LocationApi,
+  ReelsApi,
 } from './client/ig-client';
 export {
   getMediaInfo,
@@ -136,7 +137,13 @@ export {
   unpinMedia,
 } from './endpoints/media/media-manage';
 export type { EditMediaOptions, UserTag } from './endpoints/media/media-manage';
-export { uploadPhoto, uploadVideo, uploadStoryPhoto, uploadAlbum } from './endpoints/upload/upload';
+export {
+  uploadPhoto,
+  uploadVideo,
+  uploadStoryPhoto,
+  uploadAlbum,
+  uploadReel,
+} from './endpoints/upload/upload';
 export { getReelsTray, getUserStories, markStoriesSeen } from './endpoints/story/story';
 export { reelSchema } from './schemas/reel';
 export type { Reel } from './schemas/reel';
@@ -144,6 +151,7 @@ export type {
   AlbumItem,
   AlbumUploadOptions,
   PhotoUploadOptions,
+  ReelUploadOptions,
   VideoUploadOptions,
 } from './endpoints/upload/upload';
 export { parseJpegSize } from './core/media/jpeg';
@@ -229,6 +237,16 @@ export {
   deleteHighlight,
 } from './endpoints/highlight/highlight';
 export type { CreateHighlightOptions, EditHighlightOptions } from './endpoints/highlight/highlight';
+export {
+  getUserReels,
+  paginateUserReels,
+  getReelsFeed,
+  paginateReelsFeed,
+  getExploreReels,
+  paginateExploreReels,
+  getFriendsReels,
+} from './endpoints/reels/reels';
+export type { ReelsPageOptions, UserReelsOptions } from './endpoints/reels/reels';
 export { highlightSchema } from './schemas/highlight';
 export type { Highlight } from './schemas/highlight';
 export { bioLinkSchema } from './schemas/bio-link';
