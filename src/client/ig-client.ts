@@ -77,8 +77,21 @@ import { getExploreFeed, paginateExploreFeed } from '../endpoints/explore/explor
 import type { ExploreOptions } from '../endpoints/explore/explore';
 import { createNote, deleteNote, getNotes } from '../endpoints/notes/notes';
 import type { CreateNoteOptions } from '../endpoints/notes/notes';
-import { getPostInsights, getReelInsights } from '../endpoints/insights/insights';
-import type { MediaInsights } from '../schemas/insights';
+import {
+  getAccountInsights,
+  getAudienceInsights,
+  getContentInsights,
+  getPostInsights,
+  getReelInsights,
+  paginateContentInsights,
+} from '../endpoints/insights/insights';
+import type { ContentInsightsOptions, InsightsRange } from '../endpoints/insights/insights';
+import type {
+  AccountInsights,
+  AudienceInsights,
+  ContentInsight,
+  MediaInsights,
+} from '../schemas/insights';
 import {
   getExploreReels,
   getFriendsReels,
@@ -419,6 +432,13 @@ export interface InsightsApi {
   post(mediaId: string): Promise<MediaInsights>;
   /** The same for one of the account's reels, plus watch time and the rates of each reaction. */
   reel(mediaId: string): Promise<MediaInsights>;
+  /** The account overview for a date range (default: the last 30 days). */
+  account(range?: InsightsRange): Promise<AccountInsights>;
+  /** The audience: followers, ages, places and active times. */
+  audience(range?: InsightsRange): Promise<AudienceInsights>;
+  /** One page of the account's posts, reels or stories ranked by a figure. */
+  content(options?: ContentInsightsOptions): Promise<Page<ContentInsight>>;
+  paginateContent(options?: Omit<ContentInsightsOptions, 'cursor'>): AsyncGenerator<ContentInsight>;
 }
 
 /** The Explore tab. */
@@ -513,6 +533,10 @@ export class IgFlare {
     this.insights = {
       post: (mediaId) => getPostInsights(this.#client, mediaId),
       reel: (mediaId) => getReelInsights(this.#client, mediaId),
+      account: (range) => getAccountInsights(this.#client, range),
+      audience: (range) => getAudienceInsights(this.#client, range),
+      content: (options) => getContentInsights(this.#client, options),
+      paginateContent: (options) => paginateContentInsights(this.#client, options),
     };
     this.explore = {
       feed: (options) => getExploreFeed(this.#client, options),

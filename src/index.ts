@@ -252,9 +252,35 @@ export {
 export type { ReelsPageOptions, UserReelsOptions } from './endpoints/reels/reels';
 export { getExploreFeed, paginateExploreFeed } from './endpoints/explore/explore';
 export type { ExploreOptions } from './endpoints/explore/explore';
-export { getPostInsights, getReelInsights } from './endpoints/insights/insights';
-export { mediaInsightsSchema, insightMetricSchema } from './schemas/insights';
-export type { MediaInsights, InsightMetric } from './schemas/insights';
+export {
+  getPostInsights,
+  getReelInsights,
+  getAccountInsights,
+  getAudienceInsights,
+  getContentInsights,
+  paginateContentInsights,
+} from './endpoints/insights/insights';
+export type {
+  ContentInsightsOptions,
+  InsightsContentType,
+  InsightsRange,
+  InsightsTime,
+} from './endpoints/insights/insights';
+export {
+  mediaInsightsSchema,
+  insightMetricSchema,
+  accountInsightsSchema,
+  audienceInsightsSchema,
+  contentInsightSchema,
+  contentPageSchema,
+} from './schemas/insights';
+export type {
+  MediaInsights,
+  InsightMetric,
+  AccountInsights,
+  AudienceInsights,
+  ContentInsight,
+} from './schemas/insights';
 export { getNotes, createNote, deleteNote } from './endpoints/notes/notes';
 export type { CreateNoteOptions, NoteAudience } from './endpoints/notes/notes';
 export { noteSchema } from './schemas/note';

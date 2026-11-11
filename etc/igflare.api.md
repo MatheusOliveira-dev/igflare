@@ -18,6 +18,90 @@ export interface AccountApi {
 }
 
 // @public (undocumented)
+export type AccountInsights = z.infer<typeof accountInsightsSchema>;
+
+// @public
+export const accountInsightsSchema: z.ZodObject<{
+    account_views_count: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        total: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+            id: z.ZodString;
+            label: z.ZodString;
+            value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            format: z.ZodOptional<z.ZodString>;
+            formatted_value: z.ZodOptional<z.ZodString>;
+        }, z.core.$loose>>>;
+        follow_type_breakdown: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+            follower: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+                value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            }, z.core.$loose>>>;
+            non_follower: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+                value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            }, z.core.$loose>>>;
+        }, z.core.$loose>>>;
+    }, z.core.$loose>>>;
+    interactions_count: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        total: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+            id: z.ZodString;
+            label: z.ZodString;
+            value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            format: z.ZodOptional<z.ZodString>;
+            formatted_value: z.ZodOptional<z.ZodString>;
+        }, z.core.$loose>>>;
+        follower: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+            value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        }, z.core.$loose>>>;
+        non_follower: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+            value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        }, z.core.$loose>>>;
+    }, z.core.$loose>>>;
+    viewers_or_reach: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        id: z.ZodString;
+        label: z.ZodString;
+        value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        format: z.ZodOptional<z.ZodString>;
+        formatted_value: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>>>;
+    profile_visits: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    }, z.core.$loose>>>;
+    bio_link_taps: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    }, z.core.$loose>>>;
+    link_page_views: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    }, z.core.$loose>>>;
+    business_address_taps: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    }, z.core.$loose>>>;
+    views_over_time: z.ZodOptional<z.ZodUnknown>;
+    interactions_over_time: z.ZodOptional<z.ZodUnknown>;
+    net_followers_over_time: z.ZodOptional<z.ZodUnknown>;
+    account_views_by_content_type: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        total: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        entries: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            content_type: z.ZodString;
+            total: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            non_follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            facebook_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        }, z.core.$loose>>>;
+    }, z.core.$loose>>>;
+    interactions_by_content_type: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        total_breakdown: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+            total: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            entries: z.ZodOptional<z.ZodArray<z.ZodObject<{
+                content_type: z.ZodString;
+                total: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                non_follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                facebook_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            }, z.core.$loose>>>;
+        }, z.core.$loose>>>;
+        sub_breakdowns: z.ZodOptional<z.ZodArray<z.ZodUnknown>>;
+    }, z.core.$loose>>>;
+}, z.core.$loose>;
+
+// @public (undocumented)
 export class AccountSuspendedError extends IgApiError {
 }
 
@@ -98,6 +182,67 @@ export function archiveMedia(client: PrivateClient, mediaId: string): Promise<vo
 
 // @public
 export const ATTESTATION_KEYSTORE_ERROR = -1013;
+
+// @public (undocumented)
+export type AudienceInsights = z.infer<typeof audienceInsightsSchema>;
+
+// @public
+export const audienceInsightsSchema: z.ZodObject<{
+    follower_count: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        id: z.ZodString;
+        label: z.ZodString;
+        value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        format: z.ZodOptional<z.ZodString>;
+        formatted_value: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>>>;
+    active_follower_count: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        id: z.ZodString;
+        label: z.ZodString;
+        value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        format: z.ZodOptional<z.ZodString>;
+        formatted_value: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>>>;
+    follower_growth_delta: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        value: z.ZodOptional<z.ZodString>;
+        sentiment: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>>>;
+    net_followers_over_time: z.ZodOptional<z.ZodUnknown>;
+    age_demographics: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        entries: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            age_range: z.ZodString;
+            percentage: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            women_percentage: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            men_percentage: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+            other_percentage: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        }, z.core.$loose>>>;
+    }, z.core.$loose>>>;
+    gender_demographics: z.ZodOptional<z.ZodUnknown>;
+    top_countries: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        id: z.ZodOptional<z.ZodString>;
+        name: z.ZodOptional<z.ZodString>;
+        percentage: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        display_value: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>>>;
+    top_cities: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        id: z.ZodOptional<z.ZodString>;
+        name: z.ZodOptional<z.ZodString>;
+        percentage: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        display_value: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>>>;
+    top_languages: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        id: z.ZodOptional<z.ZodString>;
+        name: z.ZodOptional<z.ZodString>;
+        percentage: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        display_value: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>>>;
+    active_times: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        slots: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            day: z.ZodNumber;
+            hour: z.ZodNumber;
+            value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        }, z.core.$loose>>>;
+    }, z.core.$loose>>>;
+}, z.core.$loose>;
 
 // @public
 export interface AuthState {
@@ -319,6 +464,56 @@ export const commentSchema: z.ZodObject<{
         media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
         biography: z.ZodOptional<z.ZodString>;
         external_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    }, z.core.$loose>>;
+}, z.core.$loose>;
+
+// @public (undocumented)
+export type ContentInsight = z.infer<typeof contentInsightSchema>;
+
+// @public
+export const contentInsightSchema: z.ZodObject<{
+    thumbnail: z.ZodObject<{
+        media_id: z.ZodCoercedString<unknown>;
+        media_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        media_type: z.ZodOptional<z.ZodString>;
+        creation_time: z.ZodOptional<z.ZodNumber>;
+        caption_text: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    }, z.core.$loose>;
+    metrics: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        metric: z.ZodString;
+        value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    }, z.core.$loose>>>;
+}, z.core.$loose>;
+
+// @public (undocumented)
+export interface ContentInsightsOptions extends InsightsRange {
+    readonly ascending?: boolean;
+    readonly count?: number;
+    readonly cursor?: string;
+    readonly metric?: string;
+    readonly sortByDate?: boolean;
+    // (undocumented)
+    readonly type?: InsightsContentType;
+}
+
+// @public
+export const contentPageSchema: z.ZodObject<{
+    items: z.ZodArray<z.ZodObject<{
+        thumbnail: z.ZodObject<{
+            media_id: z.ZodCoercedString<unknown>;
+            media_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+            media_type: z.ZodOptional<z.ZodString>;
+            creation_time: z.ZodOptional<z.ZodNumber>;
+            caption_text: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        }, z.core.$loose>;
+        metrics: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            metric: z.ZodString;
+            value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        }, z.core.$loose>>>;
+    }, z.core.$loose>>;
+    page_info: z.ZodOptional<z.ZodObject<{
+        has_next_page: z.ZodOptional<z.ZodBoolean>;
+        end_cursor: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     }, z.core.$loose>>;
 }, z.core.$loose>;
 
@@ -741,7 +936,13 @@ export interface GenerateUsdidOptions {
 export function generateUuid(): string;
 
 // @public
+export function getAccountInsights(client: PrivateClient, range?: InsightsRange): Promise<AccountInsights>;
+
+// @public
 export function getActivity(client: PrivateClient): Promise<Activity>;
+
+// @public
+export function getAudienceInsights(client: PrivateClient, range?: InsightsRange): Promise<AudienceInsights>;
 
 // @public
 export function getBioLinks(client: PrivateClient): Promise<BioLink[]>;
@@ -754,6 +955,9 @@ export function getCommentReplies(client: PrivateClient, mediaId: string, commen
 
 // @public
 export function getComments(client: PrivateClient, mediaId: string, options?: CommentListOptions): Promise<Page<Comment>>;
+
+// @public
+export function getContentInsights(client: PrivateClient, options?: ContentInsightsOptions): Promise<Page<ContentInsight>>;
 
 // @public
 export function getCurrentUser(client: PrivateClient): Promise<Record<string, unknown>>;
@@ -1085,19 +1289,38 @@ export interface ImageSize {
 export type InsightMetric = z.infer<typeof insightMetricSchema>;
 
 // @public
-export const insightMetricSchema: z.ZodPreprocess<z.ZodObject<{
+export const insightMetricSchema: z.ZodObject<{
     id: z.ZodString;
     label: z.ZodString;
     value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     format: z.ZodOptional<z.ZodString>;
     formatted_value: z.ZodOptional<z.ZodString>;
-}, z.core.$loose>, unknown>;
+}, z.core.$loose>;
 
 // @public
 export interface InsightsApi {
+    account(range?: InsightsRange): Promise<AccountInsights>;
+    audience(range?: InsightsRange): Promise<AudienceInsights>;
+    content(options?: ContentInsightsOptions): Promise<Page<ContentInsight>>;
+    // (undocumented)
+    paginateContent(options?: Omit<ContentInsightsOptions, 'cursor'>): AsyncGenerator<ContentInsight>;
     post(mediaId: string): Promise<MediaInsights>;
     reel(mediaId: string): Promise<MediaInsights>;
 }
+
+// @public
+export type InsightsContentType = 'posts' | 'reels' | 'stories' | 'live_videos';
+
+// @public
+export interface InsightsRange {
+    // (undocumented)
+    readonly from?: InsightsTime;
+    // (undocumented)
+    readonly to?: InsightsTime;
+}
+
+// @public
+export type InsightsTime = Date | number;
 
 // @public
 export class InvalidVerificationCodeError extends IgApiError {
@@ -1265,34 +1488,34 @@ export const mediaInsightsSchema: z.ZodObject<{
     profile_visits: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     followers_views: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     non_followers_views: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    viewers_or_reach: z.ZodOptional<z.ZodNullable<z.ZodPreprocess<z.ZodObject<{
+    viewers_or_reach: z.ZodOptional<z.ZodNullable<z.ZodObject<{
         id: z.ZodString;
         label: z.ZodString;
         value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
         format: z.ZodOptional<z.ZodString>;
         formatted_value: z.ZodOptional<z.ZodString>;
-    }, z.core.$loose>, unknown>>>;
-    avg_watch_time: z.ZodOptional<z.ZodNullable<z.ZodPreprocess<z.ZodObject<{
+    }, z.core.$loose>>>;
+    avg_watch_time: z.ZodOptional<z.ZodNullable<z.ZodObject<{
         id: z.ZodString;
         label: z.ZodString;
         value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
         format: z.ZodOptional<z.ZodString>;
         formatted_value: z.ZodOptional<z.ZodString>;
-    }, z.core.$loose>, unknown>>>;
-    views_sources: z.ZodOptional<z.ZodArray<z.ZodPreprocess<z.ZodObject<{
+    }, z.core.$loose>>>;
+    views_sources: z.ZodOptional<z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         label: z.ZodString;
         value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
         format: z.ZodOptional<z.ZodString>;
         formatted_value: z.ZodOptional<z.ZodString>;
-    }, z.core.$loose>, unknown>>>;
-    performance_factors: z.ZodOptional<z.ZodArray<z.ZodPreprocess<z.ZodObject<{
+    }, z.core.$loose>>>;
+    performance_factors: z.ZodOptional<z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         label: z.ZodString;
         value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
         format: z.ZodOptional<z.ZodString>;
         formatted_value: z.ZodOptional<z.ZodString>;
-    }, z.core.$loose>, unknown>>>;
+    }, z.core.$loose>>>;
     demographics: z.ZodOptional<z.ZodNullable<z.ZodObject<{
         status: z.ZodOptional<z.ZodString>;
         age_breakdown: z.ZodOptional<z.ZodArray<z.ZodUnknown>>;
@@ -1439,6 +1662,9 @@ export function paginateCommentReplies(client: PrivateClient, mediaId: string, c
 
 // @public
 export function paginateComments(client: PrivateClient, mediaId: string): AsyncGenerator<Comment>;
+
+// @public
+export function paginateContentInsights(client: PrivateClient, options?: Omit<ContentInsightsOptions, 'cursor'>): AsyncGenerator<ContentInsight>;
 
 // @public
 export function paginateExploreFeed(client: PrivateClient): AsyncGenerator<Media>;

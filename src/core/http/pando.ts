@@ -76,3 +76,29 @@ export function pandoRoot(json: Record<string, unknown>, rootField: string, what
   const reason = typeof first === 'string' ? ': ' + first : '';
   throw new IgApiError(`The ${what} was refused${reason}`, 200, { raw: json });
 }
+
+/** `1fvalue`, `1ltotal`: the server prefixes the key of a float or 64-bit field with its type. */
+const TYPE_MARKER = /^1[fl](?=[a-z_])/;
+/** `1$name(arguments)`: a nested field is keyed by its name and the variables it was given. */
+const FIELD_KEY = /^1\$([A-Za-z_]\w*)\(/;
+
+/**
+ * Renames the keys of a persisted-query answer to the plain field names: drops the type
+ * marker (`1fvalue` becomes `value`) and the argument list of a nested field
+ * (`1$active_times(timezone:$timezone)` becomes `active_times`).
+ */
+export function stripPandoMarkers(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return (value as unknown[]).map(stripPandoMarkers);
+  }
+  if (!isRecord(value)) {
+    return value;
+  }
+  const out: Record<string, unknown> = {};
+  for (const [key, child] of Object.entries(value)) {
+    const field = FIELD_KEY.exec(key);
+    const name = field?.[1] ?? key.replace(TYPE_MARKER, '');
+    out[name] = stripPandoMarkers(child);
+  }
+  return out;
+}

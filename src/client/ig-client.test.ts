@@ -474,6 +474,32 @@ describe('IgFlare facade', () => {
     ]);
   });
 
+  it('delegates the account insights: overview, audience and content', async () => {
+    const { ig, transport } = clientWith(() =>
+      json({
+        data: {
+          '1$ig_account_insights(period:$period)': {
+            profile_visits: { '1fvalue': 2 },
+            follower_count: { id: 'follower_count', label: '', '1fvalue': 5 },
+            '1$your_content(count:$count)': { items: [] },
+          },
+        },
+      }),
+    );
+    expect((await ig.insights.account()).profile_visits?.value).toBe(2);
+    expect((await ig.insights.audience({ from: 1, to: 2 })).follower_count?.value).toBe(5);
+    expect((await ig.insights.content()).items).toEqual([]);
+    const items: unknown[] = [];
+    for await (const item of ig.insights.paginateContent()) items.push(item);
+    expect(items).toEqual([]);
+    expect(transport.requests.map((r) => r.headers['X-FB-Friendly-Name'])).toEqual([
+      'AccountInsightsOverviewQuery',
+      'AccountInsightsAudienceQuery',
+      'AccountInsightsContentQuery',
+      'AccountInsightsContentQuery',
+    ]);
+  });
+
   it('delegates the Explore feed', async () => {
     const { ig, transport } = clientWith(() =>
       json({

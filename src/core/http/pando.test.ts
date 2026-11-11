@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pandoRequest, pandoRoot } from './pando';
+import { pandoRequest, pandoRoot, stripPandoMarkers } from './pando';
 import { IgApiError } from '../../errors/api-errors';
 import { PrivateClient } from './private-client';
 import { FakeTransport } from '../transport/adapters/fake';
@@ -78,5 +78,27 @@ describe('pandoRoot', () => {
     expect(() => pandoRoot({ data: { '1$other': {} } }, 'example_root', 'thing')).toThrow(
       'The thing was refused',
     );
+  });
+});
+
+describe('stripPandoMarkers', () => {
+  it('drops type markers and the arguments of nested fields, at any depth', () => {
+    expect(
+      stripPandoMarkers({
+        '1fvalue': 3,
+        '1ltotal': 4,
+        '1$active_times(timezone:$timezone)': { slots: [{ '1fvalue': 0, hour: 3 }] },
+        label: 'x',
+      }),
+    ).toEqual({ value: 3, total: 4, active_times: { slots: [{ value: 0, hour: 3 }] }, label: 'x' });
+  });
+
+  it('leaves other keys and plain values alone', () => {
+    expect(stripPandoMarkers({ '1abc': 1, '1': 2, list: [1, 'a', null] })).toEqual({
+      '1abc': 1,
+      '1': 2,
+      list: [1, 'a', null],
+    });
+    expect(stripPandoMarkers('text')).toBe('text');
   });
 });
