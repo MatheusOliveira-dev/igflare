@@ -341,6 +341,31 @@ describe('IgFlare facade', () => {
     expect(transport.requests.at(-1)?.url).toContain('/media/configure_sidecar/');
   });
 
+  it('delegates collections and liked posts', async () => {
+    const { ig, transport } = clientWith((req) => {
+      if (req.url.includes('/collections/list/'))
+        return json({ status: 'ok', items: [{ collection_id: '7', collection_name: 'c' }] });
+      if (req.url.includes('/collections/create/'))
+        return json({ status: 'ok', collection_id: '8', collection_name: 'new' });
+      if (req.url.includes('/delete/')) return json({ status: 'ok' });
+      if (req.url.includes('/media/') && req.url.includes('/save/')) return json({ status: 'ok' });
+      return json({ status: 'ok', items: [{ media: { pk: 1, code: 'x' } }] });
+    });
+
+    expect((await ig.collection.list())[0]?.collection_name).toBe('c');
+    expect((await ig.collection.medias('7')).items[0]?.code).toBe('x');
+    expect((await ig.collection.liked()).items[0]?.code).toBe('x');
+    expect((await ig.collection.create('new', ['1'])).collection_id).toBe('8');
+    await ig.collection.delete('8');
+    await ig.media.save('1_9', { collectionId: '7' });
+
+    const ids: (string | undefined)[] = [];
+    for await (const media of ig.collection.paginateMedias('7')) ids.push(media.pk);
+    for await (const media of ig.collection.paginateLiked()) ids.push(media.pk);
+    expect(ids).toEqual(['1', '1']);
+    expect(transport.requests.some((r) => r.url.includes('/api/v1/feed/collection/7/'))).toBe(true);
+  });
+
   it('delegates stories: tray, user stories and story upload', async () => {
     const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90]);
     const { ig } = clientWith((req) => {

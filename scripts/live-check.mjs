@@ -51,6 +51,18 @@ const checks = [
     },
   ],
   [
+    'collection.list',
+    async () => {
+      await ig.collection.list();
+    },
+  ],
+  [
+    'collection.liked',
+    async () => {
+      await ig.collection.liked();
+    },
+  ],
+  [
     'account.links',
     async () => {
       await ig.account.links();

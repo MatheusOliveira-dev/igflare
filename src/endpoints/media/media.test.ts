@@ -177,6 +177,33 @@ describe('saved', () => {
     expect(b.transport.requests[0]?.url).toContain('/api/v1/media/1_9/unsave/');
   });
 
+  it('saves into, and removes from, one collection', async () => {
+    const save = clientReturning({ status: 'ok' });
+    await saveMedia(save.client, '1_9', { collectionId: '17900000000000001' });
+    expect(signedPayload(save.transport.requests[0]?.body)['added_collection_ids']).toBe(
+      '[17900000000000001]',
+    );
+
+    const unsave = clientReturning({ status: 'ok' });
+    await unsaveMedia(unsave.client, '1_9', { collectionId: '5' });
+    expect(unsave.transport.requests[0]?.url).toContain('/api/v1/media/1_9/unsave/');
+    expect(signedPayload(unsave.transport.requests[0]?.body)['added_collection_ids']).toBe('[5]');
+  });
+
+  it('sends no collection ids when saving to the general list', async () => {
+    const { client, transport } = clientReturning({ status: 'ok' });
+    await saveMedia(client, '1_9');
+    expect(signedPayload(transport.requests[0]?.body)).not.toHaveProperty('added_collection_ids');
+  });
+
+  it('refuses a collection id that is not numeric, before any request', async () => {
+    const { client, transport } = clientReturning({ status: 'ok' });
+    await expect(saveMedia(client, '1_9', { collectionId: '5,6' })).rejects.toThrow(
+      'A collection id must be a numeric id',
+    );
+    expect(transport.requests).toHaveLength(0);
+  });
+
   it('lists saved posts, unwrapping each item media', async () => {
     const { client, transport } = clientReturning({
       status: 'ok',

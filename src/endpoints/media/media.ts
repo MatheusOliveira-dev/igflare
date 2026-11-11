@@ -175,21 +175,43 @@ export async function getLikers(client: PrivateClient, mediaId: string): Promise
   return parseSchemaList<User>(json['users'], userSchema, 'user');
 }
 
-/** Saves a media to the account's saved collection. */
-export async function saveMedia(client: PrivateClient, mediaId: string): Promise<void> {
+export interface SaveOptions {
+  /** Save into (or remove from) this collection instead of just the general saved list. */
+  readonly collectionId?: string;
+}
+
+function savePayload(client: PrivateClient, options: SaveOptions): Record<string, unknown> {
+  return {
+    ...mediaActionPayload(client),
+    ...(options.collectionId !== undefined
+      ? { added_collection_ids: `[${checkedId(options.collectionId, 'A collection id')}]` }
+      : {}),
+  };
+}
+
+/** Saves a media to the account's saved posts, or to one of its collections. */
+export async function saveMedia(
+  client: PrivateClient,
+  mediaId: string,
+  options: SaveOptions = {},
+): Promise<void> {
   await client.request({
     method: endpoints.mediaSave.method,
     endpoint: endpoints.mediaSave.path.replace('{id}', checkedMediaId(mediaId)),
-    payload: mediaActionPayload(client),
+    payload: savePayload(client, options),
   });
 }
 
-/** Removes a media from the account's saved collection. */
-export async function unsaveMedia(client: PrivateClient, mediaId: string): Promise<void> {
+/** Removes a media from the account's saved posts, or from one of its collections. */
+export async function unsaveMedia(
+  client: PrivateClient,
+  mediaId: string,
+  options: SaveOptions = {},
+): Promise<void> {
   await client.request({
     method: endpoints.mediaUnsave.method,
     endpoint: endpoints.mediaUnsave.path.replace('{id}', checkedMediaId(mediaId)),
-    payload: mediaActionPayload(client),
+    payload: savePayload(client, options),
   });
 }
 

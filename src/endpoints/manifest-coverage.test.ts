@@ -38,6 +38,11 @@ describe('manifest coverage of the hand-written endpoints', () => {
       '/api/v1/direct_v2/threads/broadcast/story_share/',
     );
     expect(endpoints.mediaConfigureSidecar.path).toBe('/api/v1/media/configure_sidecar/');
+    expect(endpoints.collectionsList).toEqual({ method: 'GET', path: '/api/v1/collections/list/' });
+    expect(endpoints.collectionsCreate.path).toBe('/api/v1/collections/create/');
+    expect(endpoints.collectionsDelete.path).toBe('/api/v1/collections/{id}/delete/');
+    expect(endpoints.feedCollection.path).toBe('/api/v1/feed/collection/{id}/');
+    expect(endpoints.feedLiked.path).toBe('/api/v1/feed/liked/');
     expect(endpoints.attestationCreateAndroidKeystore).toEqual({
       method: 'POST',
       path: '/api/v1/attestation/create_android_keystore/',

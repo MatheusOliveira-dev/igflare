@@ -70,7 +70,17 @@ import {
 } from '../endpoints/account/account';
 import type { BioLink } from '../schemas/bio-link';
 import type { Activity } from '../schemas/activity';
-import type { CommentListOptions, CommentOptions } from '../endpoints/media/media';
+import type { Collection } from '../schemas/collection';
+import {
+  createCollection,
+  deleteCollection,
+  getCollectionMedias,
+  getLikedMedias,
+  listCollections,
+  paginateCollectionMedias,
+  paginateLikedMedias,
+} from '../endpoints/collection/collection';
+import type { CommentListOptions, CommentOptions, SaveOptions } from '../endpoints/media/media';
 import {
   likeComment,
   unlikeComment,
@@ -264,8 +274,9 @@ export interface MediaApi {
   comments(mediaId: string, options?: CommentListOptions): Promise<Page<Comment>>;
   paginateComments(mediaId: string): AsyncGenerator<Comment>;
   likers(mediaId: string): Promise<User[]>;
-  save(mediaId: string): Promise<void>;
-  unsave(mediaId: string): Promise<void>;
+  /** Saves a post, to the general saved list or to one collection. */
+  save(mediaId: string, options?: SaveOptions): Promise<void>;
+  unsave(mediaId: string, options?: SaveOptions): Promise<void>;
   saved(options?: CommentListOptions): Promise<Page<Media>>;
   paginateSaved(): AsyncGenerator<Media>;
   likeComment(commentId: string): Promise<void>;
@@ -289,6 +300,21 @@ export interface UploadApi {
   story(jpeg: Uint8Array): Promise<Media>;
   /** Publishes 2 to 10 photos and videos as one carousel post. */
   album(items: readonly AlbumItem[], options?: AlbumUploadOptions): Promise<Media>;
+}
+
+/** The account's saved-posts collections and the posts it has liked. */
+export interface CollectionApi {
+  /** Every collection, the automatic ones included. */
+  list(): Promise<Collection[]>;
+  medias(collectionId: string, options?: CursorOptions): Promise<Page<Media>>;
+  paginateMedias(collectionId: string): AsyncGenerator<Media>;
+  /** The posts the account has liked. */
+  liked(options?: CursorOptions): Promise<Page<Media>>;
+  paginateLiked(): AsyncGenerator<Media>;
+  /** Creates a collection, optionally holding some posts (by pk) from the start. */
+  create(name: string, mediaIds?: readonly string[]): Promise<Collection>;
+  /** Deletes a collection; the posts in it stay saved. */
+  delete(collectionId: string): Promise<void>;
 }
 
 /** Stories. */
@@ -341,6 +367,7 @@ export class IgFlare {
   readonly upload: UploadApi;
   readonly search: SearchApi;
   readonly story: StoryApi;
+  readonly collection: CollectionApi;
 
   constructor(options: IgFlareOptions = {}) {
     const { retry, autoRelogin, ...clientOptions } = options;
@@ -363,6 +390,7 @@ export class IgFlare {
     this.upload = this.#buildUploadApi();
     this.search = this.#buildSearchApi();
     this.story = this.#buildStoryApi();
+    this.collection = this.#buildCollectionApi();
   }
 
   /** Builds a client from a saved session in the given store. */
@@ -500,8 +528,8 @@ export class IgFlare {
       comments: (mediaId, options) => getComments(client, mediaId, options),
       paginateComments: (mediaId) => paginateComments(client, mediaId),
       likers: (mediaId) => getLikers(client, mediaId),
-      save: (mediaId) => saveMedia(client, mediaId),
-      unsave: (mediaId) => unsaveMedia(client, mediaId),
+      save: (mediaId, options) => saveMedia(client, mediaId, options),
+      unsave: (mediaId, options) => unsaveMedia(client, mediaId, options),
       saved: (options) => getSavedPosts(client, options),
       paginateSaved: () => paginateSavedPosts(client),
       likeComment: (commentId) => likeComment(client, commentId),
@@ -527,6 +555,19 @@ export class IgFlare {
       video: (mp4, coverJpeg, options) => uploadVideo(client, mp4, coverJpeg, options),
       story: (jpeg) => uploadStoryPhoto(client, jpeg),
       album: (items, options) => uploadAlbum(client, items, options),
+    };
+  }
+
+  #buildCollectionApi(): CollectionApi {
+    const client = this.#client;
+    return {
+      list: () => listCollections(client),
+      medias: (collectionId, options) => getCollectionMedias(client, collectionId, options),
+      paginateMedias: (collectionId) => paginateCollectionMedias(client, collectionId),
+      liked: (options) => getLikedMedias(client, options),
+      paginateLiked: () => paginateLikedMedias(client),
+      create: (name, mediaIds) => createCollection(client, name, mediaIds),
+      delete: (collectionId) => deleteCollection(client, collectionId),
     };
   }
 

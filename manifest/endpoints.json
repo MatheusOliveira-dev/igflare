@@ -52,6 +52,21 @@
       "path": "/api/v1/bloks/async_action/"
     },
     {
+      "name": "collectionsCreate",
+      "method": "POST",
+      "path": "/api/v1/collections/create/"
+    },
+    {
+      "name": "collectionsDelete",
+      "method": "POST",
+      "path": "/api/v1/collections/{id}/delete/"
+    },
+    {
+      "name": "collectionsList",
+      "method": "GET",
+      "path": "/api/v1/collections/list/"
+    },
+    {
       "name": "directBroadcastLink",
       "method": "POST",
       "path": "/api/v1/direct_v2/threads/broadcast/link/"
@@ -175,6 +190,16 @@
       "name": "fbsearchPlaces",
       "method": "GET",
       "path": "/api/v1/fbsearch/places/"
+    },
+    {
+      "name": "feedCollection",
+      "method": "GET",
+      "path": "/api/v1/feed/collection/{id}/"
+    },
+    {
+      "name": "feedLiked",
+      "method": "GET",
+      "path": "/api/v1/feed/liked/"
     },
     {
       "name": "feedReelsTray",

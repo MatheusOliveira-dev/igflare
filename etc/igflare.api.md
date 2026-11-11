@@ -469,7 +469,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsEditProfile' | 'accountsLogin' | 'accountsRemoveBioLinks' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'accountsUpdateBioLinks' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastRavenAttachment' | 'directBroadcastReaction' | 'directBroadcastStoryShare' | 'directBroadcastVoiceAttachment' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsRemoveFollower' | 'friendshipsSetBesties' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureSidecar' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaSeenV2' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'newsInbox' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
+export type EndpointName = 'accountsCurrentUser' | 'accountsEditProfile' | 'accountsLogin' | 'accountsRemoveBioLinks' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'accountsUpdateBioLinks' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'collectionsCreate' | 'collectionsDelete' | 'collectionsList' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastRavenAttachment' | 'directBroadcastReaction' | 'directBroadcastStoryShare' | 'directBroadcastVoiceAttachment' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedCollection' | 'feedLiked' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsRemoveFollower' | 'friendshipsSetBesties' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureSidecar' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaSeenV2' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'newsInbox' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -763,6 +763,10 @@ export class IgFlare {
     // (undocumented)
     readonly account: AccountApi;
     get client(): PrivateClient;
+    // Warning: (ae-forgotten-export) The symbol "CollectionApi" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    readonly collection: CollectionApi;
     // (undocumented)
     readonly direct: DirectApi;
     // (undocumented)
@@ -910,8 +914,8 @@ export interface MediaApi {
     pinComment(mediaId: string, commentId: string): Promise<void>;
     // (undocumented)
     replies(mediaId: string, commentId: string, options?: ReplyListOptions): Promise<Page<Comment>>;
-    // (undocumented)
-    save(mediaId: string): Promise<void>;
+    // Warning: (ae-forgotten-export) The symbol "SaveOptions" needs to be exported by the entry point index.d.ts
+    save(mediaId: string, options?: SaveOptions): Promise<void>;
     // (undocumented)
     saved(options?: CommentListOptions): Promise<Page<Media>>;
     // (undocumented)
@@ -925,7 +929,7 @@ export interface MediaApi {
     // (undocumented)
     unpinComment(mediaId: string, commentId: string): Promise<void>;
     // (undocumented)
-    unsave(mediaId: string): Promise<void>;
+    unsave(mediaId: string, options?: SaveOptions): Promise<void>;
 }
 
 // @public
@@ -1315,7 +1319,7 @@ export class RetryTransport implements HttpTransport {
 }
 
 // @public
-export function saveMedia(client: PrivateClient, mediaId: string): Promise<void>;
+export function saveMedia(client: PrivateClient, mediaId: string, options?: SaveOptions): Promise<void>;
 
 // @public
 export interface SearchApi {
@@ -1523,7 +1527,7 @@ export function unpinComment(client: PrivateClient, mediaId: string, commentId: 
 export function unpinMedia(client: PrivateClient, mediaId: string): Promise<void>;
 
 // @public
-export function unsaveMedia(client: PrivateClient, mediaId: string): Promise<void>;
+export function unsaveMedia(client: PrivateClient, mediaId: string, options?: SaveOptions): Promise<void>;
 
 // @public
 export interface UploadApi {
