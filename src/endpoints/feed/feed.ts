@@ -7,6 +7,7 @@ import type { Page } from '../../core/pagination';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 import { isRecord, readCursor } from '../../core/guards';
+import { getHashtagSerpPage } from './hashtag-serp';
 
 export interface FeedOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
@@ -203,18 +204,17 @@ function sectionsBody(cursor: string | undefined): Record<string, unknown> {
   };
 }
 
-/** One page of a hashtag's recent media. Pass `cursor` to continue. */
-export async function getHashtagFeed(
+/**
+ * One page of the posts listed for a hashtag, ranked by relevance (there is no
+ * chronological view). Posts come in the light form the search grid uses; see
+ * {@link getHashtagSerpPage}. Pass `cursor` to continue.
+ */
+export function getHashtagFeed(
   client: PrivateClient,
   tag: string,
   options: FeedOptions = {},
 ): Promise<Page<Media>> {
-  const json = await client.request({
-    method: endpoints.tagsSections.method,
-    endpoint: endpoints.tagsSections.path.replace('{tag}', encodeURIComponent(tag)),
-    payload: sectionsBody(options.cursor),
-  });
-  return sectionsPage(json);
+  return getHashtagSerpPage(client, tag, options.cursor);
 }
 
 /** Walks a hashtag's media, yielding one at a time across pages. */

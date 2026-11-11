@@ -12,7 +12,8 @@ core/signing     signing port + adapter, isolated, pinned by golden vectors
 core/crypto      password encryption, USDID identity, attestation (CAA login)
 core/bloks       Bloks payload builders and response parsers (CAA login)
 core/session     session/state port + adapters (memory, file)
-core/http        orchestrates transport + signing + session: lossless JSON, typed error mapping
+core/http        orchestrates transport + signing + session: lossless JSON, typed error mapping;
+                 pando.ts sends the persisted GraphQL queries (login registration, hashtag feed)
 core/media       dependency-free JPEG/MP4 metadata parsers (upload)
 core/pagination  the Page<T> contract and the paginate() iterator
 core/ids         checkedId/checkedMediaId: every id placed in a URL path goes through these (numeric only)

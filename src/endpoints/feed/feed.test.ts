@@ -4,9 +4,7 @@ import {
   paginateUserFeed,
   getTimelineFeed,
   paginateTimeline,
-  getHashtagFeed,
   getLocationFeed,
-  paginateHashtagFeed,
 } from './feed';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
@@ -172,7 +170,7 @@ function sections(medias: unknown[], extra: Record<string, unknown> = {}): unkno
   };
 }
 
-describe('hashtag and location feeds', () => {
+describe('location feeds', () => {
   const NEXT = {
     next_max_id: 'n1',
     next_page: 2,
@@ -180,12 +178,14 @@ describe('hashtag and location feeds', () => {
     more_available: true,
   };
 
-  it('posts to the tag sections endpoint and flattens the media', async () => {
-    const { client, transport } = clientReturning(sections([{ pk: 1, code: 'a' }], NEXT));
+  it('posts to the location sections endpoint and flattens the media', async () => {
+    const { client, transport } = clientReturning(sections([{ pk: 3, code: 'a' }], NEXT));
 
-    const page = await getHashtagFeed(client, 'sunset');
+    const page = await getLocationFeed(client, '777');
 
-    expect(transport.requests[0]?.url).toBe('https://i.instagram.com/api/v1/tags/sunset/sections/');
+    expect(transport.requests[0]?.url).toBe(
+      'https://i.instagram.com/api/v1/locations/777/sections/',
+    );
     expect(transport.requests[0]?.method).toBe('POST');
     const first = signedPayload(transport.requests[0]?.body);
     expect(first['tab']).toBe('recent');
@@ -197,9 +197,9 @@ describe('hashtag and location feeds', () => {
   it('echoes max_id, page and next_media_ids back to get the next page', async () => {
     // Sending only max_id was answered with a 500 live; the server wants all three.
     const { client, transport } = clientReturning(sections([{ pk: 1 }], NEXT));
-    const first = await getHashtagFeed(client, 'sunset');
+    const first = await getLocationFeed(client, '777');
 
-    await getHashtagFeed(client, 'sunset', { cursor: first.nextCursor ?? '' });
+    await getLocationFeed(client, '777', { cursor: first.nextCursor ?? '' });
 
     const second = signedPayload(transport.requests[1]?.body);
     expect(second['max_id']).toBe('n1');
@@ -207,60 +207,26 @@ describe('hashtag and location feeds', () => {
     expect(second['next_media_ids']).toBe('["111","222"]');
   });
 
-  it('url-encodes the tag', async () => {
-    const { client, transport } = clientReturning(sections([{ pk: 2 }]));
-    await getHashtagFeed(client, 'new year');
-    expect(transport.requests[0]?.url).toContain('/api/v1/tags/new%20year/sections/');
-  });
-
   it('rejects a cursor that did not come from a sections page, before any request', async () => {
     const { client, transport } = clientReturning(sections([{ pk: 2 }]));
-    await expect(getHashtagFeed(client, 'x', { cursor: 'not-a-cursor' })).rejects.toBeInstanceOf(
-      IgError,
-    );
     await expect(getLocationFeed(client, '1', { cursor: 'n1' })).rejects.toBeInstanceOf(IgError);
     expect(transport.requests).toHaveLength(0);
   });
 
   it('has no next cursor when the response gives no next_max_id', async () => {
     const { client } = clientReturning(sections([{ pk: 2 }], { more_available: true }));
-    expect((await getHashtagFeed(client, 'x')).nextCursor).toBeUndefined();
+    expect((await getLocationFeed(client, '777')).nextCursor).toBeUndefined();
   });
 
-  it('posts to the location sections endpoint', async () => {
-    const { client, transport } = clientReturning(
+  it('has no next cursor when more_available is false', async () => {
+    const { client } = clientReturning(
       sections([{ pk: 3 }], { more_available: false, next_max_id: 'n2' }),
     );
-
-    const page = await getLocationFeed(client, '777');
-
-    expect(transport.requests[0]?.url).toContain('/api/v1/locations/777/sections/');
-    expect(page.nextCursor).toBeUndefined();
+    expect((await getLocationFeed(client, '777')).nextCursor).toBeUndefined();
   });
 
   it('throws when the response has no sections array', async () => {
     const { client } = clientReturning({ status: 'ok' });
-    await expect(getHashtagFeed(client, 'x')).rejects.toBeInstanceOf(ClientSchemaError);
-  });
-});
-
-describe('discovery feed iterators', () => {
-  it('walks a hashtag feed across pages', async () => {
-    let call = 0;
-    const transport = new FakeTransport(() => {
-      call += 1;
-      const body =
-        call === 1
-          ? sections([{ pk: 1 }], { next_max_id: 'p2', more_available: true })
-          : sections([{ pk: 2 }], { more_available: false });
-      return { status: 200, headers: {}, body: JSON.stringify(body) };
-    });
-    const client = new PrivateClient({ transport, session: createSession() });
-
-    const ids: (string | undefined)[] = [];
-    for await (const media of paginateHashtagFeed(client, 'x')) {
-      ids.push(media.pk);
-    }
-    expect(ids).toEqual(['1', '2']);
+    await expect(getLocationFeed(client, '777')).rejects.toBeInstanceOf(ClientSchemaError);
   });
 });

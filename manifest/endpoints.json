@@ -382,11 +382,6 @@
       "path": "/api/v1/tags/search/"
     },
     {
-      "name": "tagsSections",
-      "method": "POST",
-      "path": "/api/v1/tags/{tag}/sections/"
-    },
-    {
       "name": "userInfo",
       "method": "GET",
       "path": "/api/v1/users/{pk}/info/"

@@ -11,6 +11,18 @@ function json(body: unknown): HttpResponse {
   return { status: 200, headers: {}, body: JSON.stringify(body) };
 }
 
+/** A hashtag search page holding the given media in one grid unit. */
+function serpPage(medias: Record<string, unknown>[]): unknown {
+  return {
+    data: {
+      '1$xdt_fbsearch__top_serp_graphql(request_data:{})': {
+        edges: [{ node: { __typename: 'XDTTopSerpMediaGridUnit', items: medias } }],
+        page_info: { has_next_page: false },
+      },
+    },
+  };
+}
+
 const { publicKey: caaPublicKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const caaPubKeyB64 = Buffer.from(caaPublicKey.export({ type: 'spki', format: 'pem' })).toString(
   'base64',
@@ -251,11 +263,7 @@ describe('IgFlare facade', () => {
         return json({ status: 'ok', users: [{ pk: 1, username: 'a' }] });
       if (req.url.includes('/tags/search/'))
         return json({ status: 'ok', results: [{ id: 5, name: 'sun' }] });
-      if (req.url.includes('/sections/'))
-        return json({
-          status: 'ok',
-          sections: [{ layout_content: { medias: [{ media: { pk: 9, code: 't' } }] } }],
-        });
+      if (req.url.includes('/graphql_www')) return json(serpPage([{ pk: '9', code: 't' }]));
       if (req.url.includes('/comments/'))
         return json({ status: 'ok', comments: [{ pk: 3, text: 'hi' }] });
       return json({ status: 'ok', users: [{ pk: 2, username: 'b' }] }); // likers
@@ -278,11 +286,7 @@ describe('IgFlare facade', () => {
           status: 'ok',
           sections: [{ layout_content: { medias: [{ media: { pk: 1, code: 'l' } }] } }],
         });
-      if (req.url.includes('/tags/'))
-        return json({
-          status: 'ok',
-          sections: [{ layout_content: { medias: [{ media: { pk: 2 } }] } }],
-        });
+      if (req.url.includes('/graphql_www')) return json(serpPage([{ pk: '2' }]));
       return json({ status: 'ok', comments: [{ pk: 3, text: 'c' }] });
     });
 

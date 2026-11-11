@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { PrivateClient } from '../../core/http/private-client';
 import type { PrivateResponseJson } from '../../core/http/response';
+import { pandoRequest } from '../../core/http/pando';
 import {
   generateUsdidIdentity,
   buildUsdidRegistrationToken,
@@ -76,34 +77,13 @@ async function registerUsdid(client: PrivateClient, identity: UsdidIdentity): Pr
       fdid: { sensitive_string_value: client.session.device.phoneId },
     },
   };
-  const json = await client.request({
-    method: 'POST',
-    // graphql_www is a pando GraphQL host endpoint, not an /api/v1 REST path, so
-    // it is driven by rawUrl and is intentionally absent from the manifest registry.
-    endpoint: 'graphql_www',
-    rawUrl: `https://${CAA_API_DOMAIN}/graphql_www`,
-    encoding: 'form',
+  const json = await pandoRequest(client, {
+    friendlyName: 'IGUSDIDRegistrationMutation',
+    docId: USDID_REGISTRATION_CLIENT_DOC_ID,
+    rootField: 'usdid_registration',
+    variables,
+    domain: CAA_API_DOMAIN,
     withDefaultData: false,
-    payload: {
-      method: 'post',
-      pretty: 'false',
-      format: 'json',
-      server_timestamps: 'true',
-      locale: 'user',
-      fb_api_req_friendly_name: 'IGUSDIDRegistrationMutation',
-      enable_canonical_naming: 'true',
-      enable_canonical_variable_overrides: 'true',
-      enable_canonical_naming_ambiguous_type_prefixing: 'true',
-      variables: JSON.stringify(variables),
-      purpose: 'fetch',
-      client_doc_id: USDID_REGISTRATION_CLIENT_DOC_ID,
-    },
-    headers: {
-      'X-FB-Friendly-Name': 'IGUSDIDRegistrationMutation',
-      'X-Client-Doc-Id': USDID_REGISTRATION_CLIENT_DOC_ID,
-      'X-Root-Field-Name': 'usdid_registration',
-      'X-Graphql-Client-Library': 'pando',
-    },
   });
   const data = json['data'];
   if (!isRecord(data)) {
