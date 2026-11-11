@@ -1,3 +1,4 @@
+import { persistedQueries } from '../../generated/persisted-queries';
 import type { PrivateClient } from '../../core/http/private-client';
 import { pandoRequest, pandoRoot } from '../../core/http/pando';
 import { isRecord } from '../../core/guards';
@@ -5,11 +6,12 @@ import { noteSchema, type Note } from '../../schemas/note';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 
-// Persisted-query ids of the app build this client reports (454). A new build can change
-// them, and the symptom is a typed error from these calls.
-const INBOX_TRAY_DOC_ID = '268384441910567718382899365573';
-const CREATE_DOC_ID = '3510400299040717503474948856';
-const DELETE_DOC_ID = '14646146326205214391891070715';
+// The persisted-query ids belong to the app build this client reports (see
+// manifest/persisted-queries.json). A new build can change them, and the symptom is a
+// typed error from these calls.
+const INBOX_TRAY = persistedQueries.inboxTray;
+const CREATE = persistedQueries.createInboxTrayItem;
+const DELETE = persistedQueries.deleteInboxTrayItem;
 
 /** Who may see a note. */
 export type NoteAudience = 'mutual' | 'closeFriends';
@@ -63,8 +65,8 @@ function noteOf(item: Record<string, unknown>): Note | undefined {
 /** The notes in the inbox tray: the account's own and those of followed accounts. */
 export async function getNotes(client: PrivateClient): Promise<Note[]> {
   const json = await pandoRequest(client, {
-    friendlyName: 'InboxTrayRequest',
-    docId: INBOX_TRAY_DOC_ID,
+    friendlyName: INBOX_TRAY.operation,
+    docId: INBOX_TRAY.docId,
     rootField: 'xdt_get_inbox_tray_items',
     variables: {
       should_fetch_friend_map_user: true,
@@ -106,8 +108,8 @@ export async function createNote(
     throw new IgError(`A note is 1 to ${String(MAX_TEXT)} characters`);
   }
   const json = await pandoRequest(client, {
-    friendlyName: 'CreateInboxTrayItemRequest',
-    docId: CREATE_DOC_ID,
+    friendlyName: CREATE.operation,
+    docId: CREATE.docId,
     rootField: 'xdt_create_inbox_tray_item',
     variables: {
       should_fetch_content_note_stack_video_info: false,
@@ -138,8 +140,8 @@ export async function deleteNote(client: PrivateClient, noteId: string): Promise
     throw new IgError('A note id must be numeric');
   }
   const json = await pandoRequest(client, {
-    friendlyName: 'DeleteInboxTrayItemRequest',
-    docId: DELETE_DOC_ID,
+    friendlyName: DELETE.operation,
+    docId: DELETE.docId,
     rootField: 'xdt_delete_inbox_tray_item',
     variables: { item_id: noteId },
   });

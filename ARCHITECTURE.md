@@ -47,6 +47,11 @@ Enforced by `dependency-cruiser` (`.dependency-cruiser.cjs`), not by convention:
 committed generated code matches the manifest. Change endpoints in the manifest, never in
 the generated files.
 
+`manifest/persisted-queries.json` does the same for the persisted GraphQL queries: each
+operation name with its id, which belongs to one app build. `npm run app-build -- base.apk`
+compares it with the ids an APK ships and, with `--write`, updates it. A `pinned` query is
+kept as it is and carries a `note` saying why.
+
 ## Response and error contract
 
 Every endpoint follows one shape, so a caller learns it once:

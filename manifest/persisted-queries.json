@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "appBuild": "454.0.0.54.77",
+  "queries": [
+    {
+      "name": "usdidRegistration",
+      "operation": "IGUSDIDRegistrationMutation",
+      "docId": "124930351917786857261002920888",
+      "pinned": true,
+      "note": "Captured from an older build and kept: the login works with it, and the app build's asset lists this mutation under another name."
+    },
+    {
+      "name": "topSerp",
+      "operation": "TopSerpQuery",
+      "docId": "4185316819665014057952243780"
+    },
+    {
+      "name": "inboxTray",
+      "operation": "InboxTrayRequest",
+      "docId": "268384441910567718382899365573"
+    },
+    {
+      "name": "createInboxTrayItem",
+      "operation": "CreateInboxTrayItemRequest",
+      "docId": "3510400299040717503474948856"
+    },
+    {
+      "name": "deleteInboxTrayItem",
+      "operation": "DeleteInboxTrayItemRequest",
+      "docId": "14646146326205214391891070715"
+    },
+    {
+      "name": "postInsights",
+      "operation": "PostInsightsQuery",
+      "docId": "187673829817521675190278983686"
+    },
+    {
+      "name": "reelInsights",
+      "operation": "ReelInsightsQuery",
+      "docId": "34117726174753558798011202277"
+    },
+    {
+      "name": "accountInsightsOverview",
+      "operation": "AccountInsightsOverviewQuery",
+      "docId": "297851856213787890962497531867"
+    },
+    {
+      "name": "accountInsightsAudience",
+      "operation": "AccountInsightsAudienceQuery",
+      "docId": "11313478377027549324232575805"
+    },
+    {
+      "name": "accountInsightsContent",
+      "operation": "AccountInsightsContentQuery",
+      "docId": "246019450711285746558777381992"
+    }
+  ]
+}

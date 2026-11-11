@@ -1,3 +1,4 @@
+import { persistedQueries, type PersistedQuery } from '../../generated/persisted-queries';
 import type { PrivateClient } from '../../core/http/private-client';
 import { pandoRequest, pandoRoot, stripPandoMarkers } from '../../core/http/pando';
 import { checkedMediaId } from '../../core/ids';
@@ -17,40 +18,25 @@ import {
 import { ClientSchemaError, IgApiError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 
-// Persisted-query ids of the app build this client reports (454). A new build can change
-// them, and the symptom is a typed error from these calls.
+// The persisted-query ids belong to the app build this client reports (see
+// manifest/persisted-queries.json). A new build can change them, and the symptom is a
+// typed error from these calls.
 interface InsightsQuery {
   readonly friendlyName: string;
   readonly docId: string;
   readonly rootField: string;
 }
 
-const POST: InsightsQuery = {
-  friendlyName: 'PostInsightsQuery',
-  docId: '187673829817521675190278983686',
-  rootField: 'ig_post_insights',
-};
-const REEL: InsightsQuery = {
-  friendlyName: 'ReelInsightsQuery',
-  docId: '34117726174753558798011202277',
-  rootField: 'ig_reel_insights',
-};
+function query(persisted: PersistedQuery, rootField: string): InsightsQuery {
+  return { friendlyName: persisted.operation, docId: persisted.docId, rootField };
+}
+
 const ACCOUNT_ROOT = 'ig_account_insights';
-const OVERVIEW: InsightsQuery = {
-  friendlyName: 'AccountInsightsOverviewQuery',
-  docId: '297851856213787890962497531867',
-  rootField: ACCOUNT_ROOT,
-};
-const AUDIENCE: InsightsQuery = {
-  friendlyName: 'AccountInsightsAudienceQuery',
-  docId: '11313478377027549324232575805',
-  rootField: ACCOUNT_ROOT,
-};
-const CONTENT: InsightsQuery = {
-  friendlyName: 'AccountInsightsContentQuery',
-  docId: '246019450711285746558777381992',
-  rootField: ACCOUNT_ROOT,
-};
+const POST = query(persistedQueries.postInsights, 'ig_post_insights');
+const REEL = query(persistedQueries.reelInsights, 'ig_reel_insights');
+const OVERVIEW = query(persistedQueries.accountInsightsOverview, ACCOUNT_ROOT);
+const AUDIENCE = query(persistedQueries.accountInsightsAudience, ACCOUNT_ROOT);
+const CONTENT = query(persistedQueries.accountInsightsContent, ACCOUNT_ROOT);
 
 const DAY_SECONDS = 86_400;
 const DEFAULT_RANGE_DAYS = 30;

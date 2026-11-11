@@ -1,3 +1,4 @@
+import { persistedQueries } from '../../generated/persisted-queries';
 import type { PrivateClient } from '../../core/http/private-client';
 import { pandoRequest, pandoRoot } from '../../core/http/pando';
 import type { Page } from '../../core/pagination';
@@ -9,11 +10,10 @@ import { randomUUID } from 'node:crypto';
 
 /**
  * The hashtag page was replaced in app build 454 by the search results screen, which is
- * served by this persisted GraphQL query. The id belongs to that build (read from the
- * app's `client_persist_ids` asset). A new build can change it, and the symptom is a
+ * served by the persisted GraphQL query `TopSerpQuery`. Its id belongs to that build
+ * (see manifest/persisted-queries.json). A new build can change it, and the symptom is a
  * `ClientSchemaError` or `IgApiError` from this call.
  */
-const TOP_SERP_DOC_ID = '4185316819665014057952243780';
 const ROOT_FIELD = 'xdt_fbsearch__top_serp_graphql';
 const PAGE_SIZE = 12;
 
@@ -214,8 +214,8 @@ export async function getHashtagSerpPage(
   const name = normalizeTag(tag);
   const session = cursorValue !== undefined ? decodeCursor(cursorValue) : newSession();
   const json = await pandoRequest(client, {
-    friendlyName: 'TopSerpQuery',
-    docId: TOP_SERP_DOC_ID,
+    friendlyName: persistedQueries.topSerp.operation,
+    docId: persistedQueries.topSerp.docId,
     rootField: ROOT_FIELD,
     variables: serpVariables(name, session, cursorValue !== undefined),
   });

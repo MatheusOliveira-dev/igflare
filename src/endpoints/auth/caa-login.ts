@@ -25,10 +25,9 @@ import { endpoints } from '../../generated/endpoints';
 import { IgError } from '../../errors/ig-error';
 import { CaaTwoFactorRequiredError } from '../../errors/api-errors';
 import { isRecord } from '../../core/guards';
+import { persistedQueries } from '../../generated/persisted-queries';
 
 export { CAA_API_DOMAIN };
-
-const USDID_REGISTRATION_CLIENT_DOC_ID = '124930351917786857261002920888';
 
 const PROCESS_CLIENT_DATA = 'com.bloks.www.bloks.caa.login.process_client_data_and_redirect';
 const OAUTH_TOKEN_FETCH = 'com.bloks.www.caa.login.oauth.token.fetch.async';
@@ -78,8 +77,8 @@ async function registerUsdid(client: PrivateClient, identity: UsdidIdentity): Pr
     },
   };
   const json = await pandoRequest(client, {
-    friendlyName: 'IGUSDIDRegistrationMutation',
-    docId: USDID_REGISTRATION_CLIENT_DOC_ID,
+    friendlyName: persistedQueries.usdidRegistration.operation,
+    docId: persistedQueries.usdidRegistration.docId,
     rootField: 'usdid_registration',
     variables,
     domain: CAA_API_DOMAIN,
