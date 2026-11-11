@@ -147,6 +147,45 @@ describe('PrivateClient session expiry', () => {
     expect(hookCalls).toBe(1);
   });
 
+  it('does not log in again for a rejection that arrives after the refresh finished', async () => {
+    let fresh = false;
+    let releaseSlow: (() => void) | undefined;
+    const slowGate = new Promise<void>((resolve) => {
+      releaseSlow = resolve;
+    });
+    const transport = new FakeTransport(async (req) => {
+      const rejected = !fresh;
+      if (req.url.includes('/slow/')) {
+        await slowGate;
+      }
+      return rejected
+        ? {
+            status: 403,
+            headers: {},
+            body: JSON.stringify({ message: 'login_required', status: 'fail' }),
+          }
+        : { status: 200, headers: {}, body: JSON.stringify({ status: 'ok' }) };
+    });
+    let hookCalls = 0;
+    const client = new PrivateClient({
+      transport,
+      session: createSession(),
+      onSessionExpired: () => {
+        hookCalls += 1;
+        fresh = true;
+        return Promise.resolve();
+      },
+    });
+
+    const slow = client.request({ method: 'GET', endpoint: 'slow/' });
+    const fast = client.request({ method: 'GET', endpoint: 'fast/' });
+    await fast;
+    releaseSlow?.();
+
+    expect((await slow).status).toBe('ok');
+    expect(hookCalls).toBe(1);
+  });
+
   it('does not re-enter the hook for requests the hook itself makes', async () => {
     const { transport } = expiring();
     let hookCalls = 0;

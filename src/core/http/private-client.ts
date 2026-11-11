@@ -33,6 +33,8 @@ export class PrivateClient {
   /** Marks the async call tree of a running re-authentication. */
   readonly #reauthenticating = new AsyncLocalStorage<true>();
   #refreshing: Promise<void> | undefined;
+  /** Counts finished re-authentications, so a late rejection can tell it is already covered. */
+  #refreshes = 0;
   #session: SessionData;
 
   constructor(options: PrivateClientOptions = {}) {
@@ -70,13 +72,18 @@ export class PrivateClient {
    * not applied, so repeating a mutation is safe.
    */
   async request(input: PrivateRequestOptions): Promise<PrivateResponseJson> {
+    const refreshesAtSend = this.#refreshes;
     try {
       return parsePrivateResponse(await this.send(input));
     } catch (error) {
       if (!(error instanceof LoginRequiredError) || !this.#canRefresh()) {
         throw error;
       }
-      await this.#refreshSession(error);
+      // A re-authentication that finished after this request was built already replaced
+      // the session it was rejected for, so repeat it instead of logging in again.
+      if (this.#refreshes === refreshesAtSend) {
+        await this.#refreshSession(error);
+      }
       return parsePrivateResponse(await this.send(input));
     }
   }
@@ -94,6 +101,9 @@ export class PrivateClient {
     }
     this.#refreshing ??= this.#reauthenticating
       .run(true, () => hook(error))
+      .then(() => {
+        this.#refreshes += 1;
+      })
       .finally(() => {
         this.#refreshing = undefined;
       });
