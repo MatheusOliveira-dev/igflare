@@ -17,6 +17,7 @@ export interface DeviceProfile {
   readonly capabilities: string;
 }
 
+/** The Android device and app build this client presents itself as. */
 export const DEFAULT_DEVICE_PROFILE: DeviceProfile = {
   appVersion: '454.0.0.54.77',
   versionCode: '1105698528',
@@ -45,10 +46,12 @@ export interface DeviceState {
   readonly androidDeviceId: string;
 }
 
+/** A new random UUID. */
 export function generateUuid(): string {
   return randomUUID();
 }
 
+/** A new Android device id (`android-` and 16 hex digits). */
 export function generateAndroidDeviceId(seed: string = randomUUID()): string {
   const hash = createHash('sha256').update(seed).digest('hex').slice(0, 16);
   return `android-${hash}`;
@@ -68,6 +71,7 @@ export function createDeviceState(overrides: Partial<DeviceState> = {}): DeviceS
   };
 }
 
+/** The User-Agent the app sends for a device profile. */
 export function buildUserAgent(profile: DeviceProfile, locale = 'en_US'): string {
   return (
     `Instagram ${profile.appVersion} Android ` +

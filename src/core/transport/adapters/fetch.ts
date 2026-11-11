@@ -7,6 +7,7 @@ import { IgError } from '../../../errors/ig-error';
  * HttpsTransport. This one is kept for generic use and testing.
  */
 export class FetchTransport implements HttpTransport {
+  /** Sends the request with the global fetch. */
   async request(req: HttpRequest): Promise<HttpResponse> {
     let response: Response;
     try {

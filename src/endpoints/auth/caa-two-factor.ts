@@ -23,7 +23,10 @@ const AP_2SV_CODE_ENTRY = 'com.bloks.www.ap.two_step_verification.code_entry';
 export type TwoFactorSource =
   | { readonly code: string }
   | { readonly totpSecret: string }
-  | { readonly provider: () => string | Promise<string> };
+  | {
+      /** Called when the code is needed, for example to ask the person at the keyboard. */
+      readonly provider: () => string | Promise<string>;
+    };
 
 /** Resolves a {@link TwoFactorSource} to the code string to submit. */
 export async function resolveTwoFactorCode(source: TwoFactorSource): Promise<string> {

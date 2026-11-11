@@ -16,6 +16,7 @@ const COLLECTION_TYPES = '["ALL_MEDIA_AUTO_COLLECTION","PRODUCT_AUTO_COLLECTION"
 /** A guard against a server that keeps saying there is more. */
 const MAX_LIST_PAGES = 20;
 
+/** Paging for a collection. */
 export interface CollectionPageOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
   readonly cursor?: string;

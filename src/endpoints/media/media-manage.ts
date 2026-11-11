@@ -19,6 +19,7 @@ export interface UserTag {
   readonly y: number;
 }
 
+/** What to change in a post. Leave a field out to keep it. */
 export interface EditMediaOptions {
   /** The new caption. */
   readonly caption: string;

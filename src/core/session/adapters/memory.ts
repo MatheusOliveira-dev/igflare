@@ -8,10 +8,12 @@ export class MemorySessionStore implements SessionStore {
     this.#data = initial;
   }
 
+  /** The saved session, or `null` when nothing was saved. */
   load(): Promise<SessionData | null> {
     return Promise.resolve(this.#data);
   }
 
+  /** Keeps the session in memory. */
   save(data: SessionData): Promise<void> {
     this.#data = data;
     return Promise.resolve();

@@ -17,4 +17,5 @@ export const commentSchema = z
   })
   .loose();
 
+/** A comment, as parsed by `commentSchema`. */
 export type Comment = z.infer<typeof commentSchema>;

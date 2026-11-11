@@ -16,6 +16,7 @@ export const directMessageSchema = z
   })
   .loose();
 
+/** One message of a direct thread. */
 export type DirectMessage = z.infer<typeof directMessageSchema>;
 
 /**
@@ -34,6 +35,7 @@ export const threadSchema = z
   })
   .loose();
 
+/** A direct thread, as parsed by `threadSchema`. */
 export type Thread = z.infer<typeof threadSchema>;
 
 /** The result of sending a direct message. */
@@ -45,4 +47,5 @@ export const directSendResultSchema = z
   })
   .loose();
 
+/** Where a sent message landed: its thread, item id and time. */
 export type DirectSendResult = z.infer<typeof directSendResultSchema>;

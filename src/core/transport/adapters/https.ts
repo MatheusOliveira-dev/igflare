@@ -8,6 +8,7 @@ import type { Readable } from 'node:stream';
 import { IgError } from '../../../errors/ig-error';
 import type { HttpRequest, HttpResponse, HttpTransport } from '../http-transport';
 
+/** How the default transport connects. */
 export interface HttpsTransportOptions {
   /**
    * An HTTP or HTTPS proxy, as `http://host:port` or `http://user:password@host:port`.
@@ -129,6 +130,7 @@ export class HttpsTransport implements HttpTransport {
     this.#proxy = options.proxy !== undefined ? parseProxy(options.proxy) : undefined;
   }
 
+  /** Sends the request, through the proxy when one is set. */
   async request(req: HttpRequest): Promise<HttpResponse> {
     const url = new URL(req.url);
     const proxy = this.#proxy;

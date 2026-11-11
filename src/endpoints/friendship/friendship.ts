@@ -60,6 +60,7 @@ export async function getFriendshipStatus(
   return parseFriendship(json);
 }
 
+/** Paging for a follower, following or request list. */
 export interface FollowListOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
   readonly cursor?: string;

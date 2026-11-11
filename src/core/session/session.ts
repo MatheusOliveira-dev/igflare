@@ -33,6 +33,7 @@ export interface SessionData {
   readonly usdidRegistered?: boolean;
 }
 
+/** The locale, country and time zone a new session reports. */
 export const DEFAULT_LOCATION: LocationState = {
   locale: 'en_US',
   country: 'US',
@@ -41,10 +42,13 @@ export const DEFAULT_LOCATION: LocationState = {
 
 /** Loads and persists a session. One of the three swappable seams. */
 export interface SessionStore {
+  /** The saved session, or `null` when there is none. */
   load(): Promise<SessionData | null>;
+  /** Saves the session. Called after every request that changes it. */
   save(data: SessionData): Promise<void>;
 }
 
+/** Parts of a new session to set instead of the defaults. */
 export interface CreateSessionOptions {
   readonly device?: Partial<DeviceState>;
   readonly profile?: DeviceProfile;
@@ -52,6 +56,7 @@ export interface CreateSessionOptions {
   readonly location?: Partial<LocationState>;
 }
 
+/** A new session with a fresh device and nothing logged in. */
 export function createSession(options: CreateSessionOptions = {}): SessionData {
   return {
     device: createDeviceState(options.device ?? {}),

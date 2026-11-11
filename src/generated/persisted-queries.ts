@@ -8,8 +8,10 @@ export interface PersistedQuery {
   readonly docId: string;
 }
 
+/** The name of every persisted query in the manifest. */
 export type PersistedQueryName = 'accountInsightsAudience' | 'accountInsightsContent' | 'accountInsightsOverview' | 'createInboxTrayItem' | 'deleteInboxTrayItem' | 'inboxTray' | 'postInsights' | 'reelInsights' | 'topSerp' | 'usdidRegistration';
 
+/** Every persisted GraphQL query the SDK sends, by name. */
 export const persistedQueries: Record<PersistedQueryName, PersistedQuery> = {
   accountInsightsAudience: { operation: 'AccountInsightsAudienceQuery', docId: '11313478377027549324232575805' },
   accountInsightsContent: { operation: 'AccountInsightsContentQuery', docId: '246019450711285746558777381992' },

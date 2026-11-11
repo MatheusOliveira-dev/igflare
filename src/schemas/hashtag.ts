@@ -10,4 +10,5 @@ export const hashtagSchema = z
   })
   .loose();
 
+/** A hashtag, as parsed by `hashtagSchema`. */
 export type Hashtag = z.infer<typeof hashtagSchema>;

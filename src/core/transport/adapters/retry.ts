@@ -58,6 +58,7 @@ export class RetryTransport implements HttpTransport {
     this.#random = options.random ?? Math.random;
   }
 
+  /** Sends the request, retrying transient failures with backoff. */
   async request(req: HttpRequest): Promise<HttpResponse> {
     for (let attempt = 0; ; attempt += 1) {
       const canRetry = attempt < this.#maxRetries;

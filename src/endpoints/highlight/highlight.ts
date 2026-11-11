@@ -104,6 +104,7 @@ export async function getHighlight(client: PrivateClient, id: string): Promise<H
   return parseHighlight(reel, 'highlight');
 }
 
+/** Options for a new highlight. */
 export interface CreateHighlightOptions {
   /** The story whose picture is the cover. Defaults to the first of the stories. */
   readonly coverStoryId?: string;
@@ -138,6 +139,7 @@ export async function createHighlight(
   return parseHighlight(json['reel'], 'new highlight');
 }
 
+/** What to change in a highlight. Leave a field out to keep it. */
 export interface EditHighlightOptions {
   readonly title?: string;
   /** Stories to put in. */

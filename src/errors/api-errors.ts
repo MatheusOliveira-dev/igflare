@@ -1,5 +1,6 @@
 import { IgError, IgResponseError } from './ig-error';
 
+/** What a typed API error carries from the response. */
 export interface ApiErrorPayload {
   readonly message?: string;
   readonly errorType?: string;

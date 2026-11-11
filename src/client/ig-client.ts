@@ -237,81 +237,137 @@ export interface AccountApi {
 
 /** Reads about any user. */
 export interface UserApi {
+  /** A user's profile by id. */
   info(pk: string): Promise<User>;
+  /** A user's profile by username. */
   infoByUsername(username: string): Promise<User>;
 }
 
 /** The follow graph: relationship actions and the follower/following lists. */
 export interface FriendshipApi {
+  /** Follows a user, or sends a request to a private one. */
   follow(pk: string): Promise<FriendshipStatus>;
+  /** Unfollows a user, or withdraws a pending request. */
   unfollow(pk: string): Promise<FriendshipStatus>;
+  /** How the account relates to a user: following, followed by, blocking, and so on. */
   status(pk: string): Promise<FriendshipStatus>;
+  /** One page of a user's followers. */
   followers(pk: string, options?: FollowListOptions): Promise<Page<User>>;
+  /** One page of the accounts a user follows. */
   following(pk: string, options?: FollowListOptions): Promise<Page<User>>;
+  /** Walks a user's followers, one at a time across pages. */
   paginateFollowers(pk: string): AsyncGenerator<User>;
+  /** Walks the accounts a user follows, one at a time across pages. */
   paginateFollowing(pk: string): AsyncGenerator<User>;
+  /** One page of the follow requests waiting for approval. */
   pending(options?: FollowListOptions): Promise<Page<User>>;
+  /** Walks the follow requests waiting for approval. */
   paginatePending(): AsyncGenerator<User>;
+  /** Approves a follow request. */
   approve(pk: string): Promise<FriendshipStatus>;
+  /** Denies a follow request. */
   deny(pk: string): Promise<FriendshipStatus>;
+  /** Blocks a user. */
   block(pk: string): Promise<FriendshipStatus>;
+  /** Unblocks a user. */
   unblock(pk: string): Promise<FriendshipStatus>;
+  /** Mutes a user's posts, stories or both, without unfollowing. */
   mute(pk: string, options?: MuteOptions): Promise<void>;
+  /** Undoes a mute. */
   unmute(pk: string, options?: MuteOptions): Promise<void>;
+  /** Removes a user from the account's followers. */
   removeFollower(pk: string): Promise<FriendshipStatus>;
+  /** Adds a user to the account's close friends. */
   addCloseFriend(pk: string): Promise<FriendshipStatus>;
+  /** Removes a user from the account's close friends. */
   removeCloseFriend(pk: string): Promise<FriendshipStatus>;
 }
 
 /** Media feeds. */
 export interface FeedApi {
+  /** One page of a user's posts. */
   user(pk: string, options?: FeedOptions): Promise<Page<Media>>;
+  /** Walks a user's posts, one at a time across pages. */
   paginateUser(pk: string): AsyncGenerator<Media>;
+  /** One page of the home timeline. */
   timeline(options?: FeedOptions): Promise<Page<Media>>;
+  /** Walks the home timeline, one post at a time across pages. */
   paginateTimeline(): AsyncGenerator<Media>;
+  /** One page of the posts for a hashtag, ranked by relevance (see LIMITATIONS.md). */
   hashtag(tag: string, options?: FeedOptions): Promise<Page<Media>>;
+  /** Walks the posts for a hashtag, one at a time across pages. */
   paginateHashtag(tag: string): AsyncGenerator<Media>;
+  /** One page of the recent posts at a place. */
   location(locationId: string, options?: FeedOptions): Promise<Page<Media>>;
+  /** Walks the recent posts at a place, one at a time across pages. */
   paginateLocation(locationId: string): AsyncGenerator<Media>;
 }
 
 /** Discovery search across users, hashtags and places. */
 export interface SearchApi {
+  /** Users matching a query. */
   users(query: string): Promise<User[]>;
+  /** Hashtags matching a query. */
   hashtags(query: string): Promise<Hashtag[]>;
+  /** Places matching a query. */
   places(query: string): Promise<Location[]>;
 }
 
 /** Direct messages: the inbox, a thread's messages, and sending. */
 export interface DirectApi {
+  /** One page of the inbox threads. */
   inbox(options?: CursorOptions): Promise<Page<Thread>>;
+  /** Walks the inbox threads, one at a time across pages. */
   paginateInbox(): AsyncGenerator<Thread>;
+  /** One page of a thread's messages, newest first. */
   thread(threadId: string, options?: CursorOptions): Promise<Page<DirectMessage>>;
+  /** Walks a thread's messages, newest first. */
   paginateThread(threadId: string): AsyncGenerator<DirectMessage>;
+  /** Sends a text message to a thread or to users. */
   sendText(text: string, target: SendTarget): Promise<DirectSendResult>;
+  /** One page of the message requests. */
   pending(options?: CursorOptions): Promise<Page<Thread>>;
+  /** Walks the message requests. */
   paginatePending(): AsyncGenerator<Thread>;
+  /** One page of the hidden requests. */
   spam(options?: CursorOptions): Promise<Page<Thread>>;
+  /** Walks the hidden requests. */
   paginateSpam(): AsyncGenerator<Thread>;
+  /** Accepts a message request, moving it to the inbox. */
   approve(threadId: string): Promise<void>;
+  /** Declines a message request. */
   hide(threadId: string, options?: HideThreadOptions): Promise<void>;
+  /** Renames a group thread. */
   setTitle(threadId: string, title: string): Promise<void>;
+  /** Adds people to a group thread. */
   addUsers(threadId: string, userIds: readonly string[]): Promise<void>;
+  /** Mutes the notifications of a thread. */
   mute(threadId: string): Promise<void>;
+  /** Turns the notifications of a thread back on. */
   unmute(threadId: string): Promise<void>;
+  /** Deletes one of the account's own messages for everyone in the thread. */
   deleteMessage(threadId: string, itemId: string): Promise<void>;
+  /** Marks a thread as seen up to a message. */
   markSeen(threadId: string, itemId: string): Promise<void>;
+  /** Creates a group thread and returns its id. */
   createGroup(userIds: readonly string[], title?: string): Promise<string>;
+  /** The existing thread with exactly these people, if there is one. */
   findThread(userIds: readonly string[]): Promise<Thread | undefined>;
+  /** The people the account can message who match a query, ranked. */
   searchRecipients(query: string, mode?: RecipientSearchMode): Promise<User[]>;
+  /** Sends a message with a link, which the app shows with a preview. */
   sendLink(text: string, target: SendTarget): Promise<DirectSendResult>;
+  /** Reacts to a message with an emoji, or removes the reaction. */
   react(threadId: string, itemId: string, options?: ReactionOptions): Promise<void>;
+  /** Shares a post in a thread or with users. */
   shareMedia(
     mediaId: string,
     target: SendTarget,
     options?: ShareMediaOptions,
   ): Promise<DirectSendResult>;
+  /** Shares a user's profile in a thread or with users. */
   shareProfile(userId: string, target: SendTarget): Promise<DirectSendResult>;
+  /** Sends a JPEG photo in a thread or to users. */
   sendPhoto(jpeg: Uint8Array, target: SendTarget): Promise<DirectSendResult>;
   /** Sends an MP4 video (H.264 + AAC) into a thread or the thread with the given users. */
   sendVideo(mp4: Uint8Array, target: SendTarget): Promise<DirectSendResult>;
@@ -323,38 +379,65 @@ export interface DirectApi {
 
 /** Single media reads and actions. */
 export interface MediaApi {
+  /** A post with its caption, counts and author. */
   info(mediaId: string): Promise<Media>;
+  /** Likes a post. */
   like(mediaId: string): Promise<void>;
+  /** Removes a like from a post. */
   unlike(mediaId: string): Promise<void>;
+  /** Comments on a post, or replies to a comment. */
   comment(mediaId: string, text: string, options?: CommentOptions): Promise<Comment>;
+  /** Deletes a comment. */
   deleteComment(mediaId: string, commentId: string): Promise<void>;
+  /** Deletes one of the account's own posts. */
   delete(mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL' | 'STORY'): Promise<void>;
+  /** One page of the comments on a post. */
   comments(mediaId: string, options?: CommentListOptions): Promise<Page<Comment>>;
+  /** Walks the comments on a post, one at a time across pages. */
   paginateComments(mediaId: string): AsyncGenerator<Comment>;
+  /** The users who liked a post. */
   likers(mediaId: string): Promise<User[]>;
   /** Saves a post, to the general saved list or to one collection. */
   save(mediaId: string, options?: SaveOptions): Promise<void>;
+  /** Removes a post from the saved posts, or from one collection. */
   unsave(mediaId: string, options?: SaveOptions): Promise<void>;
+  /** One page of the saved posts. */
   saved(options?: CommentListOptions): Promise<Page<Media>>;
+  /** Walks the saved posts, one at a time across pages. */
   paginateSaved(): AsyncGenerator<Media>;
+  /** Likes a comment. */
   likeComment(commentId: string): Promise<void>;
+  /** Removes a like from a comment. */
   unlikeComment(commentId: string): Promise<void>;
+  /** Pins a comment to the top of one of the account's posts. */
   pinComment(mediaId: string, commentId: string): Promise<void>;
+  /** Unpins a comment. */
   unpinComment(mediaId: string, commentId: string): Promise<void>;
+  /** Deletes several comments on a post at once. */
   deleteComments(mediaId: string, commentIds: readonly string[]): Promise<void>;
+  /** One page of the replies to a comment. */
   replies(mediaId: string, commentId: string, options?: ReplyListOptions): Promise<Page<Comment>>;
+  /** Walks the replies to a comment, one at a time across pages. */
   paginateReplies(mediaId: string, commentId: string): AsyncGenerator<Comment>;
+  /** Changes the caption or the tagged people of one of the account's posts. */
   edit(mediaId: string, options: EditMediaOptions): Promise<Media>;
+  /** Hides one of the account's posts from the profile, keeping it in the archive. */
   archive(mediaId: string): Promise<void>;
+  /** Puts an archived post back on the profile. */
   unarchive(mediaId: string): Promise<void>;
+  /** Pins one of the account's posts to the top of the profile grid. */
   pin(mediaId: string): Promise<void>;
+  /** Unpins a post from the profile grid. */
   unpin(mediaId: string): Promise<void>;
 }
 
 /** Publishing media. */
 export interface UploadApi {
+  /** Publishes a JPEG as a post. */
   photo(jpeg: Uint8Array, options?: PhotoUploadOptions): Promise<Media>;
+  /** Publishes an MP4 with its cover as a post. */
   video(mp4: Uint8Array, coverJpeg: Uint8Array, options?: VideoUploadOptions): Promise<Media>;
+  /** Publishes a JPEG as a story. */
   story(jpeg: Uint8Array): Promise<Media>;
   /** Publishes 2 to 10 photos and videos as one carousel post. */
   album(items: readonly AlbumItem[], options?: AlbumUploadOptions): Promise<Media>;
@@ -366,10 +449,13 @@ export interface UploadApi {
 export interface CollectionApi {
   /** Every collection, the automatic ones included. */
   list(): Promise<Collection[]>;
+  /** One page of the posts saved in a collection. */
   medias(collectionId: string, options?: CursorOptions): Promise<Page<Media>>;
+  /** Walks the posts saved in a collection. */
   paginateMedias(collectionId: string): AsyncGenerator<Media>;
   /** The posts the account has liked. */
   liked(options?: CursorOptions): Promise<Page<Media>>;
+  /** Walks the liked posts. */
   paginateLiked(): AsyncGenerator<Media>;
   /** Creates a collection, optionally holding some posts (by pk) from the start. */
   create(name: string, mediaIds?: readonly string[]): Promise<Collection>;
@@ -403,6 +489,7 @@ export interface HashtagApi {
 
 /** Places: a location's own page, and the places near a coordinate. */
 export interface LocationApi {
+  /** A place with its name, address and coordinates. */
   info(locationId: string): Promise<LocationInfo>;
   /** The places near a latitude and longitude. Each one's `pk` works with `feed.location`. */
   nearby(latitude: number, longitude: number): Promise<Location[]>;
@@ -412,12 +499,15 @@ export interface LocationApi {
 export interface ReelsApi {
   /** A user's reels. */
   user(userId: string, options?: UserReelsOptions): Promise<Page<Media>>;
+  /** Walks a user's reels, one at a time across pages. */
   paginateUser(userId: string): AsyncGenerator<Media>;
   /** The Reels tab feed. */
   feed(options?: ReelsPageOptions): Promise<Page<Media>>;
+  /** Walks the reels tab feed. */
   paginateFeed(): AsyncGenerator<Media>;
   /** The reels Instagram suggests. Ads are left out. */
   explore(options?: ReelsPageOptions): Promise<Page<Media>>;
+  /** Walks the reels suggested in Explore. */
   paginateExplore(): AsyncGenerator<Media>;
   /** The reels friends interacted with. */
   friends(options?: ReelsPageOptions): Promise<Page<Media>>;
@@ -445,6 +535,7 @@ export interface InsightsApi {
   audience(range?: InsightsRange): Promise<AudienceInsights>;
   /** One page of the account's posts, reels or stories ranked by a figure. */
   content(options?: ContentInsightsOptions): Promise<Page<ContentInsight>>;
+  /** Walks the content list, one item at a time across pages. */
   paginateContent(options?: Omit<ContentInsightsOptions, 'cursor'>): AsyncGenerator<ContentInsight>;
 }
 
@@ -452,12 +543,15 @@ export interface InsightsApi {
 export interface ExploreApi {
   /** One page of the Explore feed. */
   feed(options?: ExploreOptions): Promise<Page<Media>>;
+  /** Walks the Explore feed, one post at a time across pages. */
   paginateFeed(): AsyncGenerator<Media>;
 }
 
 /** Stories. */
 export interface StoryApi {
+  /** The stories tray: the accounts with active stories, in the order the app shows them. */
   tray(): Promise<Reel[]>;
+  /** A user's active stories. */
   user(pk: string): Promise<Media[]>;
   /** Marks stories as seen by their full ids (`pk_userid`). */
   markSeen(storyIds: readonly string[]): Promise<void>;

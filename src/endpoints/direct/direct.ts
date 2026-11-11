@@ -17,6 +17,7 @@ import { ClientSchemaError } from '../../errors/api-errors';
 import { isRecord } from '../../core/guards';
 import { checkedId } from '../../core/ids';
 
+/** Paging for a list. */
 export interface CursorOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
   readonly cursor?: string;

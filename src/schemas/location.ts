@@ -14,6 +14,7 @@ export const locationSchema = z
   })
   .loose();
 
+/** A place, as parsed by `locationSchema`. */
 export type Location = z.infer<typeof locationSchema>;
 
 /** What a single location's own page knows: contact details, category and post count. */
@@ -35,4 +36,5 @@ export const locationInfoSchema = z
   })
   .loose();
 
+/** A place with its details, as parsed by `locationInfoSchema`. */
 export type LocationInfo = z.infer<typeof locationInfoSchema>;

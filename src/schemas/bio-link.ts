@@ -10,4 +10,5 @@ export const bioLinkSchema = z
   })
   .loose();
 
+/** One link of the profile. */
 export type BioLink = z.infer<typeof bioLinkSchema>;

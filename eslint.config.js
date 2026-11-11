@@ -10,6 +10,7 @@ export default tseslint.config(
     ignores: [
       'dist',
       'coverage',
+      'docs-site',
       'reports',
       '.stryker-tmp',
       'src/generated',

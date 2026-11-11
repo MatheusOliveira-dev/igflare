@@ -21,6 +21,7 @@ export interface UsdidIdentity {
   readonly privateKeyPem: string;
 }
 
+/** Inputs for creating the device identity (USDID) the login flow registers. */
 export interface GenerateUsdidOptions {
   readonly usdid?: string;
   readonly kid?: string;
@@ -61,6 +62,7 @@ export function signUsdid(identity: UsdidIdentity, message: string): Buffer {
     .sign({ key: identity.privateKeyPem, dsaEncoding: 'der' });
 }
 
+/** Inputs for the signed USDID header sent on requests. */
 export interface UsdidHeaderOptions {
   readonly now?: number;
   readonly ttl?: number;
@@ -83,6 +85,7 @@ export function buildUsdidHeader(
   return `${signedPart}.${base64url(signUsdid(identity, signedPart))}`;
 }
 
+/** Inputs for the token that registers a USDID identity. */
 export interface RegistrationTokenOptions {
   readonly appId: string;
   readonly now?: number;

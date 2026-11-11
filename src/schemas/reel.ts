@@ -18,4 +18,5 @@ export const reelSchema = z
   })
   .loose();
 
+/** A user's active stories, as parsed by `reelSchema`. */
 export type Reel = z.infer<typeof reelSchema>;

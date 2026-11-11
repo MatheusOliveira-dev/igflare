@@ -91,6 +91,7 @@ export async function sendLink(
   return parseSendResult(json);
 }
 
+/** Options for a reaction. */
 export interface ReactionOptions {
   /** The emoji to react with. Defaults to a heart. */
   readonly emoji?: string;
@@ -125,6 +126,7 @@ export async function reactToMessage(
   });
 }
 
+/** Options for sharing a post. */
 export interface ShareMediaOptions {
   /** What the shared media is. Defaults to a photo. */
   readonly mediaType?: 'photo' | 'video';

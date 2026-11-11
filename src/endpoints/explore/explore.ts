@@ -6,6 +6,7 @@ import type { Page } from '../../core/pagination';
 import { mediaSchema, type Media } from '../../schemas/media';
 import { ClientSchemaError } from '../../errors/api-errors';
 
+/** Paging for the Explore feed. */
 export interface ExploreOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
   readonly cursor?: string;

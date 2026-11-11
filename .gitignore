@@ -1,6 +1,7 @@
 node_modules/
 dist/
 coverage/
+docs-site/
 .stryker-tmp/
 reports/
 temp/

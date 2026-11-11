@@ -6,6 +6,7 @@ import { IgError } from '../../errors/ig-error';
 import type { PrivateResponseJson } from '../../core/http/response';
 import { endpoints } from '../../generated/endpoints';
 
+/** The credentials for the older login endpoint. */
 export interface LoginCredentials {
   readonly username: string;
   readonly password: string;

@@ -23,6 +23,7 @@ export const activityItemSchema = z
   })
   .loose();
 
+/** One entry of the activity feed. */
 export type ActivityItem = z.infer<typeof activityItemSchema>;
 
 /** The activity feed as the app shows it: what is new, what was already seen. */

@@ -27,8 +27,10 @@
     "sourceMap": true,
     "outDir": "dist",
     "rootDir": ".",
-    "types": ["node"]
+    "types": ["node"],
+    // The examples import the package by name, as a user would.
+    "paths": { "igflare": ["./src/index.ts"] }
   },
-  "include": ["src", "scripts", "tests", "*.config.ts"],
+  "include": ["src", "scripts", "tests", "examples", "*.config.ts"],
   "exclude": ["node_modules", "dist", "coverage"]
 }

@@ -19,7 +19,7 @@ export interface AccountApi {
     setPicture(jpeg: Uint8Array): Promise<User>;
 }
 
-// @public (undocumented)
+// @public
 export type AccountInsights = z.infer<typeof accountInsightsSchema>;
 
 // @public
@@ -116,7 +116,7 @@ export interface Activity {
     readonly oldItems: ActivityItem[];
 }
 
-// @public (undocumented)
+// @public
 export type ActivityItem = z.infer<typeof activityItemSchema>;
 
 // @public
@@ -150,16 +150,16 @@ export type AlbumItem = {
     readonly height?: number;
 };
 
-// @public (undocumented)
+// @public
 export interface AlbumUploadOptions {
     // (undocumented)
     readonly caption?: string;
 }
 
-// @public (undocumented)
+// @public
 export const API_DOMAIN = "i.instagram.com";
 
-// @public (undocumented)
+// @public
 export interface ApiErrorPayload {
     // (undocumented)
     readonly errorType?: string;
@@ -185,7 +185,7 @@ export function archiveMedia(client: PrivateClient, mediaId: string): Promise<vo
 // @public
 export const ATTESTATION_KEYSTORE_ERROR = -1013;
 
-// @public (undocumented)
+// @public
 export type AudienceInsights = z.infer<typeof audienceInsightsSchema>;
 
 // @public
@@ -271,7 +271,7 @@ export class BadPasswordError extends IgApiError {
 // @public
 export function base64url(raw: Buffer): string;
 
-// @public (undocumented)
+// @public
 export interface BaseHeadersInput {
     // (undocumented)
     readonly authorization?: string;
@@ -295,7 +295,7 @@ export interface BaseHeadersInput {
     readonly wwwClaim?: string;
 }
 
-// @public (undocumented)
+// @public
 export type BioLink = z.infer<typeof bioLinkSchema>;
 
 // @public
@@ -309,7 +309,7 @@ export const bioLinkSchema: z.ZodObject<{
 // @public
 export function blockUser(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
 
-// @public (undocumented)
+// @public
 export interface BloksActionOptions {
     readonly bloksVersioningId?: string;
     readonly domain?: string;
@@ -331,7 +331,7 @@ export function buildBaseHeaders(input: BaseHeadersInput): Record<string, string
 // @public
 export function buildPrivateRequest(input: PrivateRequestInput): HttpRequest;
 
-// @public (undocumented)
+// @public
 export function buildSignedBody(payload: string): string;
 
 // @public
@@ -340,7 +340,7 @@ export function buildUsdidHeader(identity: UsdidIdentity, options?: UsdidHeaderO
 // @public
 export function buildUsdidRegistrationToken(identity: UsdidIdentity, options: RegistrationTokenOptions): string;
 
-// @public (undocumented)
+// @public
 export function buildUserAgent(profile: DeviceProfile, locale?: string): string;
 
 // @public
@@ -349,7 +349,7 @@ export const CAA_API_DOMAIN = "b.i.instagram.com";
 // @public
 export function caaLogin(client: PrivateClient, credentials: CaaLoginCredentials, options?: CaaLoginOptions): Promise<PrivateResponseJson>;
 
-// @public (undocumented)
+// @public
 export interface CaaLoginCredentials {
     // (undocumented)
     readonly password: string;
@@ -357,7 +357,7 @@ export interface CaaLoginCredentials {
     readonly username: string;
 }
 
-// @public (undocumented)
+// @public
 export interface CaaLoginOptions {
     readonly twoFactor?: TwoFactorSource;
 }
@@ -369,14 +369,14 @@ export class CaaTwoFactorRequiredError extends TwoFactorRequiredError {
     readonly aac: string;
 }
 
-// @public (undocumented)
+// @public
 export interface Challenge {
     // (undocumented)
     readonly apiPath: string;
     readonly data: PrivateResponseJson;
 }
 
-// @public (undocumented)
+// @public
 export const CHALLENGE_EMAIL = 1;
 
 // @public
@@ -401,7 +401,7 @@ export class ClientSchemaError extends IgError {
     readonly raw: unknown;
 }
 
-// @public (undocumented)
+// @public
 export type Collection = z.infer<typeof collectionSchema>;
 
 // @public
@@ -410,15 +410,12 @@ export interface CollectionApi {
     delete(collectionId: string): Promise<void>;
     liked(options?: CursorOptions): Promise<Page<Media>>;
     list(): Promise<Collection[]>;
-    // (undocumented)
     medias(collectionId: string, options?: CursorOptions): Promise<Page<Media>>;
-    // (undocumented)
     paginateLiked(): AsyncGenerator<Media>;
-    // (undocumented)
     paginateMedias(collectionId: string): AsyncGenerator<Media>;
 }
 
-// @public (undocumented)
+// @public
 export interface CollectionPageOptions {
     readonly cursor?: string;
 }
@@ -431,10 +428,10 @@ export const collectionSchema: z.ZodObject<{
     collection_media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
 }, z.core.$loose>;
 
-// @public (undocumented)
+// @public
 export type Comment = z.infer<typeof commentSchema>;
 
-// @public (undocumented)
+// @public
 export interface CommentListOptions {
     readonly cursor?: string;
 }
@@ -442,7 +439,7 @@ export interface CommentListOptions {
 // @public
 export function commentMedia(client: PrivateClient, mediaId: string, text: string, options?: CommentOptions): Promise<Comment>;
 
-// @public (undocumented)
+// @public
 export interface CommentOptions {
     readonly repliedToCommentId?: string;
 }
@@ -469,7 +466,7 @@ export const commentSchema: z.ZodObject<{
     }, z.core.$loose>>;
 }, z.core.$loose>;
 
-// @public (undocumented)
+// @public
 export type ContentInsight = z.infer<typeof contentInsightSchema>;
 
 // @public
@@ -531,7 +528,7 @@ export function createGroupThread(client: PrivateClient, userIds: readonly strin
 // @public
 export function createHighlight(client: PrivateClient, title: string, stories: readonly string[], options?: CreateHighlightOptions): Promise<Highlight>;
 
-// @public (undocumented)
+// @public
 export interface CreateHighlightOptions {
     readonly coverStoryId?: string;
 }
@@ -539,15 +536,15 @@ export interface CreateHighlightOptions {
 // @public
 export function createNote(client: PrivateClient, text: string, options?: CreateNoteOptions): Promise<Note>;
 
-// @public (undocumented)
+// @public
 export interface CreateNoteOptions {
     readonly audience?: NoteAudience;
 }
 
-// @public (undocumented)
+// @public
 export function createSession(options?: CreateSessionOptions): SessionData;
 
-// @public (undocumented)
+// @public
 export interface CreateSessionOptions {
     // (undocumented)
     readonly auth?: AuthState;
@@ -559,18 +556,18 @@ export interface CreateSessionOptions {
     readonly profile?: DeviceProfile;
 }
 
-// @public (undocumented)
+// @public
 export function createSigner(): Signer;
 
-// @public (undocumented)
+// @public
 export interface CursorOptions {
     readonly cursor?: string;
 }
 
-// @public (undocumented)
+// @public
 export const DEFAULT_DEVICE_PROFILE: DeviceProfile;
 
-// @public (undocumented)
+// @public
 export const DEFAULT_LOCATION: LocationState;
 
 // @public
@@ -649,62 +646,37 @@ export interface DeviceState {
 
 // @public
 export interface DirectApi {
-    // (undocumented)
     addUsers(threadId: string, userIds: readonly string[]): Promise<void>;
-    // (undocumented)
     approve(threadId: string): Promise<void>;
-    // (undocumented)
     createGroup(userIds: readonly string[], title?: string): Promise<string>;
-    // (undocumented)
     deleteMessage(threadId: string, itemId: string): Promise<void>;
-    // (undocumented)
     findThread(userIds: readonly string[]): Promise<Thread | undefined>;
-    // (undocumented)
     hide(threadId: string, options?: HideThreadOptions): Promise<void>;
-    // (undocumented)
     inbox(options?: CursorOptions): Promise<Page<Thread>>;
-    // (undocumented)
     markSeen(threadId: string, itemId: string): Promise<void>;
-    // (undocumented)
     mute(threadId: string): Promise<void>;
-    // (undocumented)
     paginateInbox(): AsyncGenerator<Thread>;
-    // (undocumented)
     paginatePending(): AsyncGenerator<Thread>;
-    // (undocumented)
     paginateSpam(): AsyncGenerator<Thread>;
-    // (undocumented)
     paginateThread(threadId: string): AsyncGenerator<DirectMessage>;
-    // (undocumented)
     pending(options?: CursorOptions): Promise<Page<Thread>>;
-    // (undocumented)
     react(threadId: string, itemId: string, options?: ReactionOptions): Promise<void>;
-    // (undocumented)
     searchRecipients(query: string, mode?: RecipientSearchMode): Promise<User[]>;
-    // (undocumented)
     sendLink(text: string, target: SendTarget): Promise<DirectSendResult>;
-    // (undocumented)
     sendPhoto(jpeg: Uint8Array, target: SendTarget): Promise<DirectSendResult>;
-    // (undocumented)
     sendText(text: string, target: SendTarget): Promise<DirectSendResult>;
     sendVideo(mp4: Uint8Array, target: SendTarget): Promise<DirectSendResult>;
     sendVoice(m4a: Uint8Array, target: SendTarget, options?: VoiceOptions): Promise<DirectSendResult>;
-    // (undocumented)
     setTitle(threadId: string, title: string): Promise<void>;
-    // (undocumented)
     shareMedia(mediaId: string, target: SendTarget, options?: ShareMediaOptions): Promise<DirectSendResult>;
-    // (undocumented)
     shareProfile(userId: string, target: SendTarget): Promise<DirectSendResult>;
     shareStory(storyId: string, target: SendTarget): Promise<DirectSendResult>;
-    // (undocumented)
     spam(options?: CursorOptions): Promise<Page<Thread>>;
-    // (undocumented)
     thread(threadId: string, options?: CursorOptions): Promise<Page<DirectMessage>>;
-    // (undocumented)
     unmute(threadId: string): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export type DirectMessage = z.infer<typeof directMessageSchema>;
 
 // @public
@@ -716,7 +688,7 @@ export const directMessageSchema: z.ZodObject<{
     text: z.ZodOptional<z.ZodString>;
 }, z.core.$loose>;
 
-// @public (undocumented)
+// @public
 export type DirectSendResult = z.infer<typeof directSendResultSchema>;
 
 // @public
@@ -729,7 +701,7 @@ export const directSendResultSchema: z.ZodObject<{
 // @public
 export function editHighlight(client: PrivateClient, id: string, options: EditHighlightOptions): Promise<Highlight>;
 
-// @public (undocumented)
+// @public
 export interface EditHighlightOptions {
     readonly addStoryIds?: readonly string[];
     readonly coverJpeg?: Uint8Array;
@@ -742,7 +714,7 @@ export interface EditHighlightOptions {
 // @public
 export function editMedia(client: PrivateClient, mediaId: string, options: EditMediaOptions): Promise<Media>;
 
-// @public (undocumented)
+// @public
 export interface EditMediaOptions {
     readonly caption: string;
     readonly tag?: readonly UserTag[];
@@ -752,7 +724,7 @@ export interface EditMediaOptions {
 // @public
 export function encryptPassword(password: string, key: PasswordPublicKey, options?: EncryptPasswordOptions): string;
 
-// @public (undocumented)
+// @public
 export interface EncryptPasswordOptions {
     // (undocumented)
     readonly iv?: Buffer;
@@ -762,7 +734,7 @@ export interface EncryptPasswordOptions {
     readonly timestamp?: number;
 }
 
-// @public (undocumented)
+// @public
 export interface EndpointDefinition {
     // (undocumented)
     readonly method: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -770,31 +742,29 @@ export interface EndpointDefinition {
     readonly path: string;
 }
 
-// @public (undocumented)
+// @public
 export type EndpointName = 'accountsChangeProfilePicture' | 'accountsCurrentUser' | 'accountsEditProfile' | 'accountsLogin' | 'accountsRemoveBioLinks' | 'accountsRemoveProfilePicture' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'accountsUpdateBioLinks' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'clipsConnected' | 'clipsDiscover' | 'clipsDiscoverSocial' | 'clipsUser' | 'collectionsCreate' | 'collectionsDelete' | 'collectionsList' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastRavenAttachment' | 'directBroadcastReaction' | 'directBroadcastStoryShare' | 'directBroadcastVoiceAttachment' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'discoverTopicalExplore' | 'fbsearchPlaces' | 'feedCollection' | 'feedLiked' | 'feedReelsMedia' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsRemoveFollower' | 'friendshipsSetBesties' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'highlightsCreateReel' | 'highlightsDeleteReel' | 'highlightsEditReel' | 'highlightsTray' | 'launcherSync' | 'locationSearch' | 'locationsInfo' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureSidecar' | 'mediaConfigureToClips' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaSeenV2' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'newsInbox' | 'tagsInfo' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
 
-// @public (undocumented)
+// @public
 export const endpoints: Record<EndpointName, EndpointDefinition>;
 
 // @public
 export interface ExploreApi {
     feed(options?: ExploreOptions): Promise<Page<Media>>;
-    // (undocumented)
     paginateFeed(): AsyncGenerator<Media>;
 }
 
-// @public (undocumented)
+// @public
 export interface ExploreOptions {
     readonly cursor?: string;
 }
 
-// @public (undocumented)
+// @public
 export type FakeHandler = (req: HttpRequest) => HttpResponse | Promise<HttpResponse>;
 
 // @public
 export class FakeTransport implements HttpTransport {
     constructor(handler: FakeHandler);
-    // (undocumented)
     request(req: HttpRequest): Promise<HttpResponse>;
     // (undocumented)
     readonly requests: HttpRequest[];
@@ -802,21 +772,13 @@ export class FakeTransport implements HttpTransport {
 
 // @public
 export interface FeedApi {
-    // (undocumented)
     hashtag(tag: string, options?: FeedOptions): Promise<Page<Media>>;
-    // (undocumented)
     location(locationId: string, options?: FeedOptions): Promise<Page<Media>>;
-    // (undocumented)
     paginateHashtag(tag: string): AsyncGenerator<Media>;
-    // (undocumented)
     paginateLocation(locationId: string): AsyncGenerator<Media>;
-    // (undocumented)
     paginateTimeline(): AsyncGenerator<Media>;
-    // (undocumented)
     paginateUser(pk: string): AsyncGenerator<Media>;
-    // (undocumented)
     timeline(options?: FeedOptions): Promise<Page<Media>>;
-    // (undocumented)
     user(pk: string, options?: FeedOptions): Promise<Page<Media>>;
 }
 
@@ -824,7 +786,7 @@ export interface FeedApi {
 export class FeedbackRequiredError extends IgApiError {
 }
 
-// @public (undocumented)
+// @public
 export interface FeedOptions {
     readonly cursor?: string;
 }
@@ -834,23 +796,20 @@ export function fetchPasswordPublicKey(client: PrivateClient): Promise<PasswordP
 
 // @public
 export class FetchTransport implements HttpTransport {
-    // (undocumented)
     request(req: HttpRequest): Promise<HttpResponse>;
 }
 
 // @public
 export class FileSessionStore implements SessionStore {
     constructor(path: string);
-    // (undocumented)
     load(): Promise<SessionData | null>;
-    // (undocumented)
     save(data: SessionData): Promise<void>;
 }
 
 // @public
 export function findThreadByParticipants(client: PrivateClient, userIds: readonly string[]): Promise<Thread | undefined>;
 
-// @public (undocumented)
+// @public
 export interface FollowListOptions {
     readonly cursor?: string;
 }
@@ -860,45 +819,27 @@ export function followUser(client: PrivateClient, pk: string): Promise<Friendshi
 
 // @public
 export interface FriendshipApi {
-    // (undocumented)
     addCloseFriend(pk: string): Promise<FriendshipStatus>;
-    // (undocumented)
     approve(pk: string): Promise<FriendshipStatus>;
-    // (undocumented)
     block(pk: string): Promise<FriendshipStatus>;
-    // (undocumented)
     deny(pk: string): Promise<FriendshipStatus>;
-    // (undocumented)
     follow(pk: string): Promise<FriendshipStatus>;
-    // (undocumented)
     followers(pk: string, options?: FollowListOptions): Promise<Page<User>>;
-    // (undocumented)
     following(pk: string, options?: FollowListOptions): Promise<Page<User>>;
-    // (undocumented)
     mute(pk: string, options?: MuteOptions): Promise<void>;
-    // (undocumented)
     paginateFollowers(pk: string): AsyncGenerator<User>;
-    // (undocumented)
     paginateFollowing(pk: string): AsyncGenerator<User>;
-    // (undocumented)
     paginatePending(): AsyncGenerator<User>;
-    // (undocumented)
     pending(options?: FollowListOptions): Promise<Page<User>>;
-    // (undocumented)
     removeCloseFriend(pk: string): Promise<FriendshipStatus>;
-    // (undocumented)
     removeFollower(pk: string): Promise<FriendshipStatus>;
-    // (undocumented)
     status(pk: string): Promise<FriendshipStatus>;
-    // (undocumented)
     unblock(pk: string): Promise<FriendshipStatus>;
-    // (undocumented)
     unfollow(pk: string): Promise<FriendshipStatus>;
-    // (undocumented)
     unmute(pk: string, options?: MuteOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export type FriendshipStatus = z.infer<typeof friendshipStatusSchema>;
 
 // @public
@@ -915,7 +856,7 @@ export const friendshipStatusSchema: z.ZodObject<{
     is_muting_reel: z.ZodOptional<z.ZodBoolean>;
 }, z.core.$loose>;
 
-// @public (undocumented)
+// @public
 export function generateAndroidDeviceId(seed?: string): string;
 
 // @public
@@ -924,7 +865,7 @@ export function generateTotp(secret: string, options?: TotpOptions): string;
 // @public
 export function generateUsdidIdentity(options?: GenerateUsdidOptions): UsdidIdentity;
 
-// @public (undocumented)
+// @public
 export interface GenerateUsdidOptions {
     // (undocumented)
     readonly kid?: string;
@@ -934,7 +875,7 @@ export interface GenerateUsdidOptions {
     readonly usdid?: string;
 }
 
-// @public (undocumented)
+// @public
 export function generateUuid(): string;
 
 // @public
@@ -1057,7 +998,7 @@ export function getUserReels(client: PrivateClient, userId: string, options?: Us
 // @public
 export function getUserStories(client: PrivateClient, pk: string): Promise<Media[]>;
 
-// @public (undocumented)
+// @public
 export type Hashtag = z.infer<typeof hashtagSchema>;
 
 // @public
@@ -1076,12 +1017,12 @@ export const hashtagSchema: z.ZodObject<{
 // @public
 export function hideThread(client: PrivateClient, threadId: string, options?: HideThreadOptions): Promise<void>;
 
-// @public (undocumented)
+// @public
 export interface HideThreadOptions {
     readonly moveToSpam?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export type Highlight = z.infer<typeof highlightSchema>;
 
 // @public
@@ -1168,10 +1109,10 @@ export const highlightSchema: z.ZodObject<{
     }, z.core.$loose>>>;
 }, z.core.$loose>;
 
-// @public (undocumented)
+// @public
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
-// @public (undocumented)
+// @public
 export interface HttpRequest {
     // (undocumented)
     readonly body?: string | Uint8Array;
@@ -1183,7 +1124,7 @@ export interface HttpRequest {
     readonly url: string;
 }
 
-// @public (undocumented)
+// @public
 export interface HttpResponse {
     // (undocumented)
     readonly body: string;
@@ -1196,18 +1137,16 @@ export interface HttpResponse {
 // @public
 export class HttpsTransport implements HttpTransport {
     constructor(options?: HttpsTransportOptions);
-    // (undocumented)
     request(req: HttpRequest): Promise<HttpResponse>;
 }
 
-// @public (undocumented)
+// @public
 export interface HttpsTransportOptions {
     readonly proxy?: string;
 }
 
 // @public
 export interface HttpTransport {
-    // (undocumented)
     request(req: HttpRequest): Promise<HttpResponse>;
 }
 
@@ -1286,7 +1225,7 @@ export class IgResponseError extends IgError {
     readonly statusCode: number;
 }
 
-// @public (undocumented)
+// @public
 export interface ImageSize {
     // (undocumented)
     readonly height: number;
@@ -1294,7 +1233,7 @@ export interface ImageSize {
     readonly width: number;
 }
 
-// @public (undocumented)
+// @public
 export type InsightMetric = z.infer<typeof insightMetricSchema>;
 
 // @public
@@ -1311,7 +1250,6 @@ export interface InsightsApi {
     account(range?: InsightsRange): Promise<AccountInsights>;
     audience(range?: InsightsRange): Promise<AudienceInsights>;
     content(options?: ContentInsightsOptions): Promise<Page<ContentInsight>>;
-    // (undocumented)
     paginateContent(options?: Omit<ContentInsightsOptions, 'cursor'>): AsyncGenerator<ContentInsight>;
     post(mediaId: string): Promise<MediaInsights>;
     reel(mediaId: string): Promise<MediaInsights>;
@@ -1350,17 +1288,16 @@ export function listCollections(client: PrivateClient): Promise<Collection[]>;
 // @public
 export function listHighlights(client: PrivateClient, userId: string): Promise<Highlight[]>;
 
-// @public (undocumented)
+// @public
 export type Location = z.infer<typeof locationSchema>;
 
 // @public
 export interface LocationApi {
-    // (undocumented)
     info(locationId: string): Promise<LocationInfo>;
     nearby(latitude: number, longitude: number): Promise<Location[]>;
 }
 
-// @public (undocumented)
+// @public
 export type LocationInfo = z.infer<typeof locationInfoSchema>;
 
 // @public
@@ -1405,7 +1342,7 @@ export interface LocationState {
 // @public
 export function login(client: PrivateClient, credentials: LoginCredentials): Promise<PrivateResponseJson>;
 
-// @public (undocumented)
+// @public
 export interface LoginCredentials {
     readonly countryCode?: string;
     // (undocumented)
@@ -1424,63 +1361,39 @@ export function markMessageSeen(client: PrivateClient, threadId: string, itemId:
 // @public
 export function markStoriesSeen(client: PrivateClient, storyIds: readonly string[]): Promise<void>;
 
-// @public (undocumented)
+// @public
 export type Media = z.infer<typeof mediaSchema>;
 
 // @public
 export interface MediaApi {
-    // (undocumented)
     archive(mediaId: string): Promise<void>;
-    // (undocumented)
     comment(mediaId: string, text: string, options?: CommentOptions): Promise<Comment>;
-    // (undocumented)
     comments(mediaId: string, options?: CommentListOptions): Promise<Page<Comment>>;
-    // (undocumented)
     delete(mediaId: string, mediaType?: 'PHOTO' | 'VIDEO' | 'CAROUSEL' | 'STORY'): Promise<void>;
-    // (undocumented)
     deleteComment(mediaId: string, commentId: string): Promise<void>;
-    // (undocumented)
     deleteComments(mediaId: string, commentIds: readonly string[]): Promise<void>;
-    // (undocumented)
     edit(mediaId: string, options: EditMediaOptions): Promise<Media>;
-    // (undocumented)
     info(mediaId: string): Promise<Media>;
-    // (undocumented)
     like(mediaId: string): Promise<void>;
-    // (undocumented)
     likeComment(commentId: string): Promise<void>;
-    // (undocumented)
     likers(mediaId: string): Promise<User[]>;
-    // (undocumented)
     paginateComments(mediaId: string): AsyncGenerator<Comment>;
-    // (undocumented)
     paginateReplies(mediaId: string, commentId: string): AsyncGenerator<Comment>;
-    // (undocumented)
     paginateSaved(): AsyncGenerator<Media>;
-    // (undocumented)
     pin(mediaId: string): Promise<void>;
-    // (undocumented)
     pinComment(mediaId: string, commentId: string): Promise<void>;
-    // (undocumented)
     replies(mediaId: string, commentId: string, options?: ReplyListOptions): Promise<Page<Comment>>;
     save(mediaId: string, options?: SaveOptions): Promise<void>;
-    // (undocumented)
     saved(options?: CommentListOptions): Promise<Page<Media>>;
-    // (undocumented)
     unarchive(mediaId: string): Promise<void>;
-    // (undocumented)
     unlike(mediaId: string): Promise<void>;
-    // (undocumented)
     unlikeComment(commentId: string): Promise<void>;
-    // (undocumented)
     unpin(mediaId: string): Promise<void>;
-    // (undocumented)
     unpinComment(mediaId: string, commentId: string): Promise<void>;
-    // (undocumented)
     unsave(mediaId: string, options?: SaveOptions): Promise<void>;
 }
 
-// @public (undocumented)
+// @public
 export type MediaInsights = z.infer<typeof mediaInsightsSchema>;
 
 // @public
@@ -1594,9 +1507,7 @@ export const mediaSchema: z.ZodObject<{
 // @public
 export class MemorySessionStore implements SessionStore {
     constructor(initial?: SessionData | null);
-    // (undocumented)
     load(): Promise<SessionData | null>;
-    // (undocumented)
     save(data: SessionData): Promise<void>;
 }
 
@@ -1614,7 +1525,7 @@ export function muteThread(client: PrivateClient, threadId: string): Promise<voi
 // @public
 export function muteUser(client: PrivateClient, pk: string, options?: MuteOptions): Promise<void>;
 
-// @public (undocumented)
+// @public
 export type Note = z.infer<typeof noteSchema>;
 
 // @public
@@ -1738,14 +1649,14 @@ export function parsePrivateResponse(response: HttpResponse): PrivateResponseJso
 // @public
 export function parseSessionData(value: unknown): SessionData;
 
-// @public (undocumented)
+// @public
 export interface PasswordPublicKey {
     // (undocumented)
     readonly keyId: number;
     readonly publicKey: string;
 }
 
-// @public (undocumented)
+// @public
 export interface PhotoUploadOptions {
     // (undocumented)
     readonly caption?: string;
@@ -1764,13 +1675,11 @@ export class PleaseWaitError extends IgApiError {
 // @public
 export class PrivateClient {
     constructor(options?: PrivateClientOptions);
-    // (undocumented)
     static fromStore(store: SessionStore, options?: {
         readonly transport?: HttpTransport;
     }): Promise<PrivateClient>;
     patchAuth(auth: Partial<AuthState>): void;
     patchSession(patch: Partial<SessionData>): void;
-    // (undocumented)
     persist(): Promise<void>;
     request(input: PrivateRequestOptions): Promise<PrivateResponseJson>;
     send(input: PrivateRequestOptions): Promise<HttpResponse>;
@@ -1778,7 +1687,7 @@ export class PrivateClient {
     get session(): SessionData;
 }
 
-// @public (undocumented)
+// @public
 export interface PrivateClientOptions {
     readonly onSessionExpired?: (error: LoginRequiredError) => Promise<void>;
     // (undocumented)
@@ -1789,7 +1698,7 @@ export interface PrivateClientOptions {
     readonly transport?: HttpTransport;
 }
 
-// @public (undocumented)
+// @public
 export interface PrivateRequestInput {
     // (undocumented)
     readonly domain?: string;
@@ -1817,10 +1726,10 @@ export interface PrivateRequestInput {
     readonly withSignature?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export type PrivateRequestOptions = Omit<PrivateRequestInput, 'session'>;
 
-// @public (undocumented)
+// @public
 export interface PrivateResponseJson {
     // (undocumented)
     readonly [key: string]: unknown;
@@ -1845,7 +1754,7 @@ export function quotePlus(value: string): string;
 export class RateLimitError extends IgApiError {
 }
 
-// @public (undocumented)
+// @public
 export interface ReactionOptions {
     readonly emoji?: string;
     readonly remove?: boolean;
@@ -1854,10 +1763,10 @@ export interface ReactionOptions {
 // @public
 export function reactToMessage(client: PrivateClient, threadId: string, itemId: string, options?: ReactionOptions): Promise<void>;
 
-// @public (undocumented)
+// @public
 export type RecipientSearchMode = 'universal' | 'raven';
 
-// @public (undocumented)
+// @public
 export type Reel = z.infer<typeof reelSchema>;
 
 // @public
@@ -1865,11 +1774,8 @@ export interface ReelsApi {
     explore(options?: ReelsPageOptions): Promise<Page<Media>>;
     feed(options?: ReelsPageOptions): Promise<Page<Media>>;
     friends(options?: ReelsPageOptions): Promise<Page<Media>>;
-    // (undocumented)
     paginateExplore(): AsyncGenerator<Media>;
-    // (undocumented)
     paginateFeed(): AsyncGenerator<Media>;
-    // (undocumented)
     paginateUser(userId: string): AsyncGenerator<Media>;
     user(userId: string, options?: UserReelsOptions): Promise<Page<Media>>;
 }
@@ -1950,12 +1856,12 @@ export const reelSchema: z.ZodObject<{
     latest_reel_media: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
 }, z.core.$loose>;
 
-// @public (undocumented)
+// @public
 export interface ReelsPageOptions {
     readonly cursor?: string;
 }
 
-// @public (undocumented)
+// @public
 export interface ReelUploadOptions {
     // (undocumented)
     readonly caption?: string;
@@ -1967,7 +1873,7 @@ export interface ReelUploadOptions {
     readonly width?: number;
 }
 
-// @public (undocumented)
+// @public
 export interface RegistrationTokenOptions {
     // (undocumented)
     readonly appId: string;
@@ -1989,7 +1895,7 @@ export function removeFollower(client: PrivateClient, pk: string): Promise<Frien
 // @public
 export function removeProfilePicture(client: PrivateClient): Promise<User>;
 
-// @public (undocumented)
+// @public
 export interface ReplyListOptions {
     readonly cursor?: string;
 }
@@ -2012,25 +1918,21 @@ export interface RetryOptions {
 // @public
 export class RetryTransport implements HttpTransport {
     constructor(inner: HttpTransport, options?: RetryOptions);
-    // (undocumented)
     request(req: HttpRequest): Promise<HttpResponse>;
 }
 
 // @public
 export function saveMedia(client: PrivateClient, mediaId: string, options?: SaveOptions): Promise<void>;
 
-// @public (undocumented)
+// @public
 export interface SaveOptions {
     readonly collectionId?: string;
 }
 
 // @public
 export interface SearchApi {
-    // (undocumented)
     hashtags(query: string): Promise<Hashtag[]>;
-    // (undocumented)
     places(query: string): Promise<Location[]>;
-    // (undocumented)
     users(query: string): Promise<User[]>;
 }
 
@@ -2094,9 +1996,7 @@ export interface SessionData {
 
 // @public
 export interface SessionStore {
-    // (undocumented)
     load(): Promise<SessionData | null>;
-    // (undocumented)
     save(data: SessionData): Promise<void>;
 }
 
@@ -2118,7 +2018,7 @@ export function setThreadTitle(client: PrivateClient, threadId: string, title: s
 // @public
 export function shareMedia(client: PrivateClient, mediaId: string, target: SendTarget, options?: ShareMediaOptions): Promise<DirectSendResult>;
 
-// @public (undocumented)
+// @public
 export interface ShareMediaOptions {
     readonly mediaType?: 'photo' | 'video';
 }
@@ -2131,7 +2031,6 @@ export function shareStory(client: PrivateClient, storyId: string, target: SendT
 
 // @public
 export interface Signer {
-    // (undocumented)
     sign(payload: string): string;
 }
 
@@ -2144,16 +2043,14 @@ export function startChallenge(client: PrivateClient, error: ChallengeRequiredEr
 // @public
 export interface StoryApi {
     markSeen(storyIds: readonly string[]): Promise<void>;
-    // (undocumented)
     tray(): Promise<Reel[]>;
-    // (undocumented)
     user(pk: string): Promise<Media[]>;
 }
 
 // @public
 export function submitChallengeCode(client: PrivateClient, challenge: Challenge, code: string): Promise<PrivateResponseJson>;
 
-// @public (undocumented)
+// @public
 export type Thread = z.infer<typeof threadSchema>;
 
 // @public
@@ -2191,7 +2088,7 @@ export const threadSchema: z.ZodObject<{
     }, z.core.$loose>>;
 }, z.core.$loose>;
 
-// @public (undocumented)
+// @public
 export interface TotpOptions {
     readonly digits?: number;
     readonly now?: number;
@@ -2201,7 +2098,7 @@ export interface TotpOptions {
 // @public
 export function twoFactorLogin(client: PrivateClient, error: TwoFactorRequiredError, options: TwoFactorOptions): Promise<PrivateResponseJson>;
 
-// @public (undocumented)
+// @public
 export interface TwoFactorOptions {
     // (undocumented)
     readonly code: string;
@@ -2259,12 +2156,9 @@ export function uploadAlbum(client: PrivateClient, items: readonly AlbumItem[], 
 // @public
 export interface UploadApi {
     album(items: readonly AlbumItem[], options?: AlbumUploadOptions): Promise<Media>;
-    // (undocumented)
     photo(jpeg: Uint8Array, options?: PhotoUploadOptions): Promise<Media>;
     reel(mp4: Uint8Array, coverJpeg: Uint8Array, options?: ReelUploadOptions): Promise<Media>;
-    // (undocumented)
     story(jpeg: Uint8Array): Promise<Media>;
-    // (undocumented)
     video(mp4: Uint8Array, coverJpeg: Uint8Array, options?: VideoUploadOptions): Promise<Media>;
 }
 
@@ -2283,7 +2177,7 @@ export function uploadVideo(client: PrivateClient, mp4: Uint8Array, coverJpeg: U
 // @public
 export const USDID_TOKEN_TTL = 3600;
 
-// @public (undocumented)
+// @public
 export interface UsdidHeaderOptions {
     // (undocumented)
     readonly now?: number;
@@ -2301,18 +2195,16 @@ export interface UsdidIdentity {
 // @public
 export function usdidPublicKeyDer(identity: UsdidIdentity): Buffer;
 
-// @public (undocumented)
+// @public
 export type User = z.infer<typeof userSchema>;
 
 // @public
 export interface UserApi {
-    // (undocumented)
     info(pk: string): Promise<User>;
-    // (undocumented)
     infoByUsername(username: string): Promise<User>;
 }
 
-// @public (undocumented)
+// @public
 export interface UserReelsOptions extends ReelsPageOptions {
     readonly pageSize?: number;
 }
@@ -2342,7 +2234,7 @@ export interface UserTag {
     readonly y: number;
 }
 
-// @public (undocumented)
+// @public
 export interface VideoMeta {
     // (undocumented)
     readonly durationMs: number;
@@ -2352,7 +2244,7 @@ export interface VideoMeta {
     readonly width: number;
 }
 
-// @public (undocumented)
+// @public
 export interface VideoUploadOptions {
     // (undocumented)
     readonly caption?: string;
@@ -2363,7 +2255,7 @@ export interface VideoUploadOptions {
     readonly width?: number;
 }
 
-// @public (undocumented)
+// @public
 export interface VoiceOptions {
     readonly waveform?: readonly number[];
 }

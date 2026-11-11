@@ -21,4 +21,5 @@ export const friendshipStatusSchema = z
   })
   .loose();
 
+/** How the account relates to a user, as parsed by `friendshipStatusSchema`. */
 export type FriendshipStatus = z.infer<typeof friendshipStatusSchema>;

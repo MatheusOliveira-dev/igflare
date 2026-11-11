@@ -1,6 +1,7 @@
 import type { DeviceProfile, DeviceState } from './device';
 import { buildUserAgent } from './device';
 
+/** What the headers sent on every request are built from. */
 export interface BaseHeadersInput {
   readonly profile: DeviceProfile;
   readonly device: DeviceState;

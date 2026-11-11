@@ -9,6 +9,7 @@ import { IgError } from '../../errors/ig-error';
 import { isRecord, readCursor } from '../../core/guards';
 import { getHashtagSerpPage } from './hashtag-serp';
 
+/** Paging for a feed. */
 export interface FeedOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
   readonly cursor?: string;

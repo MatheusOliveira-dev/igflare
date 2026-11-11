@@ -17,4 +17,5 @@ export const highlightSchema = z
   })
   .loose();
 
+/** A story highlight, as parsed by `highlightSchema`. */
 export type Highlight = z.infer<typeof highlightSchema>;

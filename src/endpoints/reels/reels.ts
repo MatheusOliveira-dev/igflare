@@ -10,11 +10,13 @@ import { ClientSchemaError } from '../../errors/api-errors';
 
 const PAGE_SIZE = 12;
 
+/** Paging for a reels feed. */
 export interface ReelsPageOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
   readonly cursor?: string;
 }
 
+/** Paging for a user's reels. */
 export interface UserReelsOptions extends ReelsPageOptions {
   /** How many reels a page holds. The app asks for 12. */
   readonly pageSize?: number;

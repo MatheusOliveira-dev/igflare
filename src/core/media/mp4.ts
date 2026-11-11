@@ -1,5 +1,6 @@
 import { IgError } from '../../errors/ig-error';
 
+/** What an upload needs to know about an MP4: duration and frame size. */
 export interface VideoMeta {
   readonly durationMs: number;
   readonly width: number;

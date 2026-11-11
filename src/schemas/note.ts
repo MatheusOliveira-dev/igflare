@@ -19,4 +19,5 @@ export const noteSchema = z
   })
   .loose();
 
+/** A note, as parsed by `noteSchema`. */
 export type Note = z.infer<typeof noteSchema>;

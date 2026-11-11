@@ -24,4 +24,5 @@ export const userSchema = z
   })
   .loose();
 
+/** A user profile, as parsed by `userSchema`. */
 export type User = z.infer<typeof userSchema>;

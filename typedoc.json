@@ -1,0 +1,17 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "out": "docs-site",
+  "name": "igflare",
+  "readme": "README.md",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": true
+  },
+  "requiredToBeDocumented": ["Function", "Class", "Interface", "TypeAlias", "Variable", "Enum"],
+  "disableSources": true,
+  "treatWarningsAsErrors": true
+}

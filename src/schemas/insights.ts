@@ -15,6 +15,7 @@ export const insightMetricSchema = z
   })
   .loose();
 
+/** One insights figure, as parsed by `insightMetricSchema`. */
 export type InsightMetric = z.infer<typeof insightMetricSchema>;
 
 const count = z.number().nullable().optional();
@@ -56,6 +57,7 @@ export const mediaInsightsSchema = z
   })
   .loose();
 
+/** The insights of a post or reel, as parsed by `mediaInsightsSchema`. */
 export type MediaInsights = z.infer<typeof mediaInsightsSchema>;
 
 /** A bare figure, as the account screens nest them (`{ value: 15 }`). */
@@ -126,6 +128,7 @@ export const accountInsightsSchema = z
   })
   .loose();
 
+/** The account overview, as parsed by `accountInsightsSchema`. */
 export type AccountInsights = z.infer<typeof accountInsightsSchema>;
 
 const place = z
@@ -183,6 +186,7 @@ export const audienceInsightsSchema = z
   })
   .loose();
 
+/** The audience report, as parsed by `audienceInsightsSchema`. */
 export type AudienceInsights = z.infer<typeof audienceInsightsSchema>;
 
 /** One post, reel or story in the content list, with the figures the list was sorted by. */
@@ -201,6 +205,7 @@ export const contentInsightSchema = z
   })
   .loose();
 
+/** One item of the content list, as parsed by `contentInsightSchema`. */
 export type ContentInsight = z.infer<typeof contentInsightSchema>;
 
 /** One page of the content list. */

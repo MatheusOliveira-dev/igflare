@@ -25,10 +25,12 @@ const RETRY_CONTEXT = JSON.stringify({
   num_step_manual_retry: 0,
 });
 
+/** Options for a photo post. */
 export interface PhotoUploadOptions {
   readonly caption?: string;
 }
 
+/** Options for a video post. */
 export interface VideoUploadOptions {
   readonly caption?: string;
   /** Overrides the value read from the MP4 when parsing fails or is undesired. */
@@ -358,6 +360,7 @@ export type AlbumItem =
       readonly height?: number;
     };
 
+/** Options for a carousel post. */
 export interface AlbumUploadOptions {
   readonly caption?: string;
 }
@@ -482,6 +485,7 @@ export async function uploadAlbum(
   return configureMedia(client, endpoints.mediaConfigureSidecar, payload);
 }
 
+/** Options for a reel. */
 export interface ReelUploadOptions {
   readonly caption?: string;
   /** Whether the reel also shows as a preview in the profile grid and feed. Defaults to true. */

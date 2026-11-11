@@ -12,6 +12,7 @@ import { parseSchemaList } from '../../schemas/parse-list';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { readCursor } from '../../core/guards';
 
+/** Paging for a list of comments or posts. */
 export interface CommentListOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
   readonly cursor?: string;
@@ -78,6 +79,7 @@ export async function unlikeMedia(client: PrivateClient, mediaId: string): Promi
   });
 }
 
+/** Options for a comment. */
 export interface CommentOptions {
   /** The id of the comment this one replies to. Omit for a top-level comment. */
   readonly repliedToCommentId?: string;
@@ -175,6 +177,7 @@ export async function getLikers(client: PrivateClient, mediaId: string): Promise
   return parseSchemaList<User>(json['users'], userSchema, 'user');
 }
 
+/** Where to save a post. */
 export interface SaveOptions {
   /** Save into (or remove from) this collection instead of just the general saved list. */
   readonly collectionId?: string;

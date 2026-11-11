@@ -4,6 +4,7 @@ import { buildBloksPayload } from '../../core/bloks/payload';
 import { endpoints } from '../../generated/endpoints';
 import type { EndpointDefinition } from '../../generated/endpoints';
 
+/** Overrides for one Bloks action call. */
 export interface BloksActionOptions {
   /** Bloks versioning id. Defaults to the session profile's value. */
   readonly bloksVersioningId?: string;

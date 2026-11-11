@@ -33,11 +33,13 @@ const PROCESS_CLIENT_DATA = 'com.bloks.www.bloks.caa.login.process_client_data_a
 const OAUTH_TOKEN_FETCH = 'com.bloks.www.caa.login.oauth.token.fetch.async';
 const SEND_LOGIN_REQUEST = 'com.bloks.www.bloks.caa.login.async.send_login_request';
 
+/** The username and password for a login. */
 export interface CaaLoginCredentials {
   readonly username: string;
   readonly password: string;
 }
 
+/** Options for a login. */
 export interface CaaLoginOptions {
   /** Where to get the two-factor code if the account asks for one. */
   readonly twoFactor?: TwoFactorSource;

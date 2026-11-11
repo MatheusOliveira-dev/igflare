@@ -92,6 +92,7 @@ export async function getNotes(client: PrivateClient): Promise<Note[]> {
   });
 }
 
+/** Options for a note. */
 export interface CreateNoteOptions {
   /** Who may see it. Defaults to mutual followers. */
   readonly audience?: NoteAudience;

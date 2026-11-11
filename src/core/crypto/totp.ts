@@ -1,6 +1,7 @@
 import { createHmac } from 'node:crypto';
 import { IgError } from '../../errors/ig-error';
 
+/** Code length, step and time for a TOTP code. The defaults match authenticator apps. */
 export interface TotpOptions {
   /** Unix time in seconds. Defaults to now; injectable for tests. */
   readonly now?: number;

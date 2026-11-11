@@ -10,6 +10,7 @@ import type { PrivateResponseJson } from './response';
 import { applyResponseToSession } from './session-update';
 import { LoginRequiredError } from '../../errors/api-errors';
 
+/** How a `PrivateClient` is built: transport, session store and session-expiry hook. */
 export interface PrivateClientOptions {
   readonly transport?: HttpTransport;
   readonly store?: SessionStore;
@@ -23,6 +24,7 @@ export interface PrivateClientOptions {
   readonly onSessionExpired?: (error: LoginRequiredError) => Promise<void>;
 }
 
+/** One request to the private API, without the session, which the client adds. */
 export type PrivateRequestOptions = Omit<PrivateRequestInput, 'session'>;
 
 /** Ties the three seams together: build a request, send it, update the session. */
@@ -44,6 +46,7 @@ export class PrivateClient {
     this.#session = options.session ?? createSession();
   }
 
+  /** A client started from the session a store holds, or from a fresh one. */
   static async fromStore(
     store: SessionStore,
     options: { readonly transport?: HttpTransport } = {},
@@ -120,6 +123,7 @@ export class PrivateClient {
     this.#session = { ...this.#session, ...patch };
   }
 
+  /** Saves the current session to the store, when there is one. */
   async persist(): Promise<void> {
     if (this.#store !== undefined) {
       await this.#store.save(this.#session);

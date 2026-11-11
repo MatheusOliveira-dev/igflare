@@ -13,4 +13,5 @@ export const collectionSchema = z
   })
   .loose();
 
+/** A saved-posts collection. */
 export type Collection = z.infer<typeof collectionSchema>;

@@ -6,6 +6,7 @@ import { generateUuid } from '../../core/transport/device';
 import { endpoints } from '../../generated/endpoints';
 import { finalizeLogin } from './login';
 
+/** What a two-factor login on the older endpoint takes. */
 export interface TwoFactorOptions {
   readonly username: string;
   readonly code: string;

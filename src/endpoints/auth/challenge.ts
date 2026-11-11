@@ -6,8 +6,10 @@ import { finalizeLogin } from './login';
 
 /** Verification channels for the common challenge flow. */
 export const CHALLENGE_SMS = 0;
+/** The challenge method that sends the code by email. */
 export const CHALLENGE_EMAIL = 1;
 
+/** An open challenge: where to answer it and what the server sent. */
 export interface Challenge {
   readonly apiPath: string;
   /** The raw step data, so unusual challenge types can be handled by the caller. */

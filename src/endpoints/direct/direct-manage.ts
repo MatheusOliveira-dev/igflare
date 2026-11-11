@@ -50,6 +50,7 @@ export async function approveThread(client: PrivateClient, threadId: string): Pr
   );
 }
 
+/** Options for declining a message request. */
 export interface HideThreadOptions {
   /** Also send this person's future requests to the spam folder. */
   readonly moveToSpam?: boolean;
@@ -228,6 +229,7 @@ export async function findThreadByParticipants(
   return parsed.data;
 }
 
+/** Which recipients to search: everyone the account can message (`universal`) or the ones for disappearing photos (`raven`). */
 export type RecipientSearchMode = 'universal' | 'raven';
 
 /** Searches the people the account can message, ranked, for a free-text query. */

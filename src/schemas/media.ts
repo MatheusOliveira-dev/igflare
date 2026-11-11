@@ -53,4 +53,5 @@ export const mediaSchema = z
   })
   .loose();
 
+/** A post, reel or story, as parsed by `mediaSchema`. */
 export type Media = z.infer<typeof mediaSchema>;

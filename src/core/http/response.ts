@@ -17,6 +17,7 @@ import {
 } from '../../errors/api-errors';
 import type { ApiErrorPayload } from '../../errors/api-errors';
 
+/** A parsed private-API answer. The fields named here are the ones the error mapping reads. */
 export interface PrivateResponseJson {
   readonly status?: string;
   readonly message?: string;

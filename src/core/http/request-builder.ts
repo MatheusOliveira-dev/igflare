@@ -4,6 +4,7 @@ import { buildSignedBody, quotePlus } from '../signing/signer';
 import { buildUsdidHeader } from '../crypto/usdid';
 import type { SessionData } from '../session/session';
 
+/** The host of the private API. */
 export const API_DOMAIN = 'i.instagram.com';
 
 /**
@@ -13,6 +14,7 @@ export const API_DOMAIN = 'i.instagram.com';
  */
 export type BodyEncoding = 'signed' | 'form';
 
+/** Everything a private-API request is built from, the session included. */
 export interface PrivateRequestInput {
   readonly method: HttpMethod;
   readonly endpoint: string;

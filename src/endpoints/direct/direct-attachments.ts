@@ -173,6 +173,7 @@ export async function sendVideo(
   return parseSendResult(json);
 }
 
+/** Options for a voice message. */
 export interface VoiceOptions {
   /**
    * The 70 loudness values (0 to 1) the voice bubble draws as bars. Purely cosmetic. The

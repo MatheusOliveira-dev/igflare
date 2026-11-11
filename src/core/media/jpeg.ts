@@ -1,5 +1,6 @@
 import { IgError } from '../../errors/ig-error';
 
+/** The pixel size of an image. */
 export interface ImageSize {
   readonly width: number;
   readonly height: number;

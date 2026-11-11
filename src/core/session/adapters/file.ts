@@ -12,6 +12,7 @@ export class FileSessionStore implements SessionStore {
     this.#path = path;
   }
 
+  /** The saved session, or `null` when the file does not exist yet. */
   async load(): Promise<SessionData | null> {
     let raw: string;
     try {
@@ -29,6 +30,7 @@ export class FileSessionStore implements SessionStore {
     }
   }
 
+  /** Writes the session to the file. */
   async save(data: SessionData): Promise<void> {
     await mkdir(dirname(this.#path), { recursive: true });
     await writeFile(this.#path, JSON.stringify(data, null, 2), 'utf8');

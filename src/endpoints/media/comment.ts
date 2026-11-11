@@ -99,6 +99,7 @@ export async function deleteComments(
   );
 }
 
+/** Paging for the replies to a comment. */
 export interface ReplyListOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
   readonly cursor?: string;

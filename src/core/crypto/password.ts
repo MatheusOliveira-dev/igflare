@@ -1,11 +1,13 @@
 import { publicEncrypt, randomBytes, createCipheriv, constants } from 'node:crypto';
 
+/** The server key the password is encrypted for, as login hands it out. */
 export interface PasswordPublicKey {
   readonly keyId: number;
   /** The public key as Instagram sends it: base64 of a PEM document. */
   readonly publicKey: string;
 }
 
+/** Inputs for encrypting a password the way the app does before login. */
 export interface EncryptPasswordOptions {
   readonly sessionKey?: Buffer;
   readonly iv?: Buffer;

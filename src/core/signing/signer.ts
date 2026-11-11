@@ -8,6 +8,7 @@
  * (space becomes `+`), which is what the reference client produces.
  */
 export interface Signer {
+  /** The body to send for a payload. */
   sign(payload: string): string;
 }
 
@@ -18,6 +19,7 @@ export function quotePlus(value: string): string {
     .replace(/%20/g, '+');
 }
 
+/** The `signed_body=SIGNATURE.<json>` form body the app sends. */
 export function buildSignedBody(payload: string): string {
   return `signed_body=SIGNATURE.${quotePlus(payload)}`;
 }
@@ -33,6 +35,7 @@ export function jazoest(value: string): string {
   return `2${String(sum)}`;
 }
 
+/** The default signer, which builds the signed body. */
 export function createSigner(): Signer {
   return { sign: buildSignedBody };
 }

@@ -41,9 +41,11 @@
     "api": "api-extractor run --local --verbose",
     "mutation": "stryker run",
     "prepare": "husky",
-    "ci": "npm run typecheck && npm run format:check && npm run lint && npm run prose && npm run guard && npm run deps && npm run dup && npm run deadcode && npm run gen:check && npm run coverage && npm run build && npm run api",
+    "ci": "npm run typecheck && npm run format:check && npm run lint && npm run prose && npm run guard && npm run deps && npm run dup && npm run deadcode && npm run gen:check && npm run coverage && npm run build && npm run api && npm run docs:check",
     "live-check": "node scripts/live-check.mjs",
-    "app-build": "node scripts/app-build.ts"
+    "app-build": "node scripts/app-build.ts",
+    "docs": "typedoc",
+    "docs:check": "typedoc --emit none"
   },
   "license": "MIT",
   "devDependencies": {
@@ -69,6 +71,7 @@
     "lint-staged": "17.6.0",
     "prettier": "3.9.10",
     "tsup": "9.0.0",
+    "typedoc": "0.28.20",
     "typescript": "5.9.3",
     "typescript-eslint": "8.72.1",
     "vitest": "5.1.0"
