@@ -563,7 +563,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsEditProfile' | 'accountsLogin' | 'accountsRemoveBioLinks' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'accountsUpdateBioLinks' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'collectionsCreate' | 'collectionsDelete' | 'collectionsList' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastRavenAttachment' | 'directBroadcastReaction' | 'directBroadcastStoryShare' | 'directBroadcastVoiceAttachment' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedCollection' | 'feedLiked' | 'feedReelsMedia' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsRemoveFollower' | 'friendshipsSetBesties' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'highlightsCreateReel' | 'highlightsDeleteReel' | 'highlightsEditReel' | 'highlightsTray' | 'launcherSync' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureSidecar' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaSeenV2' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'newsInbox' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
+export type EndpointName = 'accountsCurrentUser' | 'accountsEditProfile' | 'accountsLogin' | 'accountsRemoveBioLinks' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'accountsUpdateBioLinks' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'collectionsCreate' | 'collectionsDelete' | 'collectionsList' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastRavenAttachment' | 'directBroadcastReaction' | 'directBroadcastStoryShare' | 'directBroadcastVoiceAttachment' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedCollection' | 'feedLiked' | 'feedReelsMedia' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsRemoveFollower' | 'friendshipsSetBesties' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'highlightsCreateReel' | 'highlightsDeleteReel' | 'highlightsEditReel' | 'highlightsTray' | 'launcherSync' | 'locationSearch' | 'locationsInfo' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureSidecar' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaSeenV2' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'newsInbox' | 'tagsInfo' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -748,6 +748,9 @@ export function getFriendshipStatus(client: PrivateClient, pk: string): Promise<
 export function getHashtagFeed(client: PrivateClient, tag: string, options?: FeedOptions): Promise<Page<Media>>;
 
 // @public
+export function getHashtagInfo(client: PrivateClient, tag: string): Promise<Hashtag>;
+
+// @public
 export function getHighlight(client: PrivateClient, id: string): Promise<Highlight>;
 
 // @public
@@ -761,6 +764,9 @@ export function getLikers(client: PrivateClient, mediaId: string): Promise<User[
 
 // @public
 export function getLocationFeed(client: PrivateClient, locationId: string, options?: FeedOptions): Promise<Page<Media>>;
+
+// @public
+export function getLocationInfo(client: PrivateClient, locationId: string): Promise<LocationInfo>;
 
 // @public
 export function getMediaInfo(client: PrivateClient, mediaId: string): Promise<Media>;
@@ -800,6 +806,11 @@ export function getUserStories(client: PrivateClient, pk: string): Promise<Media
 
 // @public (undocumented)
 export type Hashtag = z.infer<typeof hashtagSchema>;
+
+// @public
+export interface HashtagApi {
+    info(tag: string): Promise<Hashtag>;
+}
 
 // @public
 export const hashtagSchema: z.ZodObject<{
@@ -969,7 +980,11 @@ export class IgFlare {
     readonly friendship: FriendshipApi;
     static fromStore(store: SessionStore, options?: Omit<IgFlareOptions, 'store' | 'session'>): Promise<IgFlare>;
     // (undocumented)
+    readonly hashtag: HashtagApi;
+    // (undocumented)
     readonly highlight: HighlightApi;
+    // (undocumented)
+    readonly location: LocationApi;
     login(credentials: IgFlareLogin): Promise<PrivateResponseJson>;
     // (undocumented)
     readonly media: MediaApi;
@@ -1032,6 +1047,33 @@ export function listHighlights(client: PrivateClient, userId: string): Promise<H
 
 // @public (undocumented)
 export type Location = z.infer<typeof locationSchema>;
+
+// @public
+export interface LocationApi {
+    // (undocumented)
+    info(locationId: string): Promise<LocationInfo>;
+    nearby(latitude: number, longitude: number): Promise<Location[]>;
+}
+
+// @public (undocumented)
+export type LocationInfo = z.infer<typeof locationInfoSchema>;
+
+// @public
+export const locationInfoSchema: z.ZodObject<{
+    location_id: z.ZodCoercedString<unknown>;
+    facebook_places_id: z.ZodOptional<z.ZodCoercedString<unknown>>;
+    name: z.ZodOptional<z.ZodString>;
+    slug: z.ZodOptional<z.ZodString>;
+    phone: z.ZodOptional<z.ZodString>;
+    website: z.ZodOptional<z.ZodString>;
+    category: z.ZodOptional<z.ZodString>;
+    lat: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    lng: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    location_address: z.ZodOptional<z.ZodString>;
+    location_city: z.ZodOptional<z.ZodString>;
+    location_zip: z.ZodOptional<z.ZodString>;
+    media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+}, z.core.$loose>;
 
 // @public
 export const locationSchema: z.ZodObject<{
@@ -1548,6 +1590,9 @@ export interface SearchApi {
 
 // @public
 export function searchHashtags(client: PrivateClient, query: string): Promise<Hashtag[]>;
+
+// @public
+export function searchNearby(client: PrivateClient, latitude: number, longitude: number): Promise<Location[]>;
 
 // @public
 export function searchPlaces(client: PrivateClient, query: string): Promise<Location[]>;

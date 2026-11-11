@@ -327,6 +327,16 @@
       "path": "/api/v1/launcher/sync/"
     },
     {
+      "name": "locationSearch",
+      "method": "GET",
+      "path": "/api/v1/location_search/"
+    },
+    {
+      "name": "locationsInfo",
+      "method": "GET",
+      "path": "/api/v1/locations/{id}/location_info/"
+    },
+    {
       "name": "locationsSections",
       "method": "POST",
       "path": "/api/v1/locations/{id}/sections/"
@@ -450,6 +460,11 @@
       "name": "newsInbox",
       "method": "GET",
       "path": "/api/v1/news/inbox/"
+    },
+    {
+      "name": "tagsInfo",
+      "method": "GET",
+      "path": "/api/v1/tags/{tag}/info/"
     },
     {
       "name": "tagsSearch",

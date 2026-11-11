@@ -111,7 +111,14 @@ import {
   unpinMedia,
 } from '../endpoints/media/media-manage';
 import type { EditMediaOptions } from '../endpoints/media/media-manage';
-import { searchUsers, searchHashtags, searchPlaces } from '../endpoints/search/search';
+import {
+  getHashtagInfo,
+  getLocationInfo,
+  searchHashtags,
+  searchNearby,
+  searchPlaces,
+  searchUsers,
+} from '../endpoints/search/search';
 import {
   uploadAlbum,
   uploadPhoto,
@@ -168,7 +175,7 @@ import type { Media } from '../schemas/media';
 import type { Comment } from '../schemas/comment';
 import type { Thread, DirectMessage, DirectSendResult } from '../schemas/direct';
 import type { Hashtag } from '../schemas/hashtag';
-import type { Location } from '../schemas/location';
+import type { Location, LocationInfo } from '../schemas/location';
 import type { Reel } from '../schemas/reel';
 
 /** The logged-in account itself. */
@@ -347,6 +354,19 @@ export interface HighlightApi {
   delete(highlightId: string): Promise<void>;
 }
 
+/** What a hashtag's own page shows. */
+export interface HashtagApi {
+  /** Its name and how many posts use it. */
+  info(tag: string): Promise<Hashtag>;
+}
+
+/** Places: a location's own page, and the places near a coordinate. */
+export interface LocationApi {
+  info(locationId: string): Promise<LocationInfo>;
+  /** The places near a latitude and longitude. Each one's `pk` works with `feed.location`. */
+  nearby(latitude: number, longitude: number): Promise<Location[]>;
+}
+
 /** Stories. */
 export interface StoryApi {
   tray(): Promise<Reel[]>;
@@ -399,6 +419,8 @@ export class IgFlare {
   readonly story: StoryApi;
   readonly collection: CollectionApi;
   readonly highlight: HighlightApi;
+  readonly hashtag: HashtagApi;
+  readonly location: LocationApi;
 
   constructor(options: IgFlareOptions = {}) {
     const { retry, autoRelogin, ...clientOptions } = options;
@@ -423,6 +445,11 @@ export class IgFlare {
     this.story = this.#buildStoryApi();
     this.collection = this.#buildCollectionApi();
     this.highlight = this.#buildHighlightApi();
+    this.hashtag = { info: (tag) => getHashtagInfo(this.#client, tag) };
+    this.location = {
+      info: (locationId) => getLocationInfo(this.#client, locationId),
+      nearby: (latitude, longitude) => searchNearby(this.#client, latitude, longitude),
+    };
   }
 
   /** Builds a client from a saved session in the given store. */

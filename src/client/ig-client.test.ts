@@ -384,6 +384,20 @@ describe('IgFlare facade', () => {
     expect(transport.requests.some((r) => r.url.includes('/highlight:6/delete_reel/'))).toBe(true);
   });
 
+  it('delegates hashtag info, location info and nearby places', async () => {
+    const { ig } = clientWith((req) => {
+      if (req.url.includes('/tags/'))
+        return json({ status: 'ok', id: '1', name: 'sun', media_count: 3 });
+      if (req.url.includes('/location_info/'))
+        return json({ status: 'ok', location_id: '7', name: 'Park' });
+      return json({ status: 'ok', venues: [{ external_id: 9, name: 'Cafe' }] });
+    });
+
+    expect((await ig.hashtag.info('#sun')).media_count).toBe(3);
+    expect((await ig.location.info('7')).name).toBe('Park');
+    expect((await ig.location.nearby(1, 2))[0]?.pk).toBe('9');
+  });
+
   it('delegates stories: tray, user stories and story upload', async () => {
     const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90]);
     const { ig } = clientWith((req) => {

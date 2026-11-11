@@ -70,6 +70,14 @@ const checks = [
     },
   ],
   [
+    'hashtag.info',
+    async () => {
+      const info = await ig.hashtag.info('instagram');
+      if (info.name !== 'instagram') throw new Error('wrong hashtag');
+    },
+  ],
+  ['location.nearby', async () => some(await ig.location.nearby(40.7484, -73.9857), 'places')],
+  [
     'account.links',
     async () => {
       await ig.account.links();

@@ -53,6 +53,9 @@ describe('manifest coverage of the hand-written endpoints', () => {
       '/api/v1/highlights/highlight:{id}/delete_reel/',
     );
     expect(endpoints.feedReelsMedia.path).toBe('/api/v1/feed/reels_media/');
+    expect(endpoints.tagsInfo.path).toBe('/api/v1/tags/{tag}/info/');
+    expect(endpoints.locationsInfo.path).toBe('/api/v1/locations/{id}/location_info/');
+    expect(endpoints.locationSearch.path).toBe('/api/v1/location_search/');
     expect(endpoints.attestationCreateAndroidKeystore).toEqual({
       method: 'POST',
       path: '/api/v1/attestation/create_android_keystore/',

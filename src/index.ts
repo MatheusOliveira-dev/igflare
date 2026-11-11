@@ -91,6 +91,8 @@ export type {
   StoryApi,
   CollectionApi,
   HighlightApi,
+  HashtagApi,
+  LocationApi,
 } from './client/ig-client';
 export {
   getMediaInfo,
@@ -199,7 +201,14 @@ export {
   getLocationFeed,
   paginateLocationFeed,
 } from './endpoints/feed/feed';
-export { searchUsers, searchHashtags, searchPlaces } from './endpoints/search/search';
+export {
+  searchUsers,
+  searchHashtags,
+  searchPlaces,
+  searchNearby,
+  getHashtagInfo,
+  getLocationInfo,
+} from './endpoints/search/search';
 export {
   listCollections,
   getCollectionMedias,
@@ -228,8 +237,8 @@ export { activityItemSchema } from './schemas/activity';
 export type { Activity, ActivityItem } from './schemas/activity';
 export { hashtagSchema } from './schemas/hashtag';
 export type { Hashtag } from './schemas/hashtag';
-export { locationSchema } from './schemas/location';
-export type { Location } from './schemas/location';
+export { locationSchema, locationInfoSchema } from './schemas/location';
+export type { Location, LocationInfo } from './schemas/location';
 export type { FeedOptions } from './endpoints/feed/feed';
 export { mediaSchema } from './schemas/media';
 export type { Media } from './schemas/media';
