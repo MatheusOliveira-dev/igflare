@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { uploadPhoto, uploadVideo, uploadStoryPhoto } from './upload';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
 import type { HttpRequest } from '../../core/transport/http-transport';
 import { createSession } from '../../core/session/session';
-import { ClientSchemaError } from '../../errors/api-errors';
+import { ClientSchemaError, PleaseWaitError } from '../../errors/api-errors';
 
 /** A minimal 400x300 JPEG marker stream. */
 const JPEG = new Uint8Array([
@@ -118,6 +118,62 @@ describe('uploadVideo', () => {
     expect(signedPayload(configure?.body)).toMatchObject({ length: 8, clips: [{ length: 8 }] });
 
     expect(media.code).toBe('vid');
+  });
+});
+
+describe('uploadVideo configure retries', () => {
+  function videoClient(configure: () => { status: number; body: unknown }): {
+    client: PrivateClient;
+    configures: () => number;
+  } {
+    let count = 0;
+    const transport = new FakeTransport((req: HttpRequest) => {
+      if (req.url.includes('rupload_')) {
+        return {
+          status: 200,
+          headers: {},
+          body: JSON.stringify({ upload_id: 'V1', status: 'ok' }),
+        };
+      }
+      count += 1;
+      const out = configure();
+      return { status: out.status, headers: {}, body: JSON.stringify(out.body) };
+    });
+    return {
+      client: new PrivateClient({ transport, session: createSession() }),
+      configures: () => count,
+    };
+  }
+  const OPTIONS = { durationMs: 8000, width: 720, height: 1280 };
+
+  it('retries configure while the server is still transcoding', async () => {
+    vi.useFakeTimers();
+    try {
+      let calls = 0;
+      const { client, configures } = videoClient(() => {
+        calls += 1;
+        return calls < 3
+          ? { status: 400, body: { status: 'fail', message: 'Transcode not finished yet.' } }
+          : { status: 200, body: { status: 'ok', media: { pk: 1, code: 'vid' } } };
+      });
+      const pending = uploadVideo(client, new Uint8Array([1]), JPEG, OPTIONS);
+      await vi.runAllTimersAsync();
+      expect((await pending).code).toBe('vid');
+      expect(configures()).toBe(3);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('does not repeat configure when Instagram says to wait', async () => {
+    const { client, configures } = videoClient(() => ({
+      status: 400,
+      body: { status: 'fail', message: 'Please wait a few minutes before you try again.' },
+    }));
+    await expect(uploadVideo(client, new Uint8Array([1]), JPEG, OPTIONS)).rejects.toBeInstanceOf(
+      PleaseWaitError,
+    );
+    expect(configures()).toBe(1);
   });
 });
 

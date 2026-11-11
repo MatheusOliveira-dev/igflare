@@ -4,7 +4,14 @@ import { endpoints } from '../../generated/endpoints';
 import { parseJpegSize } from '../../core/media/jpeg';
 import { parseMp4Meta } from '../../core/media/mp4';
 import { mediaSchema, type Media } from '../../schemas/media';
-import { ClientSchemaError, IgApiError } from '../../errors/api-errors';
+import {
+  ClientSchemaError,
+  IgApiError,
+  PleaseWaitError,
+  RateLimitError,
+  FeedbackRequiredError,
+  SentryBlockError,
+} from '../../errors/api-errors';
 
 const RUPLOAD_HOST = 'https://i.instagram.com';
 const TRANSCODE_RETRIES = 6;
@@ -150,11 +157,22 @@ async function configurePhoto(
   return parseConfiguredMedia(json);
 }
 
-/** Whether a configure error means the server is still transcoding the video. */
+/**
+ * Whether a configure error means the server is still transcoding the video. Throttling
+ * and block errors are excluded even if their text mentions trying again: repeating
+ * configure while throttled risks a harder block, and could publish the post twice if an
+ * earlier attempt went through.
+ */
 function isTranscodePending(error: unknown): boolean {
-  return (
-    error instanceof IgApiError && /transcode|not been uploaded|try again/i.test(error.message)
-  );
+  if (
+    error instanceof PleaseWaitError ||
+    error instanceof RateLimitError ||
+    error instanceof FeedbackRequiredError ||
+    error instanceof SentryBlockError
+  ) {
+    return false;
+  }
+  return error instanceof IgApiError && /transcode|not been uploaded/i.test(error.message);
 }
 
 async function configureVideo(
