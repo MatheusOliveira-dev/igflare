@@ -1,5 +1,6 @@
 import type { HttpResponse } from '../transport/http-transport';
 import { parseLosslessJson } from './lossless-json';
+import { parseStreamedJson } from './streamed-json';
 import {
   IgApiError,
   LoginRequiredError,
@@ -89,9 +90,13 @@ export function parsePrivateResponse(response: HttpResponse): PrivateResponseJso
   try {
     json = parseLosslessJson(response.body) as PrivateResponseJson;
   } catch (error) {
-    throw new ClientJsonError(`Response was not JSON (status ${String(response.status)})`, {
-      cause: error,
-    });
+    const streamed = parseStreamedJson(response.body);
+    if (streamed === undefined) {
+      throw new ClientJsonError(`Response was not JSON (status ${String(response.status)})`, {
+        cause: error,
+      });
+    }
+    json = streamed;
   }
   if (response.status >= 400 || json.status === 'fail') {
     throw mapError(response.status, json);

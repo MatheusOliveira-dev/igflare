@@ -77,6 +77,8 @@ import { getExploreFeed, paginateExploreFeed } from '../endpoints/explore/explor
 import type { ExploreOptions } from '../endpoints/explore/explore';
 import { createNote, deleteNote, getNotes } from '../endpoints/notes/notes';
 import type { CreateNoteOptions } from '../endpoints/notes/notes';
+import { getPostInsights, getReelInsights } from '../endpoints/insights/insights';
+import type { MediaInsights } from '../schemas/insights';
 import {
   getExploreReels,
   getFriendsReels,
@@ -411,6 +413,14 @@ export interface NotesApi {
   delete(noteId: string): Promise<void>;
 }
 
+/** Insights of a professional (business or creator) account's own media. */
+export interface InsightsApi {
+  /** Views, reach, interactions and view sources of one of the account's posts. */
+  post(mediaId: string): Promise<MediaInsights>;
+  /** The same for one of the account's reels, plus watch time and the rates of each reaction. */
+  reel(mediaId: string): Promise<MediaInsights>;
+}
+
 /** The Explore tab. */
 export interface ExploreApi {
   /** One page of the Explore feed. */
@@ -473,6 +483,7 @@ export class IgFlare {
   readonly reels: ReelsApi;
   readonly notes: NotesApi;
   readonly explore: ExploreApi;
+  readonly insights: InsightsApi;
   readonly hashtag: HashtagApi;
   readonly location: LocationApi;
 
@@ -499,6 +510,10 @@ export class IgFlare {
     this.story = this.#buildStoryApi();
     this.collection = this.#buildCollectionApi();
     this.highlight = this.#buildHighlightApi();
+    this.insights = {
+      post: (mediaId) => getPostInsights(this.#client, mediaId),
+      reel: (mediaId) => getReelInsights(this.#client, mediaId),
+    };
     this.explore = {
       feed: (options) => getExploreFeed(this.#client, options),
       paginateFeed: () => paginateExploreFeed(this.#client),

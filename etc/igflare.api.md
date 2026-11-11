@@ -813,6 +813,12 @@ export function getPendingInbox(client: PrivateClient, options?: CursorOptions):
 export function getPendingRequests(client: PrivateClient, options?: FollowListOptions): Promise<Page<User>>;
 
 // @public
+export function getPostInsights(client: PrivateClient, mediaId: string): Promise<MediaInsights>;
+
+// @public
+export function getReelInsights(client: PrivateClient, mediaId: string): Promise<MediaInsights>;
+
+// @public
 export function getReelsFeed(client: PrivateClient, options?: ReelsPageOptions): Promise<Page<Media>>;
 
 // @public
@@ -1027,6 +1033,8 @@ export class IgFlare {
     // (undocumented)
     readonly highlight: HighlightApi;
     // (undocumented)
+    readonly insights: InsightsApi;
+    // (undocumented)
     readonly location: LocationApi;
     login(credentials: IgFlareLogin): Promise<PrivateResponseJson>;
     // (undocumented)
@@ -1071,6 +1079,24 @@ export interface ImageSize {
     readonly height: number;
     // (undocumented)
     readonly width: number;
+}
+
+// @public (undocumented)
+export type InsightMetric = z.infer<typeof insightMetricSchema>;
+
+// @public
+export const insightMetricSchema: z.ZodPreprocess<z.ZodObject<{
+    id: z.ZodString;
+    label: z.ZodString;
+    value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    format: z.ZodOptional<z.ZodString>;
+    formatted_value: z.ZodOptional<z.ZodString>;
+}, z.core.$loose>, unknown>;
+
+// @public
+export interface InsightsApi {
+    post(mediaId: string): Promise<MediaInsights>;
+    reel(mediaId: string): Promise<MediaInsights>;
 }
 
 // @public
@@ -1221,6 +1247,60 @@ export interface MediaApi {
     // (undocumented)
     unsave(mediaId: string, options?: SaveOptions): Promise<void>;
 }
+
+// @public (undocumented)
+export type MediaInsights = z.infer<typeof mediaInsightsSchema>;
+
+// @public
+export const mediaInsightsSchema: z.ZodObject<{
+    media_id: z.ZodCoercedString<unknown>;
+    thumbnail_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    likes: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    comments: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    saves: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    shares: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    reposts: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    total_views: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    follows: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    profile_visits: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    followers_views: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    non_followers_views: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    viewers_or_reach: z.ZodOptional<z.ZodNullable<z.ZodPreprocess<z.ZodObject<{
+        id: z.ZodString;
+        label: z.ZodString;
+        value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        format: z.ZodOptional<z.ZodString>;
+        formatted_value: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>, unknown>>>;
+    avg_watch_time: z.ZodOptional<z.ZodNullable<z.ZodPreprocess<z.ZodObject<{
+        id: z.ZodString;
+        label: z.ZodString;
+        value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        format: z.ZodOptional<z.ZodString>;
+        formatted_value: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>, unknown>>>;
+    views_sources: z.ZodOptional<z.ZodArray<z.ZodPreprocess<z.ZodObject<{
+        id: z.ZodString;
+        label: z.ZodString;
+        value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        format: z.ZodOptional<z.ZodString>;
+        formatted_value: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>, unknown>>>;
+    performance_factors: z.ZodOptional<z.ZodArray<z.ZodPreprocess<z.ZodObject<{
+        id: z.ZodString;
+        label: z.ZodString;
+        value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        format: z.ZodOptional<z.ZodString>;
+        formatted_value: z.ZodOptional<z.ZodString>;
+    }, z.core.$loose>, unknown>>>;
+    demographics: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        status: z.ZodOptional<z.ZodString>;
+        age_breakdown: z.ZodOptional<z.ZodArray<z.ZodUnknown>>;
+        gender_breakdown: z.ZodOptional<z.ZodArray<z.ZodUnknown>>;
+        country_breakdown: z.ZodOptional<z.ZodArray<z.ZodUnknown>>;
+    }, z.core.$loose>>>;
+    views_over_time: z.ZodOptional<z.ZodUnknown>;
+}, z.core.$loose>;
 
 // @public
 export const mediaSchema: z.ZodObject<{

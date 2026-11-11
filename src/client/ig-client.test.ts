@@ -456,6 +456,24 @@ describe('IgFlare facade', () => {
     await ig.notes.delete('5');
   });
 
+  it('delegates the post and reel insights', async () => {
+    const key = (name: string): string =>
+      `1$${name}(bloks_versioning_id:$bloksVersioningId,media_igid:$mediaIgid)`;
+    const { ig, transport } = clientWith((req) =>
+      json({
+        data: {
+          [key(req.headers['X-Root-Field-Name'] ?? '')]: { media_id: '1', total_views: 4 },
+        },
+      }),
+    );
+    expect((await ig.insights.post('1')).total_views).toBe(4);
+    expect((await ig.insights.reel('1')).total_views).toBe(4);
+    expect(transport.requests.map((r) => r.headers['X-Root-Field-Name'])).toEqual([
+      'ig_post_insights',
+      'ig_reel_insights',
+    ]);
+  });
+
   it('delegates the Explore feed', async () => {
     const { ig, transport } = clientWith(() =>
       json({

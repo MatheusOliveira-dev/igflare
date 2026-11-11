@@ -95,6 +95,7 @@ export type {
   LocationApi,
   ReelsApi,
   NotesApi,
+  InsightsApi,
   ExploreApi,
 } from './client/ig-client';
 export {
@@ -251,6 +252,9 @@ export {
 export type { ReelsPageOptions, UserReelsOptions } from './endpoints/reels/reels';
 export { getExploreFeed, paginateExploreFeed } from './endpoints/explore/explore';
 export type { ExploreOptions } from './endpoints/explore/explore';
+export { getPostInsights, getReelInsights } from './endpoints/insights/insights';
+export { mediaInsightsSchema, insightMetricSchema } from './schemas/insights';
+export type { MediaInsights, InsightMetric } from './schemas/insights';
 export { getNotes, createNote, deleteNote } from './endpoints/notes/notes';
 export type { CreateNoteOptions, NoteAudience } from './endpoints/notes/notes';
 export { noteSchema } from './schemas/note';
