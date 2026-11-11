@@ -43,6 +43,16 @@ describe('manifest coverage of the hand-written endpoints', () => {
     expect(endpoints.collectionsDelete.path).toBe('/api/v1/collections/{id}/delete/');
     expect(endpoints.feedCollection.path).toBe('/api/v1/feed/collection/{id}/');
     expect(endpoints.feedLiked.path).toBe('/api/v1/feed/liked/');
+    expect(endpoints.highlightsTray).toEqual({
+      method: 'GET',
+      path: '/api/v1/highlights/{id}/highlights_tray/',
+    });
+    expect(endpoints.highlightsCreateReel.path).toBe('/api/v1/highlights/create_reel/');
+    expect(endpoints.highlightsEditReel.path).toBe('/api/v1/highlights/highlight:{id}/edit_reel/');
+    expect(endpoints.highlightsDeleteReel.path).toBe(
+      '/api/v1/highlights/highlight:{id}/delete_reel/',
+    );
+    expect(endpoints.feedReelsMedia.path).toBe('/api/v1/feed/reels_media/');
     expect(endpoints.attestationCreateAndroidKeystore).toEqual({
       method: 'POST',
       path: '/api/v1/attestation/create_android_keystore/',

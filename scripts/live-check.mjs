@@ -63,6 +63,13 @@ const checks = [
     },
   ],
   [
+    'highlight.list',
+    async () => {
+      const me = await ig.account.me();
+      await ig.highlight.list(String(me['pk']));
+    },
+  ],
+  [
     'account.links',
     async () => {
       await ig.account.links();

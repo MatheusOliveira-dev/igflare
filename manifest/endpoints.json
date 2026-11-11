@@ -202,6 +202,11 @@
       "path": "/api/v1/feed/liked/"
     },
     {
+      "name": "feedReelsMedia",
+      "method": "POST",
+      "path": "/api/v1/feed/reels_media/"
+    },
+    {
       "name": "feedReelsTray",
       "method": "POST",
       "path": "/api/v1/feed/reels_tray/"
@@ -295,6 +300,26 @@
       "name": "friendshipsUnmute",
       "method": "POST",
       "path": "/api/v1/friendships/unmute_posts_or_story_from_follow/"
+    },
+    {
+      "name": "highlightsCreateReel",
+      "method": "POST",
+      "path": "/api/v1/highlights/create_reel/"
+    },
+    {
+      "name": "highlightsDeleteReel",
+      "method": "POST",
+      "path": "/api/v1/highlights/highlight:{id}/delete_reel/"
+    },
+    {
+      "name": "highlightsEditReel",
+      "method": "POST",
+      "path": "/api/v1/highlights/highlight:{id}/edit_reel/"
+    },
+    {
+      "name": "highlightsTray",
+      "method": "GET",
+      "path": "/api/v1/highlights/{id}/highlights_tray/"
     },
     {
       "name": "launcherSync",

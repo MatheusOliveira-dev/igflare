@@ -366,6 +366,24 @@ describe('IgFlare facade', () => {
     expect(transport.requests.some((r) => r.url.includes('/api/v1/feed/collection/7/'))).toBe(true);
   });
 
+  it('delegates highlights', async () => {
+    const { ig, transport } = clientWith((req) => {
+      if (req.url.includes('/highlights_tray/'))
+        return json({ status: 'ok', tray: [{ id: 'highlight:5', title: 'h' }] });
+      if (req.url.includes('/reels_media/'))
+        return json({ status: 'ok', reels: { 'highlight:5': { id: 'highlight:5', items: [] } } });
+      if (req.url.includes('/delete_reel/')) return json({ status: 'ok' });
+      return json({ status: 'ok', reel: { id: 'highlight:6', title: 'new' } });
+    });
+
+    expect((await ig.highlight.list('7'))[0]?.title).toBe('h');
+    expect((await ig.highlight.info('5')).id).toBe('highlight:5');
+    expect((await ig.highlight.create('new', ['1_2'])).id).toBe('highlight:6');
+    expect((await ig.highlight.edit('6', { title: 'x' })).id).toBe('highlight:6');
+    await ig.highlight.delete('6');
+    expect(transport.requests.some((r) => r.url.includes('/highlight:6/delete_reel/'))).toBe(true);
+  });
+
   it('delegates stories: tray, user stories and story upload', async () => {
     const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90]);
     const { ig } = clientWith((req) => {

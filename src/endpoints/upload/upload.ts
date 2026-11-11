@@ -318,6 +318,12 @@ export async function uploadStoryPhoto(client: PrivateClient, jpeg: Uint8Array):
   return configureStory(client, uploadId, width, height);
 }
 
+/** Uploads a JPEG to use as a highlight cover and returns the upload id the edit refers to. */
+export function uploadHighlightCover(client: PrivateClient, jpeg: Uint8Array): Promise<string> {
+  parseJpegSize(jpeg); // fail early on a non-JPEG, before any network call
+  return ruploadPhoto(client, jpeg, newUploadId(), '1');
+}
+
 /** One picture of an album: a photo, or a video with its cover. */
 export type AlbumItem =
   | { readonly photo: Uint8Array }

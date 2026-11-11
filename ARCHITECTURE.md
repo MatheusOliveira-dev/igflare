@@ -19,7 +19,7 @@ core/pagination  the Page<T> contract and the paginate() iterator
 core/ids         checkedId/checkedMediaId: every id placed in a URL path goes through these (numeric only)
 core/guards      isRecord and readCursor: the shared JSON-shape helpers for endpoints and parsers
 schemas          hand-written zod schemas for API responses (User, Media, Thread, ...)
-endpoints/*      hand-written feature modules (auth, user, friendship, feed, media, collection, direct, upload, search)
+endpoints/*      hand-written feature modules (auth, user, friendship, feed, media, collection, highlight, direct, upload, search)
 client           public, ergonomic facade (IgFlare), retry-wrapped by default
 types / errors   shared models and typed errors
 generated        the endpoint registry (name -> method + path) from `npm run gen`; never edited

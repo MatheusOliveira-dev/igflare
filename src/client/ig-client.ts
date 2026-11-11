@@ -71,6 +71,18 @@ import {
 import type { BioLink } from '../schemas/bio-link';
 import type { Activity } from '../schemas/activity';
 import type { Collection } from '../schemas/collection';
+import type { Highlight } from '../schemas/highlight';
+import {
+  createHighlight,
+  deleteHighlight,
+  editHighlight,
+  getHighlight,
+  listHighlights,
+} from '../endpoints/highlight/highlight';
+import type {
+  CreateHighlightOptions,
+  EditHighlightOptions,
+} from '../endpoints/highlight/highlight';
 import {
   createCollection,
   deleteCollection,
@@ -317,6 +329,24 @@ export interface CollectionApi {
   delete(collectionId: string): Promise<void>;
 }
 
+/** Story highlights on a profile. Reading is open to anyone who may see the profile. */
+export interface HighlightApi {
+  /** The highlights on a profile, without their stories. */
+  list(userId: string): Promise<Highlight[]>;
+  /** One highlight with its stories. Accepts `highlight:123` or `123`. */
+  info(highlightId: string): Promise<Highlight>;
+  /** Creates a highlight from some of the account's own stories (full ids, or bare pks). */
+  create(
+    title: string,
+    storyIds: readonly string[],
+    options?: CreateHighlightOptions,
+  ): Promise<Highlight>;
+  /** Changes a highlight's title, stories or cover. */
+  edit(highlightId: string, options: EditHighlightOptions): Promise<Highlight>;
+  /** Deletes a highlight; its stories are not deleted. */
+  delete(highlightId: string): Promise<void>;
+}
+
 /** Stories. */
 export interface StoryApi {
   tray(): Promise<Reel[]>;
@@ -368,6 +398,7 @@ export class IgFlare {
   readonly search: SearchApi;
   readonly story: StoryApi;
   readonly collection: CollectionApi;
+  readonly highlight: HighlightApi;
 
   constructor(options: IgFlareOptions = {}) {
     const { retry, autoRelogin, ...clientOptions } = options;
@@ -391,6 +422,7 @@ export class IgFlare {
     this.search = this.#buildSearchApi();
     this.story = this.#buildStoryApi();
     this.collection = this.#buildCollectionApi();
+    this.highlight = this.#buildHighlightApi();
   }
 
   /** Builds a client from a saved session in the given store. */
@@ -568,6 +600,17 @@ export class IgFlare {
       paginateLiked: () => paginateLikedMedias(client),
       create: (name, mediaIds) => createCollection(client, name, mediaIds),
       delete: (collectionId) => deleteCollection(client, collectionId),
+    };
+  }
+
+  #buildHighlightApi(): HighlightApi {
+    const client = this.#client;
+    return {
+      list: (userId) => listHighlights(client, userId),
+      info: (highlightId) => getHighlight(client, highlightId),
+      create: (title, storyIds, options) => createHighlight(client, title, storyIds, options),
+      edit: (highlightId, options) => editHighlight(client, highlightId, options),
+      delete: (highlightId) => deleteHighlight(client, highlightId),
     };
   }
 
