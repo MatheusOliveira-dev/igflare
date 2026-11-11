@@ -7,7 +7,7 @@ import { parseSchemaList } from '../../schemas/parse-list';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 import { mediaAction } from '../media/media';
-import { uploadHighlightCover } from '../upload/upload';
+import { uploadStandalonePhoto } from '../upload/upload';
 
 /** What the app says it can render; the server shapes the reels it returns by it. */
 const SUPPORTED_CAPABILITIES = JSON.stringify([
@@ -172,7 +172,7 @@ export async function editHighlight(
     cover = { media_id: storyId(client, options.coverStoryId), crop_rect: DEFAULT_CROP };
   } else if (options.coverJpeg !== undefined) {
     cover = {
-      upload_id: await uploadHighlightCover(client, options.coverJpeg),
+      upload_id: await uploadStandalonePhoto(client, options.coverJpeg),
       crop_rect: FULL_CROP,
     };
   }

@@ -107,6 +107,24 @@ describe('IgFlare facade', () => {
     expect(transport.requests[0]?.url).toContain('/api/v1/accounts/current_user/');
   });
 
+  it('delegates the profile picture change and removal', async () => {
+    const { ig, transport } = clientWith((req) =>
+      req.url.includes('rupload_igphoto')
+        ? json({ status: 'ok', upload_id: 'U1' })
+        : json({ status: 'ok', user: { pk: 1, username: 'me' } }),
+    );
+    const jpeg = new Uint8Array([
+      0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90, 0x03,
+    ]);
+    expect((await ig.account.setPicture(jpeg)).username).toBe('me');
+    expect((await ig.account.removePicture()).username).toBe('me');
+    expect(transport.requests.map((r) => new URL(r.url).pathname)).toEqual([
+      expect.stringContaining('/rupload_igphoto/'),
+      '/api/v1/accounts/change_profile_picture/',
+      '/api/v1/accounts/remove_profile_picture/',
+    ]);
+  });
+
   it('delegates friendship actions and lists', async () => {
     const { ig, transport } = clientWith((req) =>
       req.url.includes('/followers/')

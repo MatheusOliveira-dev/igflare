@@ -68,6 +68,8 @@ import {
   setBioLink,
   setBiography,
   setName,
+  setProfilePicture,
+  removeProfilePicture,
 } from '../endpoints/account/account';
 import type { BioLink } from '../schemas/bio-link';
 import type { Activity } from '../schemas/activity';
@@ -219,6 +221,10 @@ export interface AccountApi {
   setBiography(text: string): Promise<User>;
   /** Changes the display name (Instagram limits this to a couple of changes per 14 days). */
   setName(name: string): Promise<User>;
+  /** Replaces the profile picture with a JPEG, returning the updated profile. */
+  setPicture(jpeg: Uint8Array): Promise<User>;
+  /** Removes the profile picture, back to the default avatar. */
+  removePicture(): Promise<User>;
   /** The links listed on the profile. */
   links(): Promise<BioLink[]>;
   /** Sets the profile link, returning the list as the profile now holds it. */
@@ -641,6 +647,8 @@ export class IgFlare {
       me: () => getCurrentUser(client),
       setBiography: (text) => setBiography(client, text),
       setName: (name) => setName(client, name),
+      setPicture: (jpeg) => setProfilePicture(client, jpeg),
+      removePicture: () => removeProfilePicture(client),
       links: () => getBioLinks(client),
       setLink: (url, title) => setBioLink(client, url, title),
       removeLinks: (ids) => removeBioLinks(client, ids),

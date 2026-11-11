@@ -337,8 +337,11 @@ export async function uploadStoryPhoto(client: PrivateClient, jpeg: Uint8Array):
   return configureStory(client, uploadId, width, height);
 }
 
-/** Uploads a JPEG to use as a highlight cover and returns the upload id the edit refers to. */
-export function uploadHighlightCover(client: PrivateClient, jpeg: Uint8Array): Promise<string> {
+/**
+ * Uploads a JPEG that is not published on its own (a highlight cover, a profile picture)
+ * and returns the upload id the next call refers to.
+ */
+export function uploadStandalonePhoto(client: PrivateClient, jpeg: Uint8Array): Promise<string> {
   parseJpegSize(jpeg); // fail early on a non-JPEG, before any network call
   return ruploadPhoto(client, jpeg, newUploadId(), '1');
 }

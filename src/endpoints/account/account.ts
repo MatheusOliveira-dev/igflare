@@ -9,6 +9,18 @@ import { parseSchemaList } from '../../schemas/parse-list';
 import { activityItemSchema, type Activity, type ActivityItem } from '../../schemas/activity';
 import { isRecord } from '../../core/guards';
 import { getCurrentUser } from '../user/current-user';
+import { uploadStandalonePhoto } from '../upload/upload';
+
+/** The updated profile an account edit answers with. */
+function updatedUser(json: Record<string, unknown>, what: string): User {
+  const parsed = userSchema.safeParse(json['user']);
+  if (!parsed.success) {
+    throw new ClientSchemaError(`${what} response did not include a valid user`, json['user'], {
+      cause: parsed.error,
+    });
+  }
+  return parsed.data;
+}
 
 /** Sets the logged-in account's biography and returns the updated profile. */
 export async function setBiography(client: PrivateClient, text: string): Promise<User> {
@@ -17,17 +29,28 @@ export async function setBiography(client: PrivateClient, text: string): Promise
     endpoint: endpoints.accountsSetBiography.path,
     payload: { raw_text: text },
   });
-  const parsed = userSchema.safeParse(json['user']);
-  if (!parsed.success) {
-    throw new ClientSchemaError(
-      'set_biography response did not include a valid user',
-      json['user'],
-      {
-        cause: parsed.error,
-      },
-    );
-  }
-  return parsed.data;
+  return updatedUser(json, 'set_biography');
+}
+
+/** Replaces the profile picture with a JPEG and returns the updated profile. */
+export async function setProfilePicture(client: PrivateClient, jpeg: Uint8Array): Promise<User> {
+  const uploadId = await uploadStandalonePhoto(client, jpeg);
+  const json = await client.request({
+    method: endpoints.accountsChangeProfilePicture.method,
+    endpoint: endpoints.accountsChangeProfilePicture.path,
+    payload: { use_fbuploader: 'true', upload_id: uploadId },
+  });
+  return updatedUser(json, 'change_profile_picture');
+}
+
+/** Removes the profile picture (back to the default avatar) and returns the updated profile. */
+export async function removeProfilePicture(client: PrivateClient): Promise<User> {
+  const json = await client.request({
+    method: endpoints.accountsRemoveProfilePicture.method,
+    endpoint: endpoints.accountsRemoveProfilePicture.path,
+    payload: {},
+  });
+  return updatedUser(json, 'remove_profile_picture');
 }
 
 /**
@@ -58,17 +81,7 @@ export async function setName(client: PrivateClient, name: string): Promise<User
     endpoint: endpoints.accountsEditProfile.path,
     payload,
   });
-  const parsed = userSchema.safeParse(json['user']);
-  if (!parsed.success) {
-    throw new ClientSchemaError(
-      'edit_profile response did not include a valid user',
-      json['user'],
-      {
-        cause: parsed.error,
-      },
-    );
-  }
-  return parsed.data;
+  return updatedUser(json, 'edit_profile');
 }
 
 /** The links listed on the logged-in profile (empty when there are none). */

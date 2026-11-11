@@ -117,6 +117,8 @@ export {
 export {
   setBiography,
   setName,
+  setProfilePicture,
+  removeProfilePicture,
   getBioLinks,
   setBioLink,
   removeBioLinks,

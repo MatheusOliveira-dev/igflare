@@ -12,9 +12,11 @@ export interface AccountApi {
     links(): Promise<BioLink[]>;
     me(): Promise<Record<string, unknown>>;
     removeLinks(linkIds: string[]): Promise<BioLink[]>;
+    removePicture(): Promise<User>;
     setBiography(text: string): Promise<User>;
     setLink(url: string, title?: string): Promise<BioLink[]>;
     setName(name: string): Promise<User>;
+    setPicture(jpeg: Uint8Array): Promise<User>;
 }
 
 // @public (undocumented)
@@ -769,7 +771,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsEditProfile' | 'accountsLogin' | 'accountsRemoveBioLinks' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'accountsUpdateBioLinks' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'clipsConnected' | 'clipsDiscover' | 'clipsDiscoverSocial' | 'clipsUser' | 'collectionsCreate' | 'collectionsDelete' | 'collectionsList' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastRavenAttachment' | 'directBroadcastReaction' | 'directBroadcastStoryShare' | 'directBroadcastVoiceAttachment' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'discoverTopicalExplore' | 'fbsearchPlaces' | 'feedCollection' | 'feedLiked' | 'feedReelsMedia' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsRemoveFollower' | 'friendshipsSetBesties' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'highlightsCreateReel' | 'highlightsDeleteReel' | 'highlightsEditReel' | 'highlightsTray' | 'launcherSync' | 'locationSearch' | 'locationsInfo' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureSidecar' | 'mediaConfigureToClips' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaSeenV2' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'newsInbox' | 'tagsInfo' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
+export type EndpointName = 'accountsChangeProfilePicture' | 'accountsCurrentUser' | 'accountsEditProfile' | 'accountsLogin' | 'accountsRemoveBioLinks' | 'accountsRemoveProfilePicture' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'accountsUpdateBioLinks' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'clipsConnected' | 'clipsDiscover' | 'clipsDiscoverSocial' | 'clipsUser' | 'collectionsCreate' | 'collectionsDelete' | 'collectionsList' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastRavenAttachment' | 'directBroadcastReaction' | 'directBroadcastStoryShare' | 'directBroadcastVoiceAttachment' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'discoverTopicalExplore' | 'fbsearchPlaces' | 'feedCollection' | 'feedLiked' | 'feedReelsMedia' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsRemoveFollower' | 'friendshipsSetBesties' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'highlightsCreateReel' | 'highlightsDeleteReel' | 'highlightsEditReel' | 'highlightsTray' | 'launcherSync' | 'locationSearch' | 'locationsInfo' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureSidecar' | 'mediaConfigureToClips' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaSeenV2' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'newsInbox' | 'tagsInfo' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;
@@ -1984,6 +1986,9 @@ export function removeCloseFriend(client: PrivateClient, pk: string): Promise<Fr
 // @public
 export function removeFollower(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
 
+// @public
+export function removeProfilePicture(client: PrivateClient): Promise<User>;
+
 // @public (undocumented)
 export interface ReplyListOptions {
     readonly cursor?: string;
@@ -2103,6 +2108,9 @@ export function setBioLink(client: PrivateClient, url: string, title?: string): 
 
 // @public
 export function setName(client: PrivateClient, name: string): Promise<User>;
+
+// @public
+export function setProfilePicture(client: PrivateClient, jpeg: Uint8Array): Promise<User>;
 
 // @public
 export function setThreadTitle(client: PrivateClient, threadId: string, title: string): Promise<void>;

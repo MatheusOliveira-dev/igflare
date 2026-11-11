@@ -22,6 +22,16 @@
       "path": "/api/v1/accounts/remove_bio_links/"
     },
     {
+      "name": "accountsChangeProfilePicture",
+      "method": "POST",
+      "path": "/api/v1/accounts/change_profile_picture/"
+    },
+    {
+      "name": "accountsRemoveProfilePicture",
+      "method": "POST",
+      "path": "/api/v1/accounts/remove_profile_picture/"
+    },
+    {
       "name": "accountsSetBiography",
       "method": "POST",
       "path": "/api/v1/accounts/set_biography/"

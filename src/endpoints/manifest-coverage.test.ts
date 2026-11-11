@@ -28,6 +28,12 @@ describe('manifest coverage of the hand-written endpoints', () => {
     expect(endpoints.accountsUpdateBioLinks.path).toBe('/api/v1/accounts/update_bio_links/');
     expect(endpoints.accountsRemoveBioLinks.path).toBe('/api/v1/accounts/remove_bio_links/');
     expect(endpoints.newsInbox).toEqual({ method: 'GET', path: '/api/v1/news/inbox/' });
+    expect(endpoints.accountsChangeProfilePicture.path).toBe(
+      '/api/v1/accounts/change_profile_picture/',
+    );
+    expect(endpoints.accountsRemoveProfilePicture.path).toBe(
+      '/api/v1/accounts/remove_profile_picture/',
+    );
     expect(endpoints.directBroadcastRavenAttachment.path).toBe(
       '/api/v1/direct_v2/threads/broadcast/raven_attachment/',
     );

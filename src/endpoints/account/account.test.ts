@@ -6,6 +6,8 @@ import {
   setBioLink,
   setBiography,
   setName,
+  setProfilePicture,
+  removeProfilePicture,
 } from './account';
 import { IgApiError, ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
@@ -217,5 +219,61 @@ describe('getActivity', () => {
   it('throws when an entry does not match the schema', async () => {
     const { client } = clientReturning({ status: 'ok', old_stories: [{ story_type: 'many' }] });
     await expect(getActivity(client)).rejects.toBeInstanceOf(ClientSchemaError);
+  });
+});
+
+const JPEG = new Uint8Array([
+  0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90, 0x03,
+]);
+
+describe('setProfilePicture', () => {
+  it('uploads the picture, then points the profile at the upload', async () => {
+    const transport = new FakeTransport((req) => ({
+      status: 200,
+      headers: {},
+      body: JSON.stringify(
+        req.url.includes('rupload_igphoto')
+          ? { upload_id: 'U7', status: 'ok' }
+          : {
+              status: 'ok',
+              user: { pk: 1, username: 'me', profile_pic_url: 'https://x.invalid/p.jpg' },
+            },
+      ),
+    }));
+    const client = new PrivateClient({ transport, session: createSession() });
+
+    const user = await setProfilePicture(client, JPEG);
+
+    expect(transport.requests[0]?.url).toContain('/rupload_igphoto/');
+    expect(transport.requests[1]?.url).toContain('/api/v1/accounts/change_profile_picture/');
+    const payload = signedPayload(transport.requests[1]?.body);
+    expect(payload['use_fbuploader']).toBe('true');
+    expect(typeof payload['upload_id']).toBe('string');
+    expect(user.profile_pic_url).toBe('https://x.invalid/p.jpg');
+  });
+
+  it('refuses bytes that are not a JPEG before sending anything', async () => {
+    const { client, transport } = clientReturning({ status: 'ok' });
+    await expect(setProfilePicture(client, new Uint8Array([1, 2, 3]))).rejects.toBeInstanceOf(
+      IgError,
+    );
+    expect(transport.requests).toHaveLength(0);
+  });
+});
+
+describe('removeProfilePicture', () => {
+  it('asks for the default avatar and returns the updated user', async () => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      user: { pk: 1, username: 'me', has_anonymous_profile_picture: true },
+    });
+    const user = await removeProfilePicture(client);
+    expect(transport.requests[0]?.url).toContain('/api/v1/accounts/remove_profile_picture/');
+    expect(user.username).toBe('me');
+  });
+
+  it('throws when the response has no valid user', async () => {
+    const { client } = clientReturning({ status: 'ok' });
+    await expect(removeProfilePicture(client)).rejects.toBeInstanceOf(ClientSchemaError);
   });
 });
