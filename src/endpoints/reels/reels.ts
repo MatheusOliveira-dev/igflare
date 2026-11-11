@@ -22,7 +22,7 @@ export interface UserReelsOptions extends ReelsPageOptions {
 
 /**
  * The reels of an answer, whatever it calls the list. The discovery feed mixes in ads
- * under `items_with_ads` and entries with no media; those are left out.
+ * under `items_with_ads` and entries with no media. Those are left out.
  */
 function reelsOf(json: Record<string, unknown>): Media[] {
   const items = json['items'];

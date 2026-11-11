@@ -16,7 +16,7 @@ function endpointSources(): { file: string; text: string }[] {
 const sources = endpointSources();
 
 // The machine half of the response/error contract in ARCHITECTURE.md. It catches
-// the two drifts a static check can catch for sure; honest nullability and that a
+// the two drifts a static check can catch for sure. Honest nullability and that a
 // returned model is actually schema-validated stay with the reviewer.
 describe('endpoint response/error contract', () => {
   it('scans at least the known endpoint files', () => {
@@ -34,7 +34,7 @@ describe('endpoint response/error contract', () => {
     const text = sources.find((s) => s.file === file)?.text ?? '';
     // A quoted/backtick value right after `endpoint:` that holds a path segment is
     // an inline literal. Registry use is an expression (no quote) or a template
-    // that interpolates `endpoints.*` (contains `${`); rawUrl hosts carry no slash.
+    // that interpolates `endpoints.*` (contains `${`). A `rawUrl` host carries no slash.
     const values = [...text.matchAll(/endpoint:\s*[`'"]([^`'"]*)/g)].map((m) => m[1] ?? '');
     const inlinePaths = values.filter((v) => !v.includes('${') && v.includes('/'));
     expect(inlinePaths).toEqual([]);

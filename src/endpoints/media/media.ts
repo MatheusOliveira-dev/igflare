@@ -19,7 +19,7 @@ export interface CommentListOptions {
 
 /**
  * Fetches one media by its full id (the `pk_userid` composite the feed returns).
- * `media/{id}/info/` wraps the media in a one-element `items` array; the single
+ * `media/{id}/info/` wraps the media in a one-element `items` array. The single
  * item is validated into the `Media` model. A missing item or a shape mismatch
  * surfaces as a typed error.
  */

@@ -8,7 +8,7 @@ export const API_DOMAIN = 'i.instagram.com';
 
 /**
  * How the request body is encoded. `signed` is the default private-API body
- * (`signed_body=SIGNATURE.<json>`); `form` url-encodes the payload as plain
+ * (`signed_body=SIGNATURE.<json>`). `form` url-encodes the payload as plain
  * form fields, which the Bloks endpoints expect (they are sent unsigned).
  */
 export type BodyEncoding = 'signed' | 'form';
@@ -41,7 +41,7 @@ function resolvePath(endpoint: string): string {
 
 /**
  * Builds the request path under the API host. A value already starting with
- * `/api/` (the full path a manifest endpoint carries) is used verbatim; anything
+ * `/api/` (the full path a manifest endpoint carries) is used verbatim. Anything
  * else is treated as an under-`/api` endpoint and gets the `/api` prefix.
  */
 function resolveUrl(endpoint: string, domain: string, query?: Record<string, string>): string {

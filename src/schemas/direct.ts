@@ -19,7 +19,7 @@ export const directMessageSchema = z
 export type DirectMessage = z.infer<typeof directMessageSchema>;
 
 /**
- * A direct thread. The inbox returns threads with a `last_permanent_item`; the
+ * A direct thread. The inbox returns threads with a `last_permanent_item`. The
  * thread endpoint fills `items`. The author list is the shared `User` model.
  */
 export const threadSchema = z

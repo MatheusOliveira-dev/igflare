@@ -21,7 +21,7 @@ function parseUser(json: Record<string, unknown>): User {
 }
 
 /**
- * Fetches a user's profile by id. Returns the validated `User` model; a missing
+ * Fetches a user's profile by id. Returns the validated `User` model. A missing
  * user or a response that does not match the schema surfaces as a typed error.
  */
 export async function getUserInfo(client: PrivateClient, pk: string): Promise<User> {

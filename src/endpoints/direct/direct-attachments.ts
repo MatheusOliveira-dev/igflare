@@ -69,7 +69,7 @@ async function uploadMessengerAttachment(
       ...common,
       'Content-Type': 'application/octet-stream',
       Offset: String(offset),
-      // Both lengths are needed together; without Content-Length Node falls back to
+      // Both lengths are needed together. Without Content-Length Node falls back to
       // chunked encoding, which the upload host rejects.
       'Content-Length': String(rest.length),
       'X-Entity-Length': String(upload.bytes.length),
@@ -175,7 +175,7 @@ export async function sendVideo(
 
 export interface VoiceOptions {
   /**
-   * The 70 loudness values (0 to 1) the voice bubble draws as bars. Purely cosmetic; the
+   * The 70 loudness values (0 to 1) the voice bubble draws as bars. Purely cosmetic. The
    * server does not check them. Defaults to a varied pattern so the bubble is not flat.
    */
   readonly waveform?: readonly number[];

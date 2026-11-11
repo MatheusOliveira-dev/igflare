@@ -39,7 +39,7 @@ const KEPT_FIELDS = ['username', 'biography', 'email', 'phone_number', 'external
 
 /**
  * Changes the display name of the logged-in account and returns the updated profile.
- * Instagram allows only a couple of name changes per 14 days; a refused change throws
+ * Instagram allows only a couple of name changes per 14 days. A refused change throws
  * the server's own message.
  */
 export async function setName(client: PrivateClient, name: string): Promise<User> {
@@ -79,7 +79,7 @@ export async function getBioLinks(client: PrivateClient): Promise<BioLink[]> {
 
 /**
  * Sets the profile link and returns the list as the profile now holds it. The profile
- * keeps a list; this adds an external link to it. \`accounts/edit_profile/\` ignores
+ * keeps a list. This adds an external link to it. \`accounts/edit_profile/\` ignores
  * \`external_url\`, which is why this goes through its own endpoint.
  */
 export async function setBioLink(

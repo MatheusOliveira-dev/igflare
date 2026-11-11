@@ -195,7 +195,7 @@ describe('location feeds', () => {
   });
 
   it('echoes max_id, page and next_media_ids back to get the next page', async () => {
-    // Sending only max_id was answered with a 500 live; the server wants all three.
+    // Sending only max_id was answered with a 500 live. The server wants all three.
     const { client, transport } = clientReturning(sections([{ pk: 1 }], NEXT));
     const first = await getLocationFeed(client, '777');
 

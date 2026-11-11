@@ -24,9 +24,9 @@ export function buildBloksPayload(
 
 /**
  * The device network signals the CAA login params include. These are the stable
- * values the current Android flow sends; they describe a single-SIM device on
+ * values the current Android flow sends. They describe a single-SIM device on
  * wifi and are not derived from the real connection. `310260` is the T-Mobile US
- * MCC/MNC (MCC 310, MNC 260) the reference capture carried; it is a plausible
+ * MCC/MNC (MCC 310, MNC 260) the reference capture carried. It is a plausible
  * carrier constant, not a value the server validates against the real SIM.
  */
 export function caaDeviceNetworkInfo(): Record<string, unknown> {

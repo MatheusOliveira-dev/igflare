@@ -16,7 +16,7 @@ export interface PrivateClientOptions {
   readonly session?: SessionData;
   /**
    * Called when a request is rejected with `login_required` (the session expired).
-   * It should re-authenticate; the rejected request is then repeated once. Several
+   * It should re-authenticate. The rejected request is then repeated once. Several
    * requests failing together share one call, and requests the hook itself makes
    * never trigger it again.
    */

@@ -8,7 +8,7 @@ import type { PrivateResponseJson } from '../../core/http/response';
 
 // A real login-after-challenge response from the Bloks flow, with identity, token and
 // cookie values replaced by fakes. The hand-built vectors in the other auth tests
-// cannot catch a shape drift in the real payload; this one can.
+// cannot catch a shape drift in the real payload. This one can.
 const LOGIN_SUCCESS = new URL(
   '../../core/http/__fixtures__/caa-login-success.json',
   import.meta.url,

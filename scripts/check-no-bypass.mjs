@@ -1,5 +1,5 @@
 // Fails if source sneaks in a way to bypass the guards. Config changes are the
-// honest path; silent inline escapes are not.
+// honest path. Silent inline escapes are not.
 import { readFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 

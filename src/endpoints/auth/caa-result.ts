@@ -31,7 +31,7 @@ function isSuccessLogin(loginResponse: Record<string, unknown>): boolean {
 /**
  * Bloks error states that carry no login_response bundle are surfaced as action
  * markers. Each entry maps a marker string to the typed error it raises. Only the
- * markers with a captured response are listed; others await a real sample (the
+ * markers with a captured response are listed. Others await a real sample (the
  * flow still fails with a typed IgApiError until then).
  */
 const CAA_ERROR_MARKERS: readonly {
@@ -55,7 +55,7 @@ const CAA_ERROR_MARKERS: readonly {
 
 /**
  * Applies a CAA login or code-submission response: the session on success, a typed
- * error otherwise. `aac` is the account access context of this login attempt; a
+ * error otherwise. `aac` is the account access context of this login attempt. A
  * two-factor stop carries it so the code submission can echo it back.
  */
 export async function applyCaaResult(

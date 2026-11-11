@@ -8,7 +8,7 @@ import { LoginRequiredError } from '../../errors/api-errors';
 // Real responses captured from Instagram and sanitized (the signed query strings of URLs
 // and every token, session or contact field removed). They are kept as the server sent
 // them, so 64-bit ids are plain JSON numbers here, as on the wire. The other tests build
-// their responses by hand; these are the check that the parsers still agree with reality.
+// their responses by hand. These are the check that the parsers still agree with reality.
 const FIXTURES = new URL('./__fixtures__/', import.meta.url);
 
 function fixture(name: string): string {

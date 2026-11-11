@@ -52,7 +52,7 @@ function eachBox(
 /** Reads timescale + duration from an `mvhd` box into milliseconds. */
 function mvhdDurationMs(bytes: Uint8Array, start: number): number {
   const version = bytes[start] ?? 0;
-  // version 0: creation(4) mod(4) timescale(4) duration(4); version 1 uses 8-byte times.
+  // version 0: creation(4) mod(4) timescale(4) duration(4). Version 1 uses 8-byte times.
   const timescaleAt = version === 1 ? start + 4 + 16 : start + 4 + 8;
   const timescale = u32(bytes, timescaleAt);
   const duration = version === 1 ? u32(bytes, timescaleAt + 8) : u32(bytes, timescaleAt + 4);
@@ -79,7 +79,7 @@ function tkhdSize(bytes: Uint8Array, boxEnd: number): { width: number; height: n
 
 /**
  * Reads a video's duration and pixel dimensions from an MP4's `moov` metadata,
- * without decoding the stream. Best-effort and dependency-free; throws when the
+ * without decoding the stream. Best-effort and dependency-free. Throws when the
  * boxes are not found so the caller can supply the values instead.
  */
 export function parseMp4Meta(bytes: Uint8Array): VideoMeta {
@@ -98,7 +98,7 @@ export function parseMp4Meta(bytes: Uint8Array): VideoMeta {
         eachBox(bytes, moovStart, moovEnd, (trakType, _trakStart, trakEnd) => {
           if (trakType === 'tkhd') {
             const size = tkhdSize(bytes, trakEnd);
-            // The video track reports non-zero dimensions; audio tracks report 0.
+            // The video track reports non-zero dimensions. Audio tracks report 0.
             if (size.width > 0 && size.height > 0) {
               width = size.width;
               height = size.height;

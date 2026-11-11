@@ -10,7 +10,7 @@ import { randomUUID } from 'node:crypto';
 /**
  * The hashtag page was replaced in app build 454 by the search results screen, which is
  * served by this persisted GraphQL query. The id belongs to that build (read from the
- * app's `client_persist_ids` asset); a new build can change it, and the symptom is a
+ * app's `client_persist_ids` asset). A new build can change it, and the symptom is a
  * `ClientSchemaError` or `IgApiError` from this call.
  */
 const TOP_SERP_DOC_ID = '4185316819665014057952243780';
@@ -149,7 +149,7 @@ function serpVariables(
 }
 
 /**
- * The results carry the author with an id under `strong_id__` rather than `pk`; copy it
+ * The results carry the author with an id under `strong_id__` rather than `pk`. Copy it
  * over so the shared `User` model has its usual id.
  */
 function withAuthorPk(candidate: unknown): unknown {

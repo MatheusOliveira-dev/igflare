@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * The relationship between the logged-in account and another user, as the private
  * API reports it on the friendships endpoints. Only the fields the SDK exposes are
- * typed; the rest pass through, and each is optional because the API includes a
+ * typed. The rest pass through, and each is optional because the API includes a
  * different subset per endpoint and context.
  */
 export const friendshipStatusSchema = z

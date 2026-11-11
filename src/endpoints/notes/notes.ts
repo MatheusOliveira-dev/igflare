@@ -5,7 +5,7 @@ import { noteSchema, type Note } from '../../schemas/note';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 
-// Persisted-query ids of the app build this client reports (454); a new build can change
+// Persisted-query ids of the app build this client reports (454). A new build can change
 // them, and the symptom is a typed error from these calls.
 const INBOX_TRAY_DOC_ID = '268384441910567718382899365573';
 const CREATE_DOC_ID = '3510400299040717503474948856';

@@ -1,7 +1,7 @@
 # Conventions
 
 Most conventions are enforced by tooling, not by this document. A convention that a tool
-can check lives in that tool's config; this file holds only what tools cannot check.
+can check lives in that tool's config. This file holds only what tools cannot check.
 
 ## Enforced by tooling
 

@@ -25,7 +25,7 @@ export interface EditMediaOptions {
   /**
    * People to tag, or to move if they are already tagged. Tags not listed are
    * left alone. On a private account the server only applies a tag for someone who can
-   * see the post (a follower); for anyone else it answers ok and tags nobody, so read
+   * see the post (a follower). For anyone else it answers ok and tags nobody, so read
    * the result back from `usertags`.
    */
   readonly tag?: readonly UserTag[];

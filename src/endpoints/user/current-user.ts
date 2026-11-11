@@ -3,7 +3,7 @@ import { endpoints } from '../../generated/endpoints';
 import { IgError } from '../../errors/ig-error';
 
 /**
- * Fetches the logged-in account's own profile. Requires a logged-in session; it
+ * Fetches the logged-in account's own profile. Requires a logged-in session. It
  * is the simplest way to confirm the captured authorization is accepted.
  */
 export async function getCurrentUser(client: PrivateClient): Promise<Record<string, unknown>> {

@@ -274,7 +274,7 @@ export async function uploadPhoto(
 
 /**
  * Publishes an MP4 as a feed video. The caller supplies a cover JPEG (frame
- * extraction needs a decoder, which the SDK does not bundle); duration and
+ * extraction needs a decoder, which the SDK does not bundle). Duration and
  * dimensions are read from the MP4 unless given in `options`. Configure is
  * retried while the server is still transcoding.
  */
@@ -425,7 +425,7 @@ async function uploadAlbumChild(
 
 /**
  * Publishes 2 to 10 photos and videos as one carousel post. Every item is uploaded
- * first, then one configure call publishes them together; that call is retried while
+ * first, then one configure call publishes them together. That call is retried while
  * a video is still being transcoded.
  */
 export async function uploadAlbum(
@@ -450,7 +450,7 @@ export async function uploadAlbum(
   const base = Date.now();
   const children: Record<string, unknown>[] = [];
   for (const [index, item] of items.entries()) {
-    // One id per picture; the timestamp alone would repeat within a millisecond.
+    // One id per picture. The timestamp alone would repeat within a millisecond.
     children.push(await uploadAlbumChild(client, item, String(base + index)));
   }
 
@@ -629,7 +629,7 @@ async function ruploadReelVideo(
 
 /**
  * Publishes an MP4 as a reel. The caller supplies the cover JPEG (frame extraction needs
- * a decoder, which the SDK does not bundle); duration and size are read from the MP4
+ * a decoder, which the SDK does not bundle). Duration and size are read from the MP4
  * unless given. The steps are the app's: the upload settings, the video, the cover, then
  * the configure call, retried while the server is still transcoding.
  */

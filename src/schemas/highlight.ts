@@ -3,9 +3,9 @@ import { mediaSchema } from './media';
 import { userSchema } from './user';
 
 /**
- * A story highlight. `id` is the app's form, `highlight:123`; the functions that take a
+ * A story highlight. `id` is the app's form, `highlight:123`. The functions that take a
  * highlight accept that or the bare `123`. A highlight read on its own also carries its
- * stories under `items`; one listed on a profile does not.
+ * stories under `items`. One listed on a profile does not.
  */
 export const highlightSchema = z
   .object({

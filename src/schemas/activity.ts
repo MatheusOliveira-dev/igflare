@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * One entry of the activity feed (a like, a comment, a new follower, a mention, ...).
- * `story_type` says which kind it is; the app has dozens and adds them often, so the
+ * `story_type` says which kind it is. The app has dozens and adds them often, so the
  * kind stays a number and everything else passes through untouched.
  */
 export const activityItemSchema = z

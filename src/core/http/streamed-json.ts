@@ -19,7 +19,7 @@ function mergeFragment(root: Record<string, unknown>, fragment: Record<string, u
       return;
     }
     if (isRecord(node) && typeof step === 'string') {
-      // The first document keys a root field as `1$name(...)`; a path names it without the prefix.
+      // The first document keys a root field as `1$name(...)`. A path names it without the prefix.
       const key = Object.keys(node).find((name) => name === step || name === `1$${step}`);
       node = key !== undefined ? node[key] : undefined;
     } else if (Array.isArray(node) && typeof step === 'number') {

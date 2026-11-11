@@ -37,8 +37,8 @@ function normalizeApiPath(apiPath: string): string {
 
 /**
  * Opens the challenge referenced by a ChallengeRequiredError. Covers the common
- * select-method / submit-code flow; bloks and contact-form variants are not
- * handled here — inspect `data` and drive those manually.
+ * select-method / submit-code flow. Bloks and contact-form variants are not
+ * handled here. Their details are in the response `data`, for the caller to drive.
  */
 export async function startChallenge(
   client: PrivateClient,

@@ -162,7 +162,7 @@ describe('resolveCaaTwoFactor code source timing', () => {
       },
     });
 
-    // entrypoint + code entry have already been sent; the submit has not.
+    // entrypoint + code entry have already been sent. The submit has not.
     expect(requestsWhenAsked).toBe(2);
     expect(paramsOf(transport.requests[2]).client_input_params['code']).toBe('135790');
   });

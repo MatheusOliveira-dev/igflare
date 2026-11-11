@@ -16,7 +16,7 @@ function threadPath(definition: EndpointDefinition, threadId: string): string {
 }
 
 /**
- * Posts a thread action. Most of them take plain form fields; delete, mute and
+ * Posts a thread action. Most of them take plain form fields. Delete, mute and
  * group creation take the signed body, mirroring what the app sends for each.
  */
 async function postAction(
@@ -171,7 +171,7 @@ export async function markMessageSeen(
 
 /**
  * Creates a group thread and returns its id. Instagram needs at least two other
- * participants for a group; with one, send to that user instead.
+ * participants for a group. With one, send to that user instead.
  */
 export async function createGroupThread(
   client: PrivateClient,
@@ -254,7 +254,7 @@ export async function searchRecipients(
   if (!Array.isArray(ranked)) {
     throw new ClientSchemaError('recipient search did not include ranked_recipients', json);
   }
-  // Suggestions from Facebook come without a username; only Instagram users are kept.
+  // Suggestions from Facebook come without a username. Only Instagram users are kept.
   const users = ranked
     .map((entry) => (isRecord(entry) ? entry['user'] : undefined))
     .filter(

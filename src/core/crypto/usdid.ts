@@ -9,7 +9,7 @@ import {
 /**
  * The local P-256 signing identity behind the `X-Meta-Usdid` header and the
  * USDID registration token the current Android app presents during CAA login.
- * The private key never leaves the client; only signatures and the public key
+ * The private key never leaves the client. Only signatures and the public key
  * are sent. Persist these fields to keep one stable identity across logins.
  */
 export interface UsdidIdentity {

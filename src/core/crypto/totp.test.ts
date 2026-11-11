@@ -3,7 +3,7 @@ import { generateTotp } from './totp';
 import { IgError } from '../../errors/ig-error';
 
 // RFC 6238 appendix B: the SHA-1 secret is the ASCII string "12345678901234567890",
-// whose base32 form is below. The RFC lists 8-digit codes; a 6-digit code is the
+// whose base32 form is below. The RFC lists 8-digit codes. A 6-digit code is the
 // same number modulo 10^6, which is what authenticator apps show.
 const RFC_SECRET = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ';
 

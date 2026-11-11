@@ -17,7 +17,7 @@ import {
 import { ClientSchemaError, IgApiError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 
-// Persisted-query ids of the app build this client reports (454); a new build can change
+// Persisted-query ids of the app build this client reports (454). A new build can change
 // them, and the symptom is a typed error from these calls.
 interface InsightsQuery {
   readonly friendlyName: string;

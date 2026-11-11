@@ -194,7 +194,7 @@ describe('PrivateClient session expiry', () => {
       session: createSession(),
       onSessionExpired: async () => {
         hookCalls += 1;
-        // A login-like request made inside the hook is also rejected; it must
+        // A login-like request made inside the hook is also rejected. It must
         // surface to the hook instead of recursing into another re-authentication.
         await client.request({ method: 'GET', endpoint: 'inside/' }).catch(() => undefined);
       },

@@ -463,7 +463,7 @@ export type IgFlareLogin = CaaLoginCredentials & { readonly twoFactor?: TwoFacto
 export interface IgFlareOptions extends PrivateClientOptions {
   /**
    * Retry policy. By default the transport is wrapped in a `RetryTransport` with
-   * conservative backoff; pass tuning here, or `false` to disable retries (e.g.
+   * conservative backoff. Pass tuning here, or `false` to disable retries (e.g.
    * when supplying a transport that already retries).
    */
   readonly retry?: false | RetryOptions;
@@ -576,7 +576,7 @@ export class IgFlare {
   /**
    * Logs in with username and password through the CAA/Bloks flow. If the account
    * asks for a second factor, pass `twoFactor` (a code, a TOTP secret, or a function
-   * that provides one) and the login resolves it; without it a
+   * that provides one) and the login resolves it. Without it a
    * `CaaTwoFactorRequiredError` is thrown, to finish with `resolveTwoFactor`.
    */
   async login(credentials: IgFlareLogin): Promise<PrivateResponseJson> {

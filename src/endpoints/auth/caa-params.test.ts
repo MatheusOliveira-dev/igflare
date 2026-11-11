@@ -13,7 +13,7 @@ const device = createDeviceState({
 });
 
 // The param maps are ported verbatim from a real capture. These snapshots pin the
-// exact shape so an accidental field drift during a refactor fails the build; the
+// exact shape so an accidental field drift during a refactor fails the build. The
 // live login test covers that the captured values are still the ones the server
 // accepts.
 describe('CAA param builders', () => {

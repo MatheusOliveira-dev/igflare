@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * A saved-posts collection. Besides the ones a person makes, the app lists automatic
- * ones (all saved posts, products); `collection_type` tells them apart.
+ * ones (all saved posts, products). `collection_type` tells them apart.
  */
 export const collectionSchema = z
   .object({

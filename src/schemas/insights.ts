@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * One figure of an insights screen, with the text the app shows next to it. `value` is null
  * when the figure does not apply yet, and the text is then "--". The server sends the value
- * under `1fvalue`; the endpoints strip that marker before parsing.
+ * under `1fvalue`. The endpoints strip that marker before parsing.
  */
 export const insightMetricSchema = z
   .object({

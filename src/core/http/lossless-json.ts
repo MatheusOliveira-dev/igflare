@@ -81,7 +81,7 @@ function quoteUnsafeInts(json: string): string {
 
 /** Parses JSON while preserving integers too large for a float as exact strings. */
 export function parseLosslessJson(text: string): unknown {
-  // A lossy integer has at least 16 digits in a row; most responses have none, so they
+  // A lossy integer has at least 16 digits in a row. Most responses have none, so they
   // skip the character-by-character rewrite.
   if (!/\d{16}/.test(text)) {
     return JSON.parse(text);

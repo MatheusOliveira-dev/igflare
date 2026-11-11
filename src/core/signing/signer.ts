@@ -3,7 +3,7 @@
  * is the layer most likely to change, so everything that signs goes through this
  * port and is pinned by golden vectors.
  *
- * The app no longer HMACs the body; it sends `signed_body=SIGNATURE.<payload>`
+ * The app no longer HMACs the body. It sends `signed_body=SIGNATURE.<payload>`
  * with the payload url-encoded the way Python's `urllib.parse.quote_plus` does
  * (space becomes `+`), which is what the reference client produces.
  */

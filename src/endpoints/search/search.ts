@@ -124,7 +124,7 @@ export async function searchNearby(
   const places = venues.map((venue) =>
     isRecord(venue)
       ? {
-          // A place lists its id as `external_id`; every other call calls it `pk`.
+          // A place lists its id as `external_id`. Every other call calls it `pk`.
           pk: venue['external_id'],
           lat: latitude,
           lng: longitude,

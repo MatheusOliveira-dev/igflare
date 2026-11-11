@@ -55,7 +55,7 @@ export function paginateUserFeed(client: PrivateClient, pk: string): AsyncGenera
 /**
  * Extracts the media list from a timeline response. Newer builds wrap each item in
  * `feed_items[].media_or_ad` (alongside non-media entries like suggested users and
- * the end-of-feed marker, which are skipped); older builds return a flat `items`.
+ * the end-of-feed marker, which are skipped). Older builds return a flat `items`.
  */
 function timelineMediaCandidates(json: Record<string, unknown>): unknown[] {
   const feedItems = json['feed_items'];
@@ -206,7 +206,7 @@ function sectionsBody(cursor: string | undefined): Record<string, unknown> {
 
 /**
  * One page of the posts listed for a hashtag, ranked by relevance (there is no
- * chronological view). Posts come in the light form the search grid uses; see
+ * chronological view). Posts come in the light form the search grid uses. See
  * `getHashtagSerpPage`. Pass `cursor` to continue.
  */
 export function getHashtagFeed(

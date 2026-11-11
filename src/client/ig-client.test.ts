@@ -43,7 +43,7 @@ function loginResponse(pk: number): HttpResponse {
 }
 
 /**
- * Serves the CAA preflight (password key, USDID, aac, keystore); `rest` handles every
+ * Serves the CAA preflight (password key, USDID, aac, keystore). `rest` handles every
  * later step and returns undefined to fall through to a bare ok response.
  */
 function caaFlowTransport(rest: (req: HttpRequest) => HttpResponse | undefined): FakeTransport {

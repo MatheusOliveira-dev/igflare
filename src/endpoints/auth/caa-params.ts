@@ -5,7 +5,7 @@ import { caaDeviceNetworkInfo } from '../../core/bloks/payload';
  * The large Bloks parameter maps the CAA login steps send. They are kept here,
  * apart from the flow that orchestrates them, so a field change is a localized
  * edit to typed data rather than a hunt through the request code. Every value is
- * ported verbatim from the reference Android capture; the non-obvious constants
+ * ported verbatim from the reference Android capture. The non-obvious constants
  * are documented at their definition.
  */
 

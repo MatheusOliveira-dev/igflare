@@ -27,16 +27,16 @@ generated        the endpoint registry (name -> method + path) from `npm run gen
 
 Retry/backoff on transient failures lives in a `RetryTransport` decorator over the
 transport port, not in `core/http`. An endpoint's method and path come from the
-generated registry; everything else about the endpoint is hand-written.
+generated registry. Everything else about the endpoint is hand-written.
 
-Folders appear as the code that fills them lands, not before — no empty scaffolding.
+Folders appear as the code that fills them lands, not before. There is no empty scaffolding.
 
 ## Dependency rule
 
 Enforced by `dependency-cruiser` (`.dependency-cruiser.cjs`), not by convention:
 
 - `endpoints` depend on core **ports** (interfaces), never on concrete adapters.
-- `client` depends on `endpoints`; nothing depends on `client` except the package entry.
+- `client` depends on `endpoints`. Nothing depends on `client` except the package entry.
 - Adapters are leaves.
 - No cycles.
 
@@ -53,14 +53,14 @@ Every endpoint follows one shape, so a caller learns it once:
 
 - **Success returns the model, not an envelope.** An endpoint returns the parsed,
   typed domain model directly (`User`, `Media`, …). There is no `{ ok, data }`
-  wrapper; absence of a thrown error is success.
+  wrapper. Absence of a thrown error is success.
 - **Failure throws a typed error.** Everything that can go wrong surfaces as an
-  `IgError` subclass — the `IgApiError` taxonomy (`BadPasswordError`,
+  `IgError` subclass: the `IgApiError` taxonomy (`BadPasswordError`,
   `ChallengeRequiredError`, `RateLimitError`, …) for API failures, mapped in one
   place (`core/http/response.ts`, reused by the CAA flow). Endpoints never return
   an error value.
 - **Responses are validated at the boundary with zod, leniently.** A schema types
-  and validates only the fields the SDK exposes; everything else passes through
+  and validates only the fields the SDK exposes. Everything else passes through
   (`z.looseObject` / `.loose()`), and the API's own fields are `optional`/`nullable` so a
   benign upstream change does not break callers. The types tell the truth about
   nullability rather than overpromising.

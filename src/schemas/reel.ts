@@ -5,7 +5,7 @@ import { mediaSchema } from './media';
 /**
  * A story reel: a user's current story and its media items. Lean and lenient,
  * reusing the User and Media models. The reels tray returns one per user with an
- * active story; the user story endpoint returns a single reel.
+ * active story. The user story endpoint returns a single reel.
  */
 export const reelSchema = z
   .object({
