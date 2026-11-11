@@ -61,6 +61,7 @@ import {
   paginateSavedPosts,
 } from '../endpoints/media/media';
 import {
+  getActivity,
   getBioLinks,
   removeBioLinks,
   setBioLink,
@@ -68,6 +69,7 @@ import {
   setName,
 } from '../endpoints/account/account';
 import type { BioLink } from '../schemas/bio-link';
+import type { Activity } from '../schemas/activity';
 import type { CommentListOptions, CommentOptions } from '../endpoints/media/media';
 import {
   likeComment,
@@ -148,6 +150,8 @@ export interface AccountApi {
   setLink(url: string, title?: string): Promise<BioLink[]>;
   /** Removes profile links by `link_id`, returning the list that remains. */
   removeLinks(linkIds: string[]): Promise<BioLink[]>;
+  /** The activity feed (likes, comments, new followers), first page. Marks nothing as seen. */
+  activity(): Promise<Activity>;
 }
 
 /** Reads about any user. */
@@ -413,6 +417,7 @@ export class IgFlare {
       links: () => getBioLinks(client),
       setLink: (url, title) => setBioLink(client, url, title),
       removeLinks: (ids) => removeBioLinks(client, ids),
+      activity: () => getActivity(client),
     };
   }
 

@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { getBioLinks, removeBioLinks, setBioLink, setBiography, setName } from './account';
+import {
+  getActivity,
+  getBioLinks,
+  removeBioLinks,
+  setBioLink,
+  setBiography,
+  setName,
+} from './account';
 import { IgApiError, ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 import { PrivateClient } from '../../core/http/private-client';
@@ -160,5 +167,55 @@ describe('profile links', () => {
     await expect(removeBioLinks(client, [])).rejects.toBeInstanceOf(IgError);
     await expect(removeBioLinks(client, ['9007199254740993'])).rejects.toBeInstanceOf(IgError);
     expect(transport.requests).toHaveLength(0);
+  });
+});
+
+describe('getActivity', () => {
+  const ITEM = {
+    pk: 'a1',
+    type: 3,
+    story_type: 101,
+    args: {
+      profile_id: 10000000001,
+      profile_name: 'fake_user',
+      rich_text: '{fake_user} liked',
+      timestamp: 1700000000,
+    },
+  };
+
+  it('reads the new and old entries and the pending follow requests', async () => {
+    const { client, transport } = clientReturning({
+      status: 'ok',
+      new_stories: [ITEM],
+      old_stories: [
+        { ...ITEM, pk: 'a2' },
+        { ...ITEM, pk: 'a3' },
+      ],
+      friend_request_stories: [{ type: 6, args: { request_count: 4 } }],
+    });
+
+    const activity = await getActivity(client);
+
+    expect(transport.requests[0]?.url).toContain('/api/v1/news/inbox/');
+    expect(transport.requests[0]?.method).toBe('GET');
+    expect(transport.requests[0]?.url).toContain('mark_as_seen=false');
+    expect(activity.newItems).toHaveLength(1);
+    expect(activity.oldItems.map((item) => item.pk)).toEqual(['a2', 'a3']);
+    expect(activity.newItems[0]?.args?.profile_id).toBe('10000000001');
+    expect(activity.friendRequestCount).toBe(4);
+  });
+
+  it('is empty, with no pending requests, when the account has no activity', async () => {
+    const { client } = clientReturning({ status: 'ok' });
+    expect(await getActivity(client)).toEqual({
+      newItems: [],
+      oldItems: [],
+      friendRequestCount: 0,
+    });
+  });
+
+  it('throws when an entry does not match the schema', async () => {
+    const { client } = clientReturning({ status: 'ok', old_stories: [{ story_type: 'many' }] });
+    await expect(getActivity(client)).rejects.toBeInstanceOf(ClientSchemaError);
   });
 });

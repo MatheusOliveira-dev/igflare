@@ -377,6 +377,11 @@
       "path": "/api/v1/media/{id}/unsave/"
     },
     {
+      "name": "newsInbox",
+      "method": "GET",
+      "path": "/api/v1/news/inbox/"
+    },
+    {
       "name": "tagsSearch",
       "method": "GET",
       "path": "/api/v1/tags/search/"

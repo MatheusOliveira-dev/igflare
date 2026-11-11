@@ -5,6 +5,8 @@ import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 import { bioLinkSchema, type BioLink } from '../../schemas/bio-link';
 import { parseSchemaList } from '../../schemas/parse-list';
+import { activityItemSchema, type Activity, type ActivityItem } from '../../schemas/activity';
+import { isRecord } from '../../core/guards';
 import { assertIds } from '../direct/direct-wire';
 import { getCurrentUser } from '../user/current-user';
 
@@ -114,4 +116,31 @@ export async function removeBioLinks(
     payload: { link_ids: numbers },
   });
   return getBioLinks(client);
+}
+
+function activityItems(value: unknown, what: string): ActivityItem[] {
+  return parseSchemaList<ActivityItem>(value ?? [], activityItemSchema, what);
+}
+
+/**
+ * Reads the activity feed (likes, comments, new followers, mentions): what is new and
+ * what was already seen, first page. It never marks anything as seen.
+ */
+export async function getActivity(client: PrivateClient): Promise<Activity> {
+  const json = await client.request({
+    method: endpoints.newsInbox.method,
+    endpoint: endpoints.newsInbox.path,
+    query: { mark_as_seen: 'false' },
+  });
+  const requests = Array.isArray(json['friend_request_stories'])
+    ? json['friend_request_stories']
+    : [];
+  const first: unknown = requests[0];
+  const args = isRecord(first) ? first['args'] : undefined;
+  const count = isRecord(args) ? args['request_count'] : undefined;
+  return {
+    newItems: activityItems(json['new_stories'], 'new activity'),
+    oldItems: activityItems(json['old_stories'], 'old activity'),
+    friendRequestCount: typeof count === 'number' ? count : 0,
+  };
 }

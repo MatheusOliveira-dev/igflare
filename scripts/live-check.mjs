@@ -45,6 +45,12 @@ const checks = [
     },
   ],
   [
+    'account.activity',
+    async () => {
+      await ig.account.activity();
+    },
+  ],
+  [
     'account.links',
     async () => {
       await ig.account.links();

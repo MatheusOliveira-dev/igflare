@@ -343,6 +343,8 @@ describe('IgFlare facade', () => {
 
   it('delegates profile bio and saved posts', async () => {
     const { ig, transport } = clientWith((req) => {
+      if (req.url.includes('/news/inbox/'))
+        return json({ status: 'ok', old_stories: [{ pk: 'n1' }] });
       if (req.url.includes('/edit_profile/'))
         return json({ status: 'ok', user: { pk: 1, username: 'me', full_name: 'New' } });
       if (req.url.includes('/current_user/'))
@@ -357,6 +359,7 @@ describe('IgFlare facade', () => {
     expect((await ig.account.setBiography('hi')).biography).toBe('hi');
     expect((await ig.account.setName('New')).full_name).toBe('New');
     expect(await ig.account.links()).toEqual([]);
+    expect((await ig.account.activity()).oldItems[0]?.pk).toBe('n1');
     expect(await ig.account.setLink('https://example.com')).toEqual([]);
     expect(await ig.account.removeLinks(['1'])).toEqual([]);
     await ig.media.save('1_9');
