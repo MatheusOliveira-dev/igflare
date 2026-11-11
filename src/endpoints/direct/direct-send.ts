@@ -111,6 +111,8 @@ export async function reactToMessage(
     is_x_transport_forward: 'false',
     send_silently: 'false',
     send_attribution: 'message_reaction',
+    // Quoted on purpose: a thread id has 39 digits, past 2^53, so a bare number would lose
+    // precision in JavaScript. The server accepted this form on a 39-digit id (checked live).
     thread_ids: JSON.stringify([threadId]),
     item_type: 'reaction',
     reaction_type: 'like',
