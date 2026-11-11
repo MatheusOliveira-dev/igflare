@@ -7,7 +7,15 @@ import globals from 'globals';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'coverage', 'reports', '.stryker-tmp', 'src/generated', 'node_modules'],
+    ignores: [
+      'dist',
+      'coverage',
+      'reports',
+      '.stryker-tmp',
+      'src/generated',
+      'node_modules',
+      '.local',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
