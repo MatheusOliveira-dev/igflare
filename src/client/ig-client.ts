@@ -124,8 +124,11 @@ import {
   reactToMessage,
   shareMedia,
   shareProfile,
+  shareStory,
   sendPhoto,
 } from '../endpoints/direct/direct-send';
+import { sendVideo, sendVoice } from '../endpoints/direct/direct-attachments';
+import type { VoiceOptions } from '../endpoints/direct/direct-attachments';
 import type { ReactionOptions, ShareMediaOptions } from '../endpoints/direct/direct-send';
 import type { User } from '../schemas/user';
 import type { FriendshipStatus } from '../schemas/friendship';
@@ -232,6 +235,12 @@ export interface DirectApi {
   ): Promise<DirectSendResult>;
   shareProfile(userId: string, target: SendTarget): Promise<DirectSendResult>;
   sendPhoto(jpeg: Uint8Array, target: SendTarget): Promise<DirectSendResult>;
+  /** Sends an MP4 video (H.264 + AAC) into a thread or the thread with the given users. */
+  sendVideo(mp4: Uint8Array, target: SendTarget): Promise<DirectSendResult>;
+  /** Sends a voice message: an AAC clip in an MP4 container (`.m4a`). */
+  sendVoice(m4a: Uint8Array, target: SendTarget, options?: VoiceOptions): Promise<DirectSendResult>;
+  /** Shares a story, by its full id (`pk_ownerPk`), into a thread or to users. */
+  shareStory(storyId: string, target: SendTarget): Promise<DirectSendResult>;
 }
 
 /** Single media reads and actions. */
@@ -545,6 +554,9 @@ export class IgFlare {
       shareMedia: (mediaId, target, options) => shareMedia(client, mediaId, target, options),
       shareProfile: (userId, target) => shareProfile(client, userId, target),
       sendPhoto: (jpeg, target) => sendPhoto(client, jpeg, target),
+      sendVideo: (mp4, target) => sendVideo(client, mp4, target),
+      sendVoice: (m4a, target, options) => sendVoice(client, m4a, target, options),
+      shareStory: (storyId, target) => shareStory(client, storyId, target),
     };
   }
 

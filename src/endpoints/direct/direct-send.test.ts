@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { sendLink, reactToMessage, shareMedia, shareProfile, sendPhoto } from './direct-send';
+import {
+  sendLink,
+  reactToMessage,
+  shareMedia,
+  shareProfile,
+  shareStory,
+  sendPhoto,
+} from './direct-send';
 import { PrivateClient } from '../../core/http/private-client';
 import { FakeTransport } from '../../core/transport/adapters/fake';
 import type { HttpRequest, HttpResponse } from '../../core/transport/http-transport';
@@ -208,5 +215,41 @@ describe('sendPhoto', () => {
     await expect(sendPhoto(client, JPEG, { threadId: THREAD })).rejects.toBeInstanceOf(
       ClientSchemaError,
     );
+  });
+});
+
+describe('shareStory', () => {
+  it('shares the story by its full id into a thread, as a plain form', async () => {
+    const { client, transport } = clientWith(() => json(SENT));
+
+    const result = await shareStory(client, '4000000000000000001_10000000001', {
+      threadId: THREAD,
+    });
+
+    const request = transport.requests[0];
+    expect(request?.url).toContain('/api/v1/direct_v2/threads/broadcast/story_share/');
+    expect(request?.body).not.toContain('signed_body');
+    const body = fields(request);
+    expect(body['story_media_id']).toBe('4000000000000000001_10000000001');
+    expect(body['reel_id']).toBe('4000000000000000001');
+    expect(body['send_attribution']).toBe('reel_feed_timeline');
+    expect(body['thread_ids']).toBe(`[${THREAD}]`);
+    expect(body['client_context']).toBe(body['mutation_token']);
+    expect(result.item_id).toBe('i1');
+  });
+
+  it('shares to a list of users as a nested list', async () => {
+    const { client, transport } = clientWith(() => json(SENT));
+    await shareStory(client, '1_2', { userIds: ['10000000001', '10000000003'] });
+    expect(fields(transport.requests[0])['recipient_users']).toBe('[[10000000001,10000000003]]');
+  });
+
+  it('refuses an id that is not a full story id, before any request', async () => {
+    const { client, transport } = clientWith(() => json(SENT));
+    await expect(shareStory(client, '12345', { threadId: THREAD })).rejects.toBeInstanceOf(IgError);
+    await expect(shareStory(client, '1_2/../x', { threadId: THREAD })).rejects.toBeInstanceOf(
+      IgError,
+    );
+    expect(transport.requests).toHaveLength(0);
   });
 });

@@ -42,7 +42,7 @@ function broadcastFields(client: PrivateClient, token: string): Record<string, s
   };
 }
 
-async function broadcast(
+export async function broadcast(
   client: PrivateClient,
   definition: EndpointDefinition,
   fields: Record<string, string>,
@@ -59,7 +59,7 @@ async function broadcast(
 }
 
 /** Validates the `payload` of a broadcast response into the send result. */
-function parseSendResult(json: Record<string, unknown>): DirectSendResult {
+export function parseSendResult(json: Record<string, unknown>): DirectSendResult {
   const parsed = directSendResultSchema.safeParse(json['payload']);
   if (!parsed.success) {
     throw new ClientSchemaError('direct send response did not match the schema', json['payload'], {
@@ -173,17 +173,21 @@ export async function shareProfile(
 }
 
 /**
- * The thread a photo goes to. A direct photo needs an existing thread, so for a
- * list of users the thread with exactly those participants is looked up.
+ * The thread an attachment goes to. Photos, videos and voice messages need an existing
+ * thread, so for a list of users the thread with exactly those participants is looked up.
  */
-async function photoThreadId(client: PrivateClient, target: SendTarget): Promise<string> {
+export async function existingThreadId(
+  client: PrivateClient,
+  target: SendTarget,
+  what: string,
+): Promise<string> {
   if ('threadId' in target) {
     assertIds([target.threadId], 'A thread id');
     return target.threadId;
   }
   const thread = await findThreadByParticipants(client, target.userIds);
   if (thread?.thread_id === undefined) {
-    throw new IgError('A direct photo needs an existing thread with those participants');
+    throw new IgError(`A direct ${what} needs an existing thread with those participants`);
   }
   return thread.thread_id;
 }
@@ -227,7 +231,7 @@ export async function sendPhoto(
   target: SendTarget,
 ): Promise<DirectSendResult> {
   parseJpegSize(jpeg); // fail early on a non-JPEG before any network call
-  const threadId = await photoThreadId(client, target);
+  const threadId = await existingThreadId(client, target, 'photo');
   const attachmentId = await uploadMessengerImage(client, jpeg);
   const token = mutationToken();
   const json = await broadcast(client, endpoints.directBroadcastPhotoAttachment, {
@@ -237,6 +241,37 @@ export async function sendPhoto(
     attachment_fbid: attachmentId,
     allow_full_aspect_ratio: 'true',
     thread_ids: numericIdArray([threadId]),
+  });
+  return parseSendResult(json);
+}
+
+/**
+ * Shares a story (by its full id, `pk_ownerPk`) into a thread or to users. Only stories
+ * visible to the account can be shared.
+ */
+export async function shareStory(
+  client: PrivateClient,
+  storyId: string,
+  target: SendTarget,
+): Promise<DirectSendResult> {
+  if (!/^\d+_\d+$/.test(storyId)) {
+    throw new IgError('A story id looks like 123456_789');
+  }
+  const token = mutationToken();
+  const json = await broadcast(client, endpoints.directBroadcastStoryShare, {
+    action: 'send_item',
+    is_shh_mode: '0',
+    send_attribution: 'reel_feed_timeline',
+    client_context: token,
+    mutation_token: token,
+    nav_chain:
+      '1qT:feed_timeline:1,ReelViewerFragment:reel_feed_timeline:4,' +
+      'DirectShareSheetFragment:direct_reshare_sheet:5',
+    reel_id: storyId.split('_')[0] ?? '',
+    containermodule: 'reel_feed_timeline',
+    story_media_id: storyId,
+    offline_threading_id: token,
+    ...recipientFields(target),
   });
   return parseSendResult(json);
 }

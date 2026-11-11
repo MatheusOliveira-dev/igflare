@@ -380,12 +380,16 @@ export interface DirectApi {
     sendPhoto(jpeg: Uint8Array, target: SendTarget): Promise<DirectSendResult>;
     // (undocumented)
     sendText(text: string, target: SendTarget): Promise<DirectSendResult>;
+    sendVideo(mp4: Uint8Array, target: SendTarget): Promise<DirectSendResult>;
+    // Warning: (ae-forgotten-export) The symbol "VoiceOptions" needs to be exported by the entry point index.d.ts
+    sendVoice(m4a: Uint8Array, target: SendTarget, options?: VoiceOptions): Promise<DirectSendResult>;
     // (undocumented)
     setTitle(threadId: string, title: string): Promise<void>;
     // (undocumented)
     shareMedia(mediaId: string, target: SendTarget, options?: ShareMediaOptions): Promise<DirectSendResult>;
     // (undocumented)
     shareProfile(userId: string, target: SendTarget): Promise<DirectSendResult>;
+    shareStory(storyId: string, target: SendTarget): Promise<DirectSendResult>;
     // (undocumented)
     spam(options?: CursorOptions): Promise<Page<Thread>>;
     // (undocumented)
@@ -448,7 +452,7 @@ export interface EndpointDefinition {
 }
 
 // @public (undocumented)
-export type EndpointName = 'accountsCurrentUser' | 'accountsEditProfile' | 'accountsLogin' | 'accountsRemoveBioLinks' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'accountsUpdateBioLinks' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastReaction' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsRemoveFollower' | 'friendshipsSetBesties' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaSeenV2' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'newsInbox' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
+export type EndpointName = 'accountsCurrentUser' | 'accountsEditProfile' | 'accountsLogin' | 'accountsRemoveBioLinks' | 'accountsSetBiography' | 'accountsTwoFactorLogin' | 'accountsUpdateBioLinks' | 'attestationCreateAndroidKeystore' | 'bloksApps' | 'bloksAsyncAction' | 'directBroadcastLink' | 'directBroadcastMediaShare' | 'directBroadcastPhotoAttachment' | 'directBroadcastProfile' | 'directBroadcastRavenAttachment' | 'directBroadcastReaction' | 'directBroadcastStoryShare' | 'directBroadcastVoiceAttachment' | 'directCreateGroupThread' | 'directInbox' | 'directMessageDelete' | 'directMessageSeen' | 'directPendingInbox' | 'directRankedRecipients' | 'directSendText' | 'directSpamInbox' | 'directThread' | 'directThreadAddUser' | 'directThreadApprove' | 'directThreadByParticipants' | 'directThreadHide' | 'directThreadMute' | 'directThreadUnmute' | 'directThreadUpdateTitle' | 'fbsearchPlaces' | 'feedReelsTray' | 'feedSaved' | 'feedTimeline' | 'feedUser' | 'feedUserStory' | 'friendshipsApprove' | 'friendshipsBlock' | 'friendshipsCreate' | 'friendshipsDestroy' | 'friendshipsFollowers' | 'friendshipsFollowing' | 'friendshipsIgnore' | 'friendshipsMute' | 'friendshipsPending' | 'friendshipsRemoveFollower' | 'friendshipsSetBesties' | 'friendshipsShow' | 'friendshipsUnblock' | 'friendshipsUnmute' | 'launcherSync' | 'locationsSections' | 'mediaArchive' | 'mediaComment' | 'mediaCommentBulkDelete' | 'mediaCommentDelete' | 'mediaCommentLike' | 'mediaCommentPin' | 'mediaCommentReplies' | 'mediaComments' | 'mediaCommentUnlike' | 'mediaCommentUnpin' | 'mediaConfigure' | 'mediaConfigureToStory' | 'mediaDelete' | 'mediaEdit' | 'mediaInfo' | 'mediaLike' | 'mediaLikers' | 'mediaSave' | 'mediaSeenV2' | 'mediaUnarchive' | 'mediaUnlike' | 'mediaUnsave' | 'newsInbox' | 'tagsSearch' | 'userInfo' | 'userInfoByUsername' | 'usersPinTimelineMedia' | 'usersSearch' | 'usersUnpinTimelineMedia';
 
 // @public (undocumented)
 export const endpoints: Record<EndpointName, EndpointDefinition>;

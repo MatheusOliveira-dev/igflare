@@ -5,6 +5,7 @@ import { FakeTransport } from '../core/transport/adapters/fake';
 import type { HttpRequest, HttpResponse } from '../core/transport/http-transport';
 import { MemorySessionStore } from '../core/session/adapters/memory';
 import { createSession } from '../core/session/session';
+import { sampleMp4 } from '../core/media/__fixtures__/mp4';
 import { IgApiError, CaaTwoFactorRequiredError, LoginRequiredError } from '../errors/api-errors';
 
 function json(body: unknown): HttpResponse {
@@ -589,11 +590,13 @@ describe('IgFlare facade', () => {
       0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90, 0x03,
     ]);
     const { ig, transport } = clientWith((req) => {
-      if (req.url.includes('rupload.facebook.com')) return json({ media_id: '55' });
+      if (req.url.includes('rupload.facebook.com'))
+        return req.method === 'GET' ? json({ offset: 0 }) : json({ media_id: '55' });
       if (req.url.includes('/broadcast/reaction/')) return json({ status: 'ok' });
       return json({ status: 'ok', payload: { item_id: 'i1', thread_id: '9' } });
     });
     const target = { threadId: '123' };
+    const m4a = new Uint8Array([0, 0, 0, 24, 0x66, 0x74, 0x79, 0x70, 0x4d, 0x34, 0x41, 0x20]);
 
     expect((await ig.direct.sendLink('see https://a.b', target)).item_id).toBe('i1');
     await ig.direct.react('123', '456');
@@ -601,6 +604,9 @@ describe('IgFlare facade', () => {
     expect((await ig.direct.shareMedia('1_2', target)).item_id).toBe('i1');
     expect((await ig.direct.shareProfile('77', target)).item_id).toBe('i1');
     expect((await ig.direct.sendPhoto(jpeg, target)).item_id).toBe('i1');
+    expect((await ig.direct.shareStory('1_2', target)).item_id).toBe('i1');
+    expect((await ig.direct.sendVoice(m4a, target)).item_id).toBe('i1');
+    expect((await ig.direct.sendVideo(sampleMp4(), target)).item_id).toBe('i1');
 
     expect(transport.requests.some((r) => r.url.includes('/broadcast/link/'))).toBe(true);
     expect(transport.requests.some((r) => r.url.includes('/broadcast/photo_attachment/'))).toBe(

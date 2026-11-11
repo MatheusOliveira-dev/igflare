@@ -72,9 +72,24 @@
       "path": "/api/v1/direct_v2/threads/broadcast/profile/"
     },
     {
+      "name": "directBroadcastRavenAttachment",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/broadcast/raven_attachment/"
+    },
+    {
       "name": "directBroadcastReaction",
       "method": "POST",
       "path": "/api/v1/direct_v2/threads/broadcast/reaction/"
+    },
+    {
+      "name": "directBroadcastStoryShare",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/broadcast/story_share/"
+    },
+    {
+      "name": "directBroadcastVoiceAttachment",
+      "method": "POST",
+      "path": "/api/v1/direct_v2/threads/broadcast/voice_attachment/"
     },
     {
       "name": "directCreateGroupThread",
