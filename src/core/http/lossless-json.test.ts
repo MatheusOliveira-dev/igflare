@@ -42,4 +42,12 @@ describe('parseLosslessJson', () => {
     const out = parseLosslessJson('{"a":-4000000000000000001}') as { a: unknown };
     expect(out.a).toBe('-4000000000000000001');
   });
+
+  it('leaves a body with no 16-digit run untouched', () => {
+    expect(parseLosslessJson('{"a":123456789012345,"b":1.5,"c":"x"}')).toEqual({
+      a: 123456789012345,
+      b: 1.5,
+      c: 'x',
+    });
+  });
 });
