@@ -231,7 +231,8 @@ describe('shareStory', () => {
     expect(request?.body).not.toContain('signed_body');
     const body = fields(request);
     expect(body['story_media_id']).toBe('4000000000000000001_10000000001');
-    expect(body['reel_id']).toBe('4000000000000000001');
+    // The reel is the owner's, not the story's.
+    expect(body['reel_id']).toBe('10000000001');
     expect(body['send_attribution']).toBe('reel_feed_timeline');
     expect(body['thread_ids']).toBe(`[${THREAD}]`);
     expect(body['client_context']).toBe(body['mutation_token']);

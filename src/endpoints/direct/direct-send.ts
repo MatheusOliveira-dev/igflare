@@ -267,7 +267,9 @@ export async function shareStory(
     nav_chain:
       '1qT:feed_timeline:1,ReelViewerFragment:reel_feed_timeline:4,' +
       'DirectShareSheetFragment:direct_reshare_sheet:5',
-    reel_id: storyId.split('_')[0] ?? '',
+    // The reel of a story is its owner's: opening the share from the conversation looks the
+    // story up under this id, and with the story's own id it answers "not available".
+    reel_id: storyId.split('_')[1] ?? '',
     containermodule: 'reel_feed_timeline',
     story_media_id: storyId,
     offline_threading_id: token,
