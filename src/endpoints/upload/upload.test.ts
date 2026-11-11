@@ -5,6 +5,7 @@ import { FakeTransport } from '../../core/transport/adapters/fake';
 import type { HttpRequest } from '../../core/transport/http-transport';
 import { createSession } from '../../core/session/session';
 import { ClientSchemaError, PleaseWaitError } from '../../errors/api-errors';
+import { sampleMp4 } from '../../core/media/__fixtures__/mp4';
 
 /** A minimal 400x300 JPEG marker stream. */
 const JPEG = new Uint8Array([
@@ -163,6 +164,33 @@ describe('uploadVideo configure retries', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it('lets a single override replace the value read from the file', async () => {
+    const { client, transport } = (() => {
+      const t = new FakeTransport((req: HttpRequest) =>
+        req.url.includes('rupload_')
+          ? { status: 200, headers: {}, body: JSON.stringify({ upload_id: 'V1', status: 'ok' }) }
+          : { status: 200, headers: {}, body: JSON.stringify({ status: 'ok', media: { pk: 1 } }) },
+      );
+      return {
+        client: new PrivateClient({ transport: t, session: createSession() }),
+        transport: t,
+      };
+    })();
+
+    await uploadVideo(client, sampleMp4(), JPEG, { durationMs: 12000 });
+
+    const params = JSON.parse(
+      transport.requests[0]?.headers['X-Instagram-Rupload-Params'] ?? '{}',
+    ) as {
+      upload_media_duration_ms: string;
+      upload_media_width: string;
+      upload_media_height: string;
+    };
+    expect(params.upload_media_duration_ms).toBe('12000');
+    expect(params.upload_media_width).toBe('640');
+    expect(params.upload_media_height).toBe('480');
   });
 
   it('does not repeat configure when Instagram says to wait', async () => {

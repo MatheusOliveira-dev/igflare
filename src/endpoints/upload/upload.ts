@@ -239,10 +239,17 @@ export async function uploadVideo(
   coverJpeg: Uint8Array,
   options: VideoUploadOptions = {},
 ): Promise<Media> {
-  const parsed =
-    options.durationMs !== undefined && options.width !== undefined && options.height !== undefined
-      ? { durationMs: options.durationMs, width: options.width, height: options.height }
-      : parseMp4Meta(mp4);
+  // Each value the caller gives wins over the one read from the file, and the file is
+  // only parsed when something is missing, so a clip whose metadata cannot be read
+  // still works when the caller supplies all three.
+  const complete =
+    options.durationMs !== undefined && options.width !== undefined && options.height !== undefined;
+  const read = complete ? undefined : parseMp4Meta(mp4);
+  const parsed = {
+    durationMs: options.durationMs ?? read?.durationMs ?? 0,
+    width: options.width ?? read?.width ?? 0,
+    height: options.height ?? read?.height ?? 0,
+  };
   const uploadId = newUploadId();
   await ruploadVideo(client, mp4, uploadId, parsed);
   await ruploadPhoto(client, coverJpeg, uploadId, '2');
