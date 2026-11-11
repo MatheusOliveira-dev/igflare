@@ -2,6 +2,9 @@
 
 Work intentionally postponed. Each item names the trigger that should bring it back.
 Read this file before `npm publish` or cutting a release tag.
+Also run `npm run live-check` (a read-only pass against the live service with a test
+account's saved session, see `scripts/live-check.mjs`) before a release: the automated suite
+never talks to Instagram, so this is the only thing that notices when the service changed.
 
 | Item                                                                                                                                                                                                                                                                                                                      | Trigger                                                           |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |

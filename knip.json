@@ -1,13 +1,5 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": [
-    "src/index.ts",
-    "scripts/*.mjs",
-    "*.config.ts",
-    "eslint.config.js",
-    "commitlint.config.js"
-  ],
-  "project": ["src/**/*.ts", "scripts/**/*.mjs"],
-  "ignore": ["src/generated/**"],
-  "ignoreDependencies": ["@microsoft/api-extractor"]
+  "entry": ["scripts/*.mjs", "*.config.ts"],
+  "project": ["src/**/*.ts", "scripts/**/*.mjs"]
 }

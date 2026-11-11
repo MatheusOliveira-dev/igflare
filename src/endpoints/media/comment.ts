@@ -6,7 +6,7 @@ import { parseSchemaList } from '../../schemas/parse-list';
 import { paginate } from '../../core/pagination';
 import type { Page } from '../../core/pagination';
 import { assertIds } from '../direct/direct-wire';
-import { mediaActionPayload } from './media';
+import { mediaAction, mediaActionPayload } from './media';
 import { checkedMediaId } from '../../core/ids';
 
 function commentPath(
@@ -22,18 +22,9 @@ function commentPath(
   return path;
 }
 
-async function post(
-  client: PrivateClient,
-  definition: EndpointDefinition,
-  endpoint: string,
-  payload: Record<string, unknown>,
-): Promise<void> {
-  await client.request({ method: definition.method, endpoint, payload });
-}
-
 /** Likes a comment by its id. */
 export async function likeComment(client: PrivateClient, commentId: string): Promise<void> {
-  await post(
+  await mediaAction(
     client,
     endpoints.mediaCommentLike,
     commentPath(endpoints.mediaCommentLike, { commentId }),
@@ -48,7 +39,7 @@ export async function likeComment(client: PrivateClient, commentId: string): Pro
 
 /** Removes a like from a comment. */
 export async function unlikeComment(client: PrivateClient, commentId: string): Promise<void> {
-  await post(
+  await mediaAction(
     client,
     endpoints.mediaCommentUnlike,
     commentPath(endpoints.mediaCommentUnlike, { commentId }),
@@ -67,7 +58,7 @@ export async function pinComment(
   mediaId: string,
   commentId: string,
 ): Promise<void> {
-  await post(
+  await mediaAction(
     client,
     endpoints.mediaCommentPin,
     commentPath(endpoints.mediaCommentPin, { mediaId, commentId }),
@@ -81,7 +72,7 @@ export async function unpinComment(
   mediaId: string,
   commentId: string,
 ): Promise<void> {
-  await post(
+  await mediaAction(
     client,
     endpoints.mediaCommentUnpin,
     commentPath(endpoints.mediaCommentUnpin, { mediaId, commentId }),
@@ -97,7 +88,7 @@ export async function deleteComments(
 ): Promise<void> {
   checkedMediaId(mediaId);
   assertIds(commentIds, 'Comment ids');
-  await post(
+  await mediaAction(
     client,
     endpoints.mediaCommentBulkDelete,
     endpoints.mediaCommentBulkDelete.path.replace('{id}', mediaId),

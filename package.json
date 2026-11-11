@@ -41,7 +41,8 @@
     "api": "api-extractor run --local --verbose",
     "mutation": "stryker run",
     "prepare": "husky",
-    "ci": "npm run typecheck && npm run format:check && npm run lint && npm run prose && npm run guard && npm run deps && npm run dup && npm run deadcode && npm run gen:check && npm run coverage && npm run build && npm run api"
+    "ci": "npm run typecheck && npm run format:check && npm run lint && npm run prose && npm run guard && npm run deps && npm run dup && npm run deadcode && npm run gen:check && npm run coverage && npm run build && npm run api",
+    "live-check": "node scripts/live-check.mjs"
   },
   "license": "MIT",
   "devDependencies": {

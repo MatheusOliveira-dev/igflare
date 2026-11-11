@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { checkedId, checkedMediaId } from '../../core/ids';
 import type { PrivateClient } from '../../core/http/private-client';
 import { endpoints } from '../../generated/endpoints';
+import type { EndpointDefinition } from '../../generated/endpoints';
 import { mediaSchema, type Media } from '../../schemas/media';
 import { commentSchema, type Comment } from '../../schemas/comment';
 import { userSchema, type User } from '../../schemas/user';
@@ -41,6 +42,16 @@ export async function getMediaInfo(client: PrivateClient, mediaId: string): Prom
 }
 
 /** The common fields a media action POST carries, over the signed default data. */
+/** Sends a write that answers with nothing the caller needs. */
+export async function mediaAction(
+  client: PrivateClient,
+  definition: EndpointDefinition,
+  endpoint: string,
+  payload: Record<string, unknown>,
+): Promise<void> {
+  await client.request({ method: definition.method, endpoint, payload });
+}
+
 export function mediaActionPayload(client: PrivateClient): Record<string, unknown> {
   return {
     ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),

@@ -134,6 +134,20 @@ function deviceBlock(client: PrivateClient): Record<string, unknown> {
   };
 }
 
+/** The account, device and crop fields that every photo-shaped configure call carries. */
+function configureFraming(
+  client: PrivateClient,
+  width: number,
+  height: number,
+): Record<string, unknown> {
+  return {
+    ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),
+    device: deviceBlock(client),
+    edits: { crop_original_size: [width, height], crop_center: [0, 0], crop_zoom: 1 },
+    extra: { source_width: width, source_height: height },
+  };
+}
+
 async function configurePhoto(
   client: PrivateClient,
   uploadId: string,
@@ -148,10 +162,7 @@ async function configurePhoto(
       upload_id: uploadId,
       caption,
       source_type: '4',
-      ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),
-      device: deviceBlock(client),
-      edits: { crop_original_size: [width, height], crop_center: [0, 0], crop_zoom: 1 },
-      extra: { source_width: width, source_height: height },
+      ...configureFraming(client, width, height),
     },
   });
   return parseConfiguredMedia(json);
@@ -279,10 +290,7 @@ async function configureStory(
       client_timestamp: nowSec,
       story_media_creation_date: nowSec,
       disable_comments: '0',
-      ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),
-      device: deviceBlock(client),
-      edits: { crop_original_size: [width, height], crop_center: [0, 0], crop_zoom: 1 },
-      extra: { source_width: width, source_height: height },
+      ...configureFraming(client, width, height),
     },
   });
   return parseConfiguredMedia(json);

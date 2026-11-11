@@ -1,13 +1,12 @@
 import type { PrivateClient } from '../../core/http/private-client';
 import { endpoints } from '../../generated/endpoints';
-import type { EndpointDefinition } from '../../generated/endpoints';
 import { mediaSchema, type Media } from '../../schemas/media';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 import { checkedMediaId } from '../../core/ids';
 import { assertIds } from '../direct/direct-wire';
 import { isRecord } from '../../core/guards';
-import { mediaActionPayload } from './media';
+import { mediaAction, mediaActionPayload } from './media';
 
 /** The numeric pk of a media id, whether it is `pk` or `pk_userid`. */
 function mediaPk(mediaId: string): string {
@@ -87,15 +86,6 @@ export async function editMedia(
     });
   }
   return parsed.data;
-}
-
-async function mediaAction(
-  client: PrivateClient,
-  definition: EndpointDefinition,
-  endpoint: string,
-  payload: Record<string, unknown>,
-): Promise<void> {
-  await client.request({ method: definition.method, endpoint, payload });
 }
 
 /** Archives a post: it leaves the profile and moves to the archive. */
