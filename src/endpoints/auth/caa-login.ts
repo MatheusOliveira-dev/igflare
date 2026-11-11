@@ -23,6 +23,7 @@ import { fetchPasswordPublicKey } from './login';
 import { endpoints } from '../../generated/endpoints';
 import { IgError } from '../../errors/ig-error';
 import { CaaTwoFactorRequiredError } from '../../errors/api-errors';
+import { isRecord } from '../../core/guards';
 
 export { CAA_API_DOMAIN };
 
@@ -40,10 +41,6 @@ export interface CaaLoginCredentials {
 export interface CaaLoginOptions {
   /** Where to get the two-factor code if the account asks for one. */
   readonly twoFactor?: TwoFactorSource;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 /** Whether a string contains any non-ASCII code unit (mirrors Python str.isascii). */

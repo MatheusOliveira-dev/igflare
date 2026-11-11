@@ -1,3 +1,4 @@
+import { isRecord } from '../guards';
 /**
  * Parsers for the Bloks responses the CAA login flow returns. Bloks payloads
  * carry data as nested, Lisp-like parenthesized expressions embedded in strings,
@@ -8,10 +9,6 @@
 
 /** The error context token key the server issues for the account access state. */
 const AAC_KEY = 'CAA_ACCOUNT_ACCESS_CONTEXT:aac';
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
 
 /** Length of the JSON string literal starting at `start` (`value[start]` is `"`), or -1 if unterminated. */
 function jsonStringLength(value: string, start: number): number {

@@ -7,7 +7,8 @@ import { userSchema, type User } from '../../schemas/user';
 import { parseSchemaList } from '../../schemas/parse-list';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
-import { assertIds, isRecord, mutationToken, numericIdArray } from './direct-wire';
+import { assertIds, mutationToken, numericIdArray } from './direct-wire';
+import { isRecord } from '../../core/guards';
 
 function threadPath(definition: EndpointDefinition, threadId: string): string {
   assertIds([threadId], 'A thread id');

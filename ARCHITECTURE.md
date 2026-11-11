@@ -16,6 +16,7 @@ core/http        orchestrates transport + signing + session: lossless JSON, type
 core/media       dependency-free JPEG/MP4 metadata parsers (upload)
 core/pagination  the Page<T> contract and the paginate() iterator
 core/ids         checkedId/checkedMediaId: every id placed in a URL path goes through these (numeric only)
+core/guards      isRecord and readCursor: the shared JSON-shape helpers for endpoints and parsers
 schemas          hand-written zod schemas for API responses (User, Media, Thread, ...)
 endpoints/*      hand-written feature modules (auth, user, friendship, feed, media, direct, upload, search)
 client           public, ergonomic facade (IgFlare), retry-wrapped by default

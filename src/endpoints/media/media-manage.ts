@@ -5,7 +5,8 @@ import { mediaSchema, type Media } from '../../schemas/media';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 import { checkedMediaId } from '../../core/ids';
-import { assertIds, isRecord } from '../direct/direct-wire';
+import { assertIds } from '../direct/direct-wire';
+import { isRecord } from '../../core/guards';
 import { mediaActionPayload } from './media';
 
 /** The numeric pk of a media id, whether it is `pk` or `pk_userid`. */

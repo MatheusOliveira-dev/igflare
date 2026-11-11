@@ -10,7 +10,7 @@ import { paginate } from '../../core/pagination';
 import type { Page } from '../../core/pagination';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
-import { isRecord } from '../direct/direct-wire';
+import { isRecord, readCursor } from '../../core/guards';
 
 /** Validates a friendship_status value into the typed model, or throws a typed error. */
 function parseFriendship(value: unknown): FriendshipStatus {
@@ -86,12 +86,6 @@ function parseUserList(json: Record<string, unknown>): User[] {
   });
 }
 
-/** Reads the next-page cursor from a list response, or undefined on the last page. */
-function readNextCursor(json: Record<string, unknown>): string | undefined {
-  const next = json['next_max_id'];
-  return typeof next === 'string' || typeof next === 'number' ? String(next) : undefined;
-}
-
 async function fetchFollowList(
   client: PrivateClient,
   definition: EndpointDefinition,
@@ -108,7 +102,7 @@ async function fetchFollowList(
     },
   });
   const items = parseUserList(json);
-  const nextCursor = readNextCursor(json);
+  const nextCursor = readCursor(json, 'next_max_id');
   return nextCursor !== undefined ? { items, nextCursor } : { items };
 }
 
@@ -185,9 +179,7 @@ export async function getPendingRequests(
     ...(options.cursor !== undefined ? { query: { max_id: options.cursor } } : {}),
   });
   const items = parseSchemaList<User>(json['users'], userSchema, 'user');
-  const next = json['next_max_id'];
-  const nextCursor =
-    typeof next === 'string' || typeof next === 'number' ? String(next) : undefined;
+  const nextCursor = readCursor(json, 'next_max_id');
   return nextCursor !== undefined ? { items, nextCursor } : { items };
 }
 

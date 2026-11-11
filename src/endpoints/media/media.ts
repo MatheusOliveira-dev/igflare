@@ -9,6 +9,7 @@ import { paginate } from '../../core/pagination';
 import type { Page } from '../../core/pagination';
 import { parseSchemaList } from '../../schemas/parse-list';
 import { ClientSchemaError } from '../../errors/api-errors';
+import { readCursor } from '../../core/guards';
 
 export interface CommentListOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
@@ -145,9 +146,7 @@ export async function getComments(
     ...(options.cursor !== undefined ? { query: { min_id: options.cursor } } : {}),
   });
   const items = parseSchemaList<Comment>(json['comments'], commentSchema, 'comment');
-  const next = json['next_min_id'];
-  const nextCursor =
-    typeof next === 'string' || typeof next === 'number' ? String(next) : undefined;
+  const nextCursor = readCursor(json, 'next_min_id');
   return nextCursor !== undefined ? { items, nextCursor } : { items };
 }
 
@@ -206,9 +205,7 @@ export async function getSavedPosts(
     mediaSchema,
     'saved media',
   );
-  const next = json['next_max_id'];
-  const nextCursor =
-    typeof next === 'string' || typeof next === 'number' ? String(next) : undefined;
+  const nextCursor = readCursor(json, 'next_max_id');
   return nextCursor !== undefined && json['more_available'] !== false
     ? { items: medias, nextCursor }
     : { items: medias };

@@ -1,10 +1,6 @@
 import { randomInt } from 'node:crypto';
 import { IgError } from '../../errors/ig-error';
 
-export function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
 /**
  * The 19-digit numeric token the app attaches to direct mutations as its client
  * context. It only has to be unique per action.

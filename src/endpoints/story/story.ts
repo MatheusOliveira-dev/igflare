@@ -5,10 +5,7 @@ import { reelSchema, type Reel } from '../../schemas/reel';
 import { mediaSchema, type Media } from '../../schemas/media';
 import { parseSchemaList } from '../../schemas/parse-list';
 import { IgError } from '../../errors/ig-error';
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
+import { isRecord } from '../../core/guards';
 
 /** The story tray: one reel per account the session follows that has an active story. */
 export async function getReelsTray(client: PrivateClient): Promise<Reel[]> {

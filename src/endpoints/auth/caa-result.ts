@@ -7,16 +7,13 @@ import {
   CaaTwoFactorRequiredError,
   InvalidVerificationCodeError,
 } from '../../errors/api-errors';
+import { isRecord } from '../../core/guards';
 
 /** The Bloks action the login routes to when the account needs a two-factor code. */
 export const AP_2SV_ENTRYPOINT = 'com.bloks.www.ap.two_step_verification.entrypoint_async';
 
 /** The code-submission screen; a response that shows it again means the code was refused. */
 export const AP_2SV_CODE_ENTRY_ASYNC = 'com.bloks.www.ap.two_step_verification.code_entry_async';
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
 
 function extractUserId(loginResponse: Record<string, unknown>): string | undefined {
   const user = loginResponse['logged_in_user'];

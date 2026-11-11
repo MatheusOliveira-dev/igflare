@@ -6,6 +6,7 @@ import { paginate } from '../../core/pagination';
 import type { Page } from '../../core/pagination';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
+import { isRecord, readCursor } from '../../core/guards';
 
 export interface FeedOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
@@ -29,12 +30,6 @@ function parseMediaList(json: Record<string, unknown>): Media[] {
   });
 }
 
-/** Reads the next-page cursor from a feed response, or undefined on the last page. */
-function readNextCursor(json: Record<string, unknown>): string | undefined {
-  const next = json['next_max_id'];
-  return typeof next === 'string' || typeof next === 'number' ? String(next) : undefined;
-}
-
 /** One page of a user's own posts. Pass `cursor` from a previous page to continue. */
 export async function getUserFeed(
   client: PrivateClient,
@@ -47,17 +42,13 @@ export async function getUserFeed(
     ...(options.cursor !== undefined ? { query: { max_id: options.cursor } } : {}),
   });
   const items = parseMediaList(json);
-  const nextCursor = readNextCursor(json);
+  const nextCursor = readCursor(json, 'next_max_id');
   return nextCursor !== undefined ? { items, nextCursor } : { items };
 }
 
 /** Walks every post of a user, yielding one at a time across pages. */
 export function paginateUserFeed(client: PrivateClient, pk: string): AsyncGenerator<Media> {
   return paginate((cursor) => getUserFeed(client, pk, cursor !== undefined ? { cursor } : {}));
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 /**
@@ -102,7 +93,7 @@ export async function getTimelineFeed(
     }
     return parsed.data;
   });
-  const next = readNextCursor(json);
+  const next = readCursor(json, 'next_max_id');
   const moreAvailable = json['more_available'];
   return next !== undefined && moreAvailable !== false ? { items, nextCursor: next } : { items };
 }

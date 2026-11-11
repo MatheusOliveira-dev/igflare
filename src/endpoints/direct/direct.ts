@@ -14,14 +14,11 @@ import { paginate } from '../../core/pagination';
 import type { Page } from '../../core/pagination';
 import { parseSchemaList } from '../../schemas/parse-list';
 import { ClientSchemaError } from '../../errors/api-errors';
+import { isRecord } from '../../core/guards';
 
 export interface CursorOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
   readonly cursor?: string;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 /** The cursor a direct `inbox`/`thread` node carries, or undefined when exhausted. */
