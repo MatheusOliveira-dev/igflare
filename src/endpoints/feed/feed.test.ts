@@ -50,7 +50,7 @@ describe('getUserFeed', () => {
   it('passes the cursor as max_id and omits nextCursor on the last page', async () => {
     const { client, transport } = clientReturning({ status: 'ok', items: [{ pk: 2 }] });
 
-    const page = await getUserFeed(client, '42', { maxId: 'n1' });
+    const page = await getUserFeed(client, '42', { cursor: 'n1' });
 
     expect(transport.requests[0]?.url).toContain('/api/v1/feed/user/42/?max_id=n1');
     expect(page.nextCursor).toBeUndefined();
@@ -119,7 +119,7 @@ describe('getTimelineFeed', () => {
       more_available: true,
     });
 
-    const page = await getTimelineFeed(client, { maxId: 'n1' });
+    const page = await getTimelineFeed(client, { cursor: 'n1' });
 
     const payload = signedPayload(transport.requests[0]?.body);
     expect(payload['reason']).toBe('pagination');
@@ -199,7 +199,7 @@ describe('hashtag and location feeds', () => {
     const { client, transport } = clientReturning(sections([{ pk: 1 }], NEXT));
     const first = await getHashtagFeed(client, 'sunset');
 
-    await getHashtagFeed(client, 'sunset', { maxId: first.nextCursor ?? '' });
+    await getHashtagFeed(client, 'sunset', { cursor: first.nextCursor ?? '' });
 
     const second = signedPayload(transport.requests[1]?.body);
     expect(second['max_id']).toBe('n1');
@@ -215,10 +215,10 @@ describe('hashtag and location feeds', () => {
 
   it('rejects a cursor that did not come from a sections page, before any request', async () => {
     const { client, transport } = clientReturning(sections([{ pk: 2 }]));
-    await expect(getHashtagFeed(client, 'x', { maxId: 'not-a-cursor' })).rejects.toBeInstanceOf(
+    await expect(getHashtagFeed(client, 'x', { cursor: 'not-a-cursor' })).rejects.toBeInstanceOf(
       IgError,
     );
-    await expect(getLocationFeed(client, '1', { maxId: 'n1' })).rejects.toBeInstanceOf(IgError);
+    await expect(getLocationFeed(client, '1', { cursor: 'n1' })).rejects.toBeInstanceOf(IgError);
     expect(transport.requests).toHaveLength(0);
   });
 

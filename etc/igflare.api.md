@@ -484,7 +484,7 @@ export class FeedbackRequiredError extends IgApiError {
 
 // @public (undocumented)
 export interface FeedOptions {
-    readonly maxId?: string;
+    readonly cursor?: string;
 }
 
 // @public
@@ -510,7 +510,7 @@ export function findThreadByParticipants(client: PrivateClient, userIds: readonl
 
 // @public (undocumented)
 export interface FollowListOptions {
-    readonly maxId?: string;
+    readonly cursor?: string;
 }
 
 // @public

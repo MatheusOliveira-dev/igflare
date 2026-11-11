@@ -110,7 +110,7 @@ describe('friendship lists', () => {
       users: [{ pk: 2, username: 'b' }],
     });
 
-    const page = await getFollowing(client, '42', { maxId: '100' });
+    const page = await getFollowing(client, '42', { cursor: '100' });
 
     expect(transport.requests[0]?.url).toContain('/friendships/42/following/?');
     expect(transport.requests[0]?.url).toContain('max_id=100');

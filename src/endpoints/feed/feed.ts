@@ -8,7 +8,7 @@ import { IgError } from '../../errors/ig-error';
 
 export interface FeedOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
-  readonly maxId?: string;
+  readonly cursor?: string;
 }
 
 /** Validates the `items` array of a feed response into typed Media models. */
@@ -34,7 +34,7 @@ function readNextCursor(json: Record<string, unknown>): string | undefined {
   return typeof next === 'string' || typeof next === 'number' ? String(next) : undefined;
 }
 
-/** One page of a user's own posts. Pass `maxId` from a previous page to continue. */
+/** One page of a user's own posts. Pass `cursor` from a previous page to continue. */
 export async function getUserFeed(
   client: PrivateClient,
   pk: string,
@@ -43,7 +43,7 @@ export async function getUserFeed(
   const json = await client.request({
     method: endpoints.feedUser.method,
     endpoint: endpoints.feedUser.path.replace('{pk}', pk),
-    ...(options.maxId !== undefined ? { query: { max_id: options.maxId } } : {}),
+    ...(options.cursor !== undefined ? { query: { max_id: options.cursor } } : {}),
   });
   const items = parseMediaList(json);
   const nextCursor = readNextCursor(json);
@@ -52,7 +52,7 @@ export async function getUserFeed(
 
 /** Walks every post of a user, yielding one at a time across pages. */
 export function paginateUserFeed(client: PrivateClient, pk: string): AsyncGenerator<Media> {
-  return paginate((maxId) => getUserFeed(client, pk, maxId !== undefined ? { maxId } : {}));
+  return paginate((cursor) => getUserFeed(client, pk, cursor !== undefined ? { cursor } : {}));
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -78,7 +78,7 @@ function timelineMediaCandidates(json: Record<string, unknown>): unknown[] {
   throw new ClientSchemaError('timeline response had neither feed_items nor items', json);
 }
 
-/** One page of the home timeline. Pass `maxId` from a previous page to continue. */
+/** One page of the home timeline. Pass `cursor` from a previous page to continue. */
 export async function getTimelineFeed(
   client: PrivateClient,
   options: FeedOptions = {},
@@ -87,9 +87,9 @@ export async function getTimelineFeed(
     method: endpoints.feedTimeline.method,
     endpoint: endpoints.feedTimeline.path,
     payload: {
-      reason: options.maxId !== undefined ? 'pagination' : 'cold_start_fetch',
+      reason: options.cursor !== undefined ? 'pagination' : 'cold_start_fetch',
       is_pull_to_refresh: '0',
-      ...(options.maxId !== undefined ? { max_id: options.maxId } : {}),
+      ...(options.cursor !== undefined ? { max_id: options.cursor } : {}),
     },
   });
   const items = timelineMediaCandidates(json).map((candidate) => {
@@ -108,7 +108,7 @@ export async function getTimelineFeed(
 
 /** Walks the home timeline, yielding one media at a time across pages. */
 export function paginateTimeline(client: PrivateClient): AsyncGenerator<Media> {
-  return paginate((maxId) => getTimelineFeed(client, maxId !== undefined ? { maxId } : {}));
+  return paginate((cursor) => getTimelineFeed(client, cursor !== undefined ? { cursor } : {}));
 }
 
 /**
@@ -211,7 +211,7 @@ function sectionsBody(cursor: string | undefined): Record<string, unknown> {
   };
 }
 
-/** One page of a hashtag's recent media. Pass `maxId` to continue. */
+/** One page of a hashtag's recent media. Pass `cursor` to continue. */
 export async function getHashtagFeed(
   client: PrivateClient,
   tag: string,
@@ -220,17 +220,17 @@ export async function getHashtagFeed(
   const json = await client.request({
     method: endpoints.tagsSections.method,
     endpoint: endpoints.tagsSections.path.replace('{tag}', encodeURIComponent(tag)),
-    payload: sectionsBody(options.maxId),
+    payload: sectionsBody(options.cursor),
   });
   return sectionsPage(json);
 }
 
 /** Walks a hashtag's media, yielding one at a time across pages. */
 export function paginateHashtagFeed(client: PrivateClient, tag: string): AsyncGenerator<Media> {
-  return paginate((maxId) => getHashtagFeed(client, tag, maxId !== undefined ? { maxId } : {}));
+  return paginate((cursor) => getHashtagFeed(client, tag, cursor !== undefined ? { cursor } : {}));
 }
 
-/** One page of a location's recent media. Pass `maxId` to continue. */
+/** One page of a location's recent media. Pass `cursor` to continue. */
 export async function getLocationFeed(
   client: PrivateClient,
   locationId: string,
@@ -239,7 +239,7 @@ export async function getLocationFeed(
   const json = await client.request({
     method: endpoints.locationsSections.method,
     endpoint: endpoints.locationsSections.path.replace('{id}', locationId),
-    payload: sectionsBody(options.maxId),
+    payload: sectionsBody(options.cursor),
   });
   return sectionsPage(json);
 }
@@ -249,7 +249,7 @@ export function paginateLocationFeed(
   client: PrivateClient,
   locationId: string,
 ): AsyncGenerator<Media> {
-  return paginate((maxId) =>
-    getLocationFeed(client, locationId, maxId !== undefined ? { maxId } : {}),
+  return paginate((cursor) =>
+    getLocationFeed(client, locationId, cursor !== undefined ? { cursor } : {}),
   );
 }

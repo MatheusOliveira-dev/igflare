@@ -61,7 +61,7 @@ export async function getFriendshipStatus(
 
 export interface FollowListOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
-  readonly maxId?: string;
+  readonly cursor?: string;
 }
 
 /** Validates the `users` array of a friendship list response into typed models. */
@@ -103,7 +103,7 @@ async function fetchFollowList(
     endpoint: definition.path.replace('{pk}', pk),
     query: {
       rank_token: rankToken,
-      ...(options.maxId !== undefined ? { max_id: options.maxId } : {}),
+      ...(options.cursor !== undefined ? { max_id: options.cursor } : {}),
     },
   });
   const items = parseUserList(json);
@@ -111,7 +111,7 @@ async function fetchFollowList(
   return nextCursor !== undefined ? { items, nextCursor } : { items };
 }
 
-/** One page of a user's followers. Pass `maxId` from a previous page to continue. */
+/** One page of a user's followers. Pass `cursor` from a previous page to continue. */
 export function getFollowers(
   client: PrivateClient,
   pk: string,
@@ -120,7 +120,7 @@ export function getFollowers(
   return fetchFollowList(client, endpoints.friendshipsFollowers, pk, options);
 }
 
-/** One page of the accounts a user follows. Pass `maxId` to continue. */
+/** One page of the accounts a user follows. Pass `cursor` to continue. */
 export function getFollowing(
   client: PrivateClient,
   pk: string,
@@ -131,12 +131,12 @@ export function getFollowing(
 
 /** Walks every follower of a user, yielding one at a time across pages. */
 export function paginateFollowers(client: PrivateClient, pk: string): AsyncGenerator<User> {
-  return paginate((maxId) => getFollowers(client, pk, maxId !== undefined ? { maxId } : {}));
+  return paginate((cursor) => getFollowers(client, pk, cursor !== undefined ? { cursor } : {}));
 }
 
 /** Walks every account a user follows, yielding one at a time across pages. */
 export function paginateFollowing(client: PrivateClient, pk: string): AsyncGenerator<User> {
-  return paginate((maxId) => getFollowing(client, pk, maxId !== undefined ? { maxId } : {}));
+  return paginate((cursor) => getFollowing(client, pk, cursor !== undefined ? { cursor } : {}));
 }
 
 /** Posts a friendship action by user id and returns the resulting status. */
@@ -173,7 +173,7 @@ export function unblockUser(client: PrivateClient, pk: string): Promise<Friendsh
   return friendshipAction(client, endpoints.friendshipsUnblock, pk);
 }
 
-/** One page of incoming follow requests. Pass `maxId` to continue. */
+/** One page of incoming follow requests. Pass `cursor` to continue. */
 export async function getPendingRequests(
   client: PrivateClient,
   options: FollowListOptions = {},
@@ -181,7 +181,7 @@ export async function getPendingRequests(
   const json = await client.request({
     method: endpoints.friendshipsPending.method,
     endpoint: endpoints.friendshipsPending.path,
-    ...(options.maxId !== undefined ? { query: { max_id: options.maxId } } : {}),
+    ...(options.cursor !== undefined ? { query: { max_id: options.cursor } } : {}),
   });
   const items = parseSchemaList<User>(json['users'], userSchema, 'user');
   const next = json['next_max_id'];
@@ -192,7 +192,7 @@ export async function getPendingRequests(
 
 /** Walks every incoming follow request, yielding one at a time across pages. */
 export function paginatePendingRequests(client: PrivateClient): AsyncGenerator<User> {
-  return paginate((maxId) => getPendingRequests(client, maxId !== undefined ? { maxId } : {}));
+  return paginate((cursor) => getPendingRequests(client, cursor !== undefined ? { cursor } : {}));
 }
 
 /** Which of a user's content to mute; omit both to mute posts and stories. */

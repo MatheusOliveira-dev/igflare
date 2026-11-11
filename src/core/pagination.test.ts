@@ -19,9 +19,9 @@ describe('paginate', () => {
     const seen: (string | undefined)[] = [];
 
     const all = await collect(
-      paginate((maxId) => {
-        seen.push(maxId);
-        return Promise.resolve(pages[maxId ?? '__first'] ?? { items: [] });
+      paginate((cursor) => {
+        seen.push(cursor);
+        return Promise.resolve(pages[cursor ?? '__first'] ?? { items: [] });
       }),
     );
 
