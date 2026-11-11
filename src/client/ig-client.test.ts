@@ -355,7 +355,7 @@ describe('IgFlare facade', () => {
   });
 
   /** A CAA login that stops at the two-factor step, then walks the code-entry screens. */
-  function twoFactorFlow(): FakeTransport {
+  function twoFactorFlow(extra?: (req: HttpRequest) => HttpResponse | undefined): FakeTransport {
     const context = (appId: string, value: string): HttpResponse =>
       json({
         status: 'ok',
@@ -366,6 +366,8 @@ describe('IgFlare facade', () => {
         },
       });
     return caaFlowTransport((req) => {
+      const handled = extra?.(req);
+      if (handled !== undefined) return handled;
       if (req.url.includes('code_entry_async/')) return loginResponse(42);
       if (req.url.includes('/bloks/apps/')) return context('code_entry_async', 'C3');
       if (req.url.includes('entrypoint_async/')) return context('code_entry', 'C2');
@@ -436,6 +438,54 @@ describe('IgFlare facade', () => {
     expect(user.username).toBe('a');
     expect(state.logins).toBe(2);
     expect(ig.session.auth.userId).toBe('2');
+  });
+
+  const EXPIRED = {
+    status: 403,
+    headers: {},
+    body: JSON.stringify({ message: 'login_required', status: 'fail' }),
+  };
+
+  it('does not remember the credentials of a login that failed', async () => {
+    const transport = twoFactorFlow((req) => (req.url.includes('/users/') ? EXPIRED : undefined));
+    const ig = new IgFlare({
+      transport,
+      session: createSession(),
+      retry: false,
+      autoRelogin: true,
+    });
+
+    await expect(ig.login({ username: 'u', password: 'p' })).rejects.toBeInstanceOf(
+      CaaTwoFactorRequiredError,
+    );
+    const loginsBefore = transport.requests.filter((r) => r.url.includes('send_login_request'));
+
+    await expect(ig.user.info('1')).rejects.toBeInstanceOf(LoginRequiredError);
+    expect(transport.requests.filter((r) => r.url.includes('send_login_request'))).toHaveLength(
+      loginsBefore.length,
+    );
+  });
+
+  it('does not replay a single-use literal code when the session expires', async () => {
+    let expired = false;
+    const transport = twoFactorFlow((req) =>
+      req.url.includes('/users/') && expired ? EXPIRED : undefined,
+    );
+    const ig = new IgFlare({
+      transport,
+      session: createSession(),
+      retry: false,
+      autoRelogin: true,
+    });
+    await ig.login({ username: 'u', password: 'p', twoFactor: { code: '123456' } });
+    const submitted = (): number =>
+      transport.requests.filter((r) => r.url.includes('code_entry_async/')).length;
+    expect(submitted()).toBe(1);
+
+    expired = true;
+    await ig.user.info('1').catch(() => undefined);
+
+    expect(submitted()).toBe(1);
   });
 
   it('does not re-authenticate by default', async () => {

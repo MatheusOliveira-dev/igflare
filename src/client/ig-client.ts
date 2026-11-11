@@ -343,12 +343,23 @@ export class IgFlare {
    * that provides one) and the login resolves it; without it a
    * `CaaTwoFactorRequiredError` is thrown, to finish with `resolveTwoFactor`.
    */
-  login(credentials: IgFlareLogin): Promise<PrivateResponseJson> {
-    if (this.#rememberLogin) {
-      this.#lastLogin = credentials;
-    }
+  async login(credentials: IgFlareLogin): Promise<PrivateResponseJson> {
     const { twoFactor, ...account } = credentials;
-    return caaLogin(this.#client, account, twoFactor !== undefined ? { twoFactor } : {});
+    const result = await caaLogin(
+      this.#client,
+      account,
+      twoFactor !== undefined ? { twoFactor } : {},
+    );
+    if (this.#rememberLogin) {
+      // Kept only once the login worked, so a wrong password is not replayed on every
+      // expiry. A literal code is single-use and would be refused on replay, so only a
+      // TOTP secret or a provider function is kept as the second-factor source.
+      this.#lastLogin = {
+        ...account,
+        ...(twoFactor !== undefined && !('code' in twoFactor) ? { twoFactor } : {}),
+      };
+    }
+    return result;
   }
 
   /** Replays the last login after a session expiry, or rethrows when there is none. */
