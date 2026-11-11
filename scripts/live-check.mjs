@@ -2,11 +2,15 @@
 // account? Run it before a release and whenever Instagram seems to have changed.
 //
 //   npm run build
-//   IGFLARE_SESSION=/path/to/session.json node scripts/live-check.mjs [--cycles 3]
+//   IGFLARE_SESSION=/path/to/session.json node scripts/live-check.mjs [--cycles 3] [--professional]
 //
 // The session file is the one a `FileSessionStore` writes after a login. Use a test
 // account. Nothing here writes, follows, likes or messages anyone, so nobody is notified.
 // Output carries counts and timings only, never ids, names or tokens.
+//
+// `--cycles N` repeats the whole pass N times with 20 to 40 seconds between calls, which is
+// the soak run: it shows whether a long session starts getting refused. `--professional`
+// adds the insights calls, which only a business or creator account can make.
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 import { randomInt } from 'node:crypto';
@@ -23,6 +27,8 @@ if (!Number.isInteger(cycles) || cycles < 1) {
   process.stderr.write('--cycles takes a whole number of 1 or more.\n');
   process.exit(2);
 }
+
+const professional = process.argv.includes('--professional');
 
 const dist = pathToFileURL(resolve(import.meta.dirname, '../dist/index.mjs')).href;
 const { IgFlare, FileSessionStore } = await import(dist);
@@ -98,6 +104,13 @@ const checks = [
       if (user.username !== 'instagram') throw new Error('wrong user');
     },
   ],
+  [
+    'reels.user',
+    async () => {
+      const user = await ig.user.infoByUsername('instagram');
+      some((await ig.reels.user(String(user.pk))).items, 'reels of a public account');
+    },
+  ],
   ['search.users', async () => some(await ig.search.users('instagram'), 'users')],
   ['search.hashtags', async () => some(await ig.search.hashtags('instagram'), 'hashtags')],
   [
@@ -137,6 +150,34 @@ const checks = [
     },
   ],
 ];
+
+if (professional) {
+  checks.push(
+    [
+      'insights.account',
+      async () => {
+        const insights = await ig.insights.account();
+        if (insights.account_views_count == null) throw new Error('no views figure');
+      },
+    ],
+    [
+      'insights.audience',
+      async () => {
+        const audience = await ig.insights.audience();
+        if (audience.follower_count == null) throw new Error('no follower count');
+      },
+    ],
+    [
+      'insights.content',
+      async () => {
+        const page = await ig.insights.content({ type: 'posts', count: 1 });
+        const first = page.items[0];
+        // An account with no posts has nothing to read a post's insights from.
+        if (first !== undefined) await ig.insights.post(first.thumbnail.media_id);
+      },
+    ],
+  );
+}
 
 const stats = new Map();
 for (let cycle = 1; cycle <= cycles; cycle += 1) {
