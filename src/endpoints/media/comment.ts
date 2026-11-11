@@ -5,15 +5,14 @@ import { commentSchema, type Comment } from '../../schemas/comment';
 import { parseSchemaList } from '../../schemas/parse-list';
 import { paginate } from '../../core/pagination';
 import type { Page } from '../../core/pagination';
-import { assertIds } from '../direct/direct-wire';
 import { mediaAction, mediaActionPayload } from './media';
-import { checkedMediaId } from '../../core/ids';
+import { checkedMediaId, checkedIds } from '../../core/ids';
 
 function commentPath(
   definition: EndpointDefinition,
   values: { readonly mediaId?: string; readonly commentId: string },
 ): string {
-  assertIds([values.commentId], 'A comment id');
+  checkedIds([values.commentId], 'A comment id');
   let path = definition.path.replace('{comment_id}', values.commentId);
   if (values.mediaId !== undefined) {
     checkedMediaId(values.mediaId);
@@ -87,7 +86,7 @@ export async function deleteComments(
   commentIds: readonly string[],
 ): Promise<void> {
   checkedMediaId(mediaId);
-  assertIds(commentIds, 'Comment ids');
+  checkedIds(commentIds, 'Comment ids');
   await mediaAction(
     client,
     endpoints.mediaCommentBulkDelete,

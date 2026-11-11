@@ -18,3 +18,11 @@ export function checkedMediaId(value: string): string {
   }
   return value;
 }
+
+/** A non-empty list of numeric ids, for paths and for bodies that carry them as raw JSON. */
+export function checkedIds(values: readonly string[], what: string): readonly string[] {
+  if (values.length === 0 || values.some((value) => !/^\d+$/.test(value))) {
+    throw new IgError(`${what} must be a non-empty list of numeric ids`);
+  }
+  return values;
+}

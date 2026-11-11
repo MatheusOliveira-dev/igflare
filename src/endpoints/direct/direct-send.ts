@@ -7,7 +7,8 @@ import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 import { findThreadByParticipants } from './direct-manage';
 import type { SendTarget } from './direct';
-import { assertIds, mutationToken, numericIdArray } from './direct-wire';
+import { mutationToken, numericIdArray } from './direct-wire';
+import { checkedIds } from '../../core/ids';
 
 const NAV_CHAIN =
   '1qT:feed_timeline:1,1qT:feed_timeline:2,1qT:feed_timeline:3,' +
@@ -17,10 +18,10 @@ const MESSENGER_UPLOAD_HOST = 'https://rupload.facebook.com';
 /** Where the recipients go in the body: thread ids, or a nested list of user ids. */
 function recipientFields(target: SendTarget): Record<string, string> {
   if ('threadId' in target) {
-    assertIds([target.threadId], 'A thread id');
+    checkedIds([target.threadId], 'A thread id');
     return { thread_ids: numericIdArray([target.threadId]) };
   }
-  assertIds(target.userIds, 'User ids');
+  checkedIds(target.userIds, 'User ids');
   return { recipient_users: `[${numericIdArray(target.userIds)}]` };
 }
 
@@ -104,7 +105,7 @@ export async function reactToMessage(
   itemId: string,
   options: ReactionOptions = {},
 ): Promise<void> {
-  assertIds([threadId, itemId], 'Thread and message ids');
+  checkedIds([threadId, itemId], 'Thread and message ids');
   const token = mutationToken();
   await broadcast(client, endpoints.directBroadcastReaction, {
     ...broadcastFields(client, token),
@@ -161,7 +162,7 @@ export async function shareProfile(
   userId: string,
   target: SendTarget,
 ): Promise<DirectSendResult> {
-  assertIds([userId], 'A user id');
+  checkedIds([userId], 'A user id');
   const token = mutationToken();
   const json = await broadcast(client, endpoints.directBroadcastProfile, {
     ...broadcastFields(client, token),
@@ -182,7 +183,7 @@ export async function existingThreadId(
   what: string,
 ): Promise<string> {
   if ('threadId' in target) {
-    assertIds([target.threadId], 'A thread id');
+    checkedIds([target.threadId], 'A thread id');
     return target.threadId;
   }
   const thread = await findThreadByParticipants(client, target.userIds);

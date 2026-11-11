@@ -3,8 +3,7 @@ import { endpoints } from '../../generated/endpoints';
 import { mediaSchema, type Media } from '../../schemas/media';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
-import { checkedMediaId } from '../../core/ids';
-import { assertIds } from '../direct/direct-wire';
+import { checkedIds, checkedMediaId } from '../../core/ids';
 import { isRecord } from '../../core/guards';
 import { mediaAction, mediaActionPayload } from './media';
 
@@ -41,7 +40,7 @@ export interface EditMediaOptions {
  */
 function usertagsJson(tag: readonly UserTag[], untag: readonly string[] | undefined): string {
   const entries = tag.map((entry) => {
-    assertIds([entry.userId], 'A tagged user id');
+    checkedIds([entry.userId], 'A tagged user id');
     if (!(entry.x >= 0 && entry.x <= 1 && entry.y >= 0 && entry.y <= 1)) {
       throw new IgError('A tag position is a pair of fractions between 0 and 1');
     }
@@ -49,7 +48,7 @@ function usertagsJson(tag: readonly UserTag[], untag: readonly string[] | undefi
   });
   let json = `"in":[${entries.join(',')}]`;
   if (untag !== undefined && untag.length > 0) {
-    assertIds(untag, 'Untagged user ids');
+    checkedIds(untag, 'Untagged user ids');
     json += `,"removed":[${untag.join(',')}]`;
   }
   return `{${json}}`;

@@ -7,12 +7,12 @@ import { userSchema, type User } from '../../schemas/user';
 import { parseSchemaList } from '../../schemas/parse-list';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
-import { assertIds, mutationToken, numericIdArray } from './direct-wire';
+import { mutationToken, numericIdArray } from './direct-wire';
+import { checkedId, checkedIds } from '../../core/ids';
 import { isRecord } from '../../core/guards';
 
 function threadPath(definition: EndpointDefinition, threadId: string): string {
-  assertIds([threadId], 'A thread id');
-  return definition.path.replace('{thread_id}', threadId);
+  return definition.path.replace('{thread_id}', checkedId(threadId, 'A thread id'));
 }
 
 /**
@@ -94,7 +94,7 @@ export async function addThreadUsers(
   threadId: string,
   userIds: readonly string[],
 ): Promise<void> {
-  assertIds(userIds, 'User ids');
+  checkedIds(userIds, 'User ids');
   await postAction(
     client,
     endpoints.directThreadAddUser,
@@ -127,8 +127,9 @@ export async function unmuteThread(client: PrivateClient, threadId: string): Pro
 }
 
 function messagePath(definition: EndpointDefinition, threadId: string, itemId: string): string {
-  assertIds([threadId, itemId], 'Thread and message ids');
-  return definition.path.replace('{thread_id}', threadId).replace('{item_id}', itemId);
+  return definition.path
+    .replace('{thread_id}', checkedId(threadId, 'A thread id'))
+    .replace('{item_id}', checkedId(itemId, 'A message id'));
 }
 
 /** Deletes one of the account's messages from a thread (unsends it). */
@@ -177,7 +178,7 @@ export async function createGroupThread(
   userIds: readonly string[],
   title = '',
 ): Promise<string> {
-  assertIds(userIds, 'User ids');
+  checkedIds(userIds, 'User ids');
   if (userIds.length < 2) {
     throw new IgError('A group thread needs at least two other participants');
   }
@@ -208,7 +209,7 @@ export async function findThreadByParticipants(
   client: PrivateClient,
   userIds: readonly string[],
 ): Promise<Thread | undefined> {
-  assertIds(userIds, 'User ids');
+  checkedIds(userIds, 'User ids');
   const json = await client.request({
     method: endpoints.directThreadByParticipants.method,
     endpoint: endpoints.directThreadByParticipants.path,

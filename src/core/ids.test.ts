@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { checkedId, checkedMediaId } from './ids';
+import { checkedId, checkedIds, checkedMediaId } from './ids';
+import { getThread } from '../endpoints/direct/direct';
 import { PrivateClient } from './http/private-client';
 import { FakeTransport } from './transport/adapters/fake';
 import { createSession } from './session/session';
@@ -49,8 +50,17 @@ describe('checkedId', () => {
   });
 });
 
+describe('checkedIds', () => {
+  it('passes a list of digits and rejects an empty list or any forged entry', () => {
+    expect(checkedIds(['1', '20000000002'], 'Ids')).toEqual(['1', '20000000002']);
+    expect(() => checkedIds([], 'Ids')).toThrow(IgError);
+    expect(() => checkedIds(['1', FORGED], 'Ids')).toThrow(IgError);
+  });
+});
+
 describe('a forged id never reaches the network', () => {
   const cases: [string, (c: PrivateClient) => Promise<unknown>][] = [
+    ['getThread', (c) => getThread(c, FORGED)],
     ['getUserInfo', (c) => getUserInfo(c, FORGED)],
     ['followUser', (c) => followUser(c, FORGED)],
     ['unfollowUser', (c) => unfollowUser(c, FORGED)],

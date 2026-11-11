@@ -482,8 +482,6 @@ export interface IgFlareOptions extends PrivateClientOptions {
  * by domain (`ig.user.*`, `ig.friendship.*`, `ig.feed.*`, `ig.media.*`).
  * Persistence is pluggable: pass any `SessionStore` (memory, file, or a provider
  * adapter) as `store`. The transport retries transient failures by default.
- *
- * The class name is provisional; the public brand is settled before publishing.
  */
 export class IgFlare {
   readonly #client: PrivateClient;

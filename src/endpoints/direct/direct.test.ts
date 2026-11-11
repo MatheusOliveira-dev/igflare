@@ -94,9 +94,11 @@ describe('getThread', () => {
       },
     });
 
-    const page = await getThread(client, 't1');
+    const page = await getThread(client, '340282366841710300000000000000000001');
 
-    expect(transport.requests[0]?.url).toContain('/api/v1/direct_v2/threads/t1/');
+    expect(transport.requests[0]?.url).toContain(
+      '/api/v1/direct_v2/threads/340282366841710300000000000000000001/',
+    );
     expect(page.items[0]?.text).toBe('hi');
     expect(page.items[0]?.user_id).toBe('9');
     expect(page.nextCursor).toBe('tc1');
@@ -104,7 +106,9 @@ describe('getThread', () => {
 
   it('throws a typed schema error on a malformed message', async () => {
     const { client } = clientReturning({ status: 'ok', thread: { items: [{ item_id: 5 }] } });
-    await expect(getThread(client, 't1')).rejects.toBeInstanceOf(ClientSchemaError);
+    await expect(getThread(client, '340282366841710300000000000000000001')).rejects.toBeInstanceOf(
+      ClientSchemaError,
+    );
   });
 });
 

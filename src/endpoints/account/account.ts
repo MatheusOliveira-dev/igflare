@@ -1,3 +1,4 @@
+import { checkedIds } from '../../core/ids';
 import type { PrivateClient } from '../../core/http/private-client';
 import { endpoints } from '../../generated/endpoints';
 import { userSchema, type User } from '../../schemas/user';
@@ -7,7 +8,6 @@ import { bioLinkSchema, type BioLink } from '../../schemas/bio-link';
 import { parseSchemaList } from '../../schemas/parse-list';
 import { activityItemSchema, type Activity, type ActivityItem } from '../../schemas/activity';
 import { isRecord } from '../../core/guards';
-import { assertIds } from '../direct/direct-wire';
 import { getCurrentUser } from '../user/current-user';
 
 /** Sets the logged-in account's biography and returns the updated profile. */
@@ -103,7 +103,7 @@ export async function removeBioLinks(
   client: PrivateClient,
   linkIds: readonly string[],
 ): Promise<BioLink[]> {
-  assertIds(linkIds, 'Link ids');
+  checkedIds(linkIds, 'Link ids');
   // The endpoint takes the ids as JSON numbers. Link ids seen so far fit in a double;
   // one that does not would be rounded into a different link, so it is refused.
   const numbers = linkIds.map(Number);

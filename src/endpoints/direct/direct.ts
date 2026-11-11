@@ -15,6 +15,7 @@ import type { Page } from '../../core/pagination';
 import { parseSchemaList } from '../../schemas/parse-list';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { isRecord } from '../../core/guards';
+import { checkedId } from '../../core/ids';
 
 export interface CursorOptions {
   /** The cursor from a previous page's `nextCursor`. Omit for the first page. */
@@ -113,7 +114,10 @@ export async function getThread(
 ): Promise<Page<DirectMessage>> {
   const json = await client.request({
     method: endpoints.directThread.method,
-    endpoint: endpoints.directThread.path.replace('{thread_id}', threadId),
+    endpoint: endpoints.directThread.path.replace(
+      '{thread_id}',
+      checkedId(threadId, 'A thread id'),
+    ),
     query: { ...(options.cursor !== undefined ? { cursor: options.cursor } : {}) },
   });
   const thread = json['thread'];

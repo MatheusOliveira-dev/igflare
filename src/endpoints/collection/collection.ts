@@ -1,6 +1,6 @@
 import type { PrivateClient } from '../../core/http/private-client';
 import { endpoints } from '../../generated/endpoints';
-import { checkedId } from '../../core/ids';
+import { checkedId, checkedIds } from '../../core/ids';
 import { isRecord, readCursor } from '../../core/guards';
 import { paginate } from '../../core/pagination';
 import type { Page } from '../../core/pagination';
@@ -10,7 +10,6 @@ import { parseSchemaList } from '../../schemas/parse-list';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 import { mediaAction, mediaActionPayload } from '../media/media';
-import { assertIds } from '../direct/direct-wire';
 
 /** The types the app asks for: the automatic ones and the ones a person makes. */
 const COLLECTION_TYPES = '["ALL_MEDIA_AUTO_COLLECTION","PRODUCT_AUTO_COLLECTION","MEDIA"]';
@@ -111,7 +110,7 @@ export async function createCollection(
     throw new IgError('A collection needs a name');
   }
   if (mediaIds.length > 0) {
-    assertIds(mediaIds, 'Media ids');
+    checkedIds(mediaIds, 'Media ids');
   }
   const json = await client.request({
     method: endpoints.collectionsCreate.method,
