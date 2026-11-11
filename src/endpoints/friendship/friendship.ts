@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { checkedId } from '../../core/ids';
 import type { PrivateClient } from '../../core/http/private-client';
 import { endpoints } from '../../generated/endpoints';
 import type { EndpointDefinition } from '../../generated/endpoints';
@@ -28,7 +29,7 @@ function parseFriendship(value: unknown): FriendshipStatus {
 export async function followUser(client: PrivateClient, pk: string): Promise<FriendshipStatus> {
   const json = await client.request({
     method: endpoints.friendshipsCreate.method,
-    endpoint: endpoints.friendshipsCreate.path.replace('{pk}', pk),
+    endpoint: endpoints.friendshipsCreate.path.replace('{pk}', checkedId(pk, 'A user id')),
     payload: { user_id: pk },
   });
   return parseFriendship(json['friendship_status']);
@@ -38,7 +39,7 @@ export async function followUser(client: PrivateClient, pk: string): Promise<Fri
 export async function unfollowUser(client: PrivateClient, pk: string): Promise<FriendshipStatus> {
   const json = await client.request({
     method: endpoints.friendshipsDestroy.method,
-    endpoint: endpoints.friendshipsDestroy.path.replace('{pk}', pk),
+    endpoint: endpoints.friendshipsDestroy.path.replace('{pk}', checkedId(pk, 'A user id')),
     payload: { user_id: pk },
   });
   return parseFriendship(json['friendship_status']);
@@ -54,7 +55,7 @@ export async function getFriendshipStatus(
 ): Promise<FriendshipStatus> {
   const json = await client.request({
     method: endpoints.friendshipsShow.method,
-    endpoint: endpoints.friendshipsShow.path.replace('{pk}', pk),
+    endpoint: endpoints.friendshipsShow.path.replace('{pk}', checkedId(pk, 'A user id')),
   });
   return parseFriendship(json);
 }
@@ -100,7 +101,7 @@ async function fetchFollowList(
   const rankToken = `${client.session.auth.userId ?? randomUUID()}_${randomUUID()}`;
   const json = await client.request({
     method: definition.method,
-    endpoint: definition.path.replace('{pk}', pk),
+    endpoint: definition.path.replace('{pk}', checkedId(pk, 'A user id')),
     query: {
       rank_token: rankToken,
       ...(options.cursor !== undefined ? { max_id: options.cursor } : {}),
@@ -147,7 +148,7 @@ async function friendshipAction(
 ): Promise<FriendshipStatus> {
   const json = await client.request({
     method: definition.method,
-    endpoint: definition.path.replace('{pk}', pk),
+    endpoint: definition.path.replace('{pk}', checkedId(pk, 'A user id')),
     payload: { user_id: pk },
   });
   return parseFriendship(json['friendship_status']);

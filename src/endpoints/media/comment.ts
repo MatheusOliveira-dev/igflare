@@ -7,14 +7,7 @@ import { paginate } from '../../core/pagination';
 import type { Page } from '../../core/pagination';
 import { assertIds } from '../direct/direct-wire';
 import { mediaActionPayload } from './media';
-import { IgError } from '../../errors/ig-error';
-
-/** A media id is the numeric pk, optionally with the author id (`pk_userid`). */
-function assertMediaId(mediaId: string): void {
-  if (!/^\d+(_\d+)?$/.test(mediaId)) {
-    throw new IgError('A media id looks like 123456 or 123456_789');
-  }
-}
+import { checkedMediaId } from '../../core/ids';
 
 function commentPath(
   definition: EndpointDefinition,
@@ -23,7 +16,7 @@ function commentPath(
   assertIds([values.commentId], 'A comment id');
   let path = definition.path.replace('{comment_id}', values.commentId);
   if (values.mediaId !== undefined) {
-    assertMediaId(values.mediaId);
+    checkedMediaId(values.mediaId);
     path = path.replace('{id}', values.mediaId);
   }
   return path;
@@ -102,7 +95,7 @@ export async function deleteComments(
   mediaId: string,
   commentIds: readonly string[],
 ): Promise<void> {
-  assertMediaId(mediaId);
+  checkedMediaId(mediaId);
   assertIds(commentIds, 'Comment ids');
   await post(
     client,

@@ -1,4 +1,5 @@
 import type { PrivateClient } from '../../core/http/private-client';
+import { checkedId } from '../../core/ids';
 import { endpoints } from '../../generated/endpoints';
 import { reelSchema, type Reel } from '../../schemas/reel';
 import { mediaSchema, type Media } from '../../schemas/media';
@@ -26,7 +27,7 @@ export async function getReelsTray(client: PrivateClient): Promise<Reel[]> {
 export async function getUserStories(client: PrivateClient, pk: string): Promise<Media[]> {
   const json = await client.request({
     method: endpoints.feedUserStory.method,
-    endpoint: endpoints.feedUserStory.path.replace('{pk}', pk),
+    endpoint: endpoints.feedUserStory.path.replace('{pk}', checkedId(pk, 'A user id')),
   });
   const reel = json['reel'];
   if (!isRecord(reel)) {

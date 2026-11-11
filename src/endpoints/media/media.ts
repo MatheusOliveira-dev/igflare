@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { checkedId, checkedMediaId } from '../../core/ids';
 import type { PrivateClient } from '../../core/http/private-client';
 import { endpoints } from '../../generated/endpoints';
 import { mediaSchema, type Media } from '../../schemas/media';
@@ -23,7 +24,7 @@ export interface CommentListOptions {
 export async function getMediaInfo(client: PrivateClient, mediaId: string): Promise<Media> {
   const json = await client.request({
     method: endpoints.mediaInfo.method,
-    endpoint: endpoints.mediaInfo.path.replace('{id}', mediaId),
+    endpoint: endpoints.mediaInfo.path.replace('{id}', checkedMediaId(mediaId)),
   });
   const items = json['items'];
   if (!Array.isArray(items) || items.length === 0) {
@@ -51,7 +52,7 @@ export function mediaActionPayload(client: PrivateClient): Record<string, unknow
 export async function likeMedia(client: PrivateClient, mediaId: string): Promise<void> {
   await client.request({
     method: endpoints.mediaLike.method,
-    endpoint: endpoints.mediaLike.path.replace('{id}', mediaId),
+    endpoint: endpoints.mediaLike.path.replace('{id}', checkedMediaId(mediaId)),
     payload: { ...mediaActionPayload(client), media_id: mediaId },
   });
 }
@@ -60,7 +61,7 @@ export async function likeMedia(client: PrivateClient, mediaId: string): Promise
 export async function unlikeMedia(client: PrivateClient, mediaId: string): Promise<void> {
   await client.request({
     method: endpoints.mediaUnlike.method,
-    endpoint: endpoints.mediaUnlike.path.replace('{id}', mediaId),
+    endpoint: endpoints.mediaUnlike.path.replace('{id}', checkedMediaId(mediaId)),
     payload: { ...mediaActionPayload(client), media_id: mediaId },
   });
 }
@@ -79,7 +80,7 @@ export async function commentMedia(
 ): Promise<Comment> {
   const json = await client.request({
     method: endpoints.mediaComment.method,
-    endpoint: endpoints.mediaComment.path.replace('{id}', mediaId),
+    endpoint: endpoints.mediaComment.path.replace('{id}', checkedMediaId(mediaId)),
     payload: {
       ...mediaActionPayload(client),
       comment_text: text,
@@ -107,7 +108,7 @@ export async function deleteMedia(
 ): Promise<void> {
   await client.request({
     method: endpoints.mediaDelete.method,
-    endpoint: endpoints.mediaDelete.path.replace('{id}', mediaId),
+    endpoint: endpoints.mediaDelete.path.replace('{id}', checkedMediaId(mediaId)),
     query: { media_type: mediaType },
     payload: {
       igtv_feed_preview: false,
@@ -126,8 +127,8 @@ export async function deleteComment(
   await client.request({
     method: endpoints.mediaCommentDelete.method,
     endpoint: endpoints.mediaCommentDelete.path
-      .replace('{id}', mediaId)
-      .replace('{comment_id}', commentId),
+      .replace('{id}', checkedMediaId(mediaId))
+      .replace('{comment_id}', checkedId(commentId, 'A comment id')),
     payload: mediaActionPayload(client),
   });
 }
@@ -140,7 +141,7 @@ export async function getComments(
 ): Promise<Page<Comment>> {
   const json = await client.request({
     method: endpoints.mediaComments.method,
-    endpoint: endpoints.mediaComments.path.replace('{id}', mediaId),
+    endpoint: endpoints.mediaComments.path.replace('{id}', checkedMediaId(mediaId)),
     ...(options.cursor !== undefined ? { query: { min_id: options.cursor } } : {}),
   });
   const items = parseSchemaList<Comment>(json['comments'], commentSchema, 'comment');
@@ -159,7 +160,7 @@ export function paginateComments(client: PrivateClient, mediaId: string): AsyncG
 export async function getLikers(client: PrivateClient, mediaId: string): Promise<User[]> {
   const json = await client.request({
     method: endpoints.mediaLikers.method,
-    endpoint: endpoints.mediaLikers.path.replace('{id}', mediaId),
+    endpoint: endpoints.mediaLikers.path.replace('{id}', checkedMediaId(mediaId)),
   });
   return parseSchemaList<User>(json['users'], userSchema, 'user');
 }
@@ -168,7 +169,7 @@ export async function getLikers(client: PrivateClient, mediaId: string): Promise
 export async function saveMedia(client: PrivateClient, mediaId: string): Promise<void> {
   await client.request({
     method: endpoints.mediaSave.method,
-    endpoint: endpoints.mediaSave.path.replace('{id}', mediaId),
+    endpoint: endpoints.mediaSave.path.replace('{id}', checkedMediaId(mediaId)),
     payload: mediaActionPayload(client),
   });
 }
@@ -177,7 +178,7 @@ export async function saveMedia(client: PrivateClient, mediaId: string): Promise
 export async function unsaveMedia(client: PrivateClient, mediaId: string): Promise<void> {
   await client.request({
     method: endpoints.mediaUnsave.method,
-    endpoint: endpoints.mediaUnsave.path.replace('{id}', mediaId),
+    endpoint: endpoints.mediaUnsave.path.replace('{id}', checkedMediaId(mediaId)),
     payload: mediaActionPayload(client),
   });
 }

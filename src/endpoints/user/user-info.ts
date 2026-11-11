@@ -1,4 +1,5 @@
 import type { PrivateClient } from '../../core/http/private-client';
+import { checkedId } from '../../core/ids';
 import { endpoints } from '../../generated/endpoints';
 import { userSchema, type User } from '../../schemas/user';
 import { IgError } from '../../errors/ig-error';
@@ -26,7 +27,7 @@ function parseUser(json: Record<string, unknown>): User {
 export async function getUserInfo(client: PrivateClient, pk: string): Promise<User> {
   const json = await client.request({
     method: endpoints.userInfo.method,
-    endpoint: endpoints.userInfo.path.replace('{pk}', pk),
+    endpoint: endpoints.userInfo.path.replace('{pk}', checkedId(pk, 'A user id')),
   });
   return parseUser(json);
 }
@@ -38,7 +39,7 @@ export async function getUserInfoByUsername(
 ): Promise<User> {
   const json = await client.request({
     method: endpoints.userInfoByUsername.method,
-    endpoint: endpoints.userInfoByUsername.path.replace('{username}', username),
+    endpoint: endpoints.userInfoByUsername.path.replace('{username}', encodeURIComponent(username)),
   });
   return parseUser(json);
 }

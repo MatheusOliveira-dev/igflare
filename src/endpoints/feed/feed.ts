@@ -1,4 +1,5 @@
 import type { PrivateClient } from '../../core/http/private-client';
+import { checkedId } from '../../core/ids';
 import { endpoints } from '../../generated/endpoints';
 import { mediaSchema, type Media } from '../../schemas/media';
 import { paginate } from '../../core/pagination';
@@ -42,7 +43,7 @@ export async function getUserFeed(
 ): Promise<Page<Media>> {
   const json = await client.request({
     method: endpoints.feedUser.method,
-    endpoint: endpoints.feedUser.path.replace('{pk}', pk),
+    endpoint: endpoints.feedUser.path.replace('{pk}', checkedId(pk, 'A user id')),
     ...(options.cursor !== undefined ? { query: { max_id: options.cursor } } : {}),
   });
   const items = parseMediaList(json);
@@ -238,7 +239,10 @@ export async function getLocationFeed(
 ): Promise<Page<Media>> {
   const json = await client.request({
     method: endpoints.locationsSections.method,
-    endpoint: endpoints.locationsSections.path.replace('{id}', locationId),
+    endpoint: endpoints.locationsSections.path.replace(
+      '{id}',
+      checkedId(locationId, 'A location id'),
+    ),
     payload: sectionsBody(options.cursor),
   });
   return sectionsPage(json);

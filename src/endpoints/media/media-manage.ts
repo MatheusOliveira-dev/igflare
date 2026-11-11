@@ -4,19 +4,13 @@ import type { EndpointDefinition } from '../../generated/endpoints';
 import { mediaSchema, type Media } from '../../schemas/media';
 import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
+import { checkedMediaId } from '../../core/ids';
 import { assertIds, isRecord } from '../direct/direct-wire';
 import { mediaActionPayload } from './media';
 
-function mediaPathId(mediaId: string): string {
-  if (!/^\d+(_\d+)?$/.test(mediaId)) {
-    throw new IgError('A media id looks like 123456 or 123456_789');
-  }
-  return mediaId;
-}
-
 /** The numeric pk of a media id, whether it is `pk` or `pk_userid`. */
 function mediaPk(mediaId: string): string {
-  return mediaPathId(mediaId).split('_')[0] ?? mediaId;
+  return checkedMediaId(mediaId).split('_')[0] ?? mediaId;
 }
 
 /** Where on the photo a person is tagged, as fractions of its width and height. */
@@ -73,7 +67,7 @@ export async function editMedia(
 ): Promise<Media> {
   const json = await client.request({
     method: endpoints.mediaEdit.method,
-    endpoint: endpoints.mediaEdit.path.replace('{id}', mediaPathId(mediaId)),
+    endpoint: endpoints.mediaEdit.path.replace('{id}', checkedMediaId(mediaId)),
     payload: {
       caption_text: options.caption,
       container_module: 'edit_media_info',
@@ -108,7 +102,7 @@ export async function archiveMedia(client: PrivateClient, mediaId: string): Prom
   await mediaAction(
     client,
     endpoints.mediaArchive,
-    endpoints.mediaArchive.path.replace('{id}', mediaPathId(mediaId)),
+    endpoints.mediaArchive.path.replace('{id}', checkedMediaId(mediaId)),
     { ...mediaActionPayload(client), media_id: mediaId },
   );
 }
@@ -118,7 +112,7 @@ export async function unarchiveMedia(client: PrivateClient, mediaId: string): Pr
   await mediaAction(
     client,
     endpoints.mediaUnarchive,
-    endpoints.mediaUnarchive.path.replace('{id}', mediaPathId(mediaId)),
+    endpoints.mediaUnarchive.path.replace('{id}', checkedMediaId(mediaId)),
     { ...mediaActionPayload(client), media_id: mediaId },
   );
 }
