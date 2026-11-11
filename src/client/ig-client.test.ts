@@ -428,6 +428,34 @@ describe('IgFlare facade', () => {
     expect(transport.requests.some((r) => r.url.includes('/media/configure_to_clips/'))).toBe(true);
   });
 
+  it('delegates notes', async () => {
+    const note = { note_id: '5', text: 'n', author_id: '7' };
+    const { ig } = clientWith((req) => {
+      if (req.headers['X-FB-Friendly-Name'] === 'InboxTrayRequest')
+        return json({
+          data: {
+            '1$xdt_get_inbox_tray_items(request:$request)': {
+              inbox_tray_items: [{ note_dict: note }],
+            },
+          },
+        });
+      if (req.headers['X-FB-Friendly-Name'] === 'CreateInboxTrayItemRequest')
+        return json({
+          data: {
+            '1$xdt_create_inbox_tray_item(request:$request)': {
+              success: true,
+              inbox_tray_item: { note_dict: note },
+            },
+          },
+        });
+      return json({ data: { '1$xdt_delete_inbox_tray_item(item_id:$item_id)': true } });
+    });
+
+    expect((await ig.notes.list())[0]?.text).toBe('n');
+    expect((await ig.notes.create('n')).note_id).toBe('5');
+    await ig.notes.delete('5');
+  });
+
   it('delegates stories: tray, user stories and story upload', async () => {
     const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90]);
     const { ig } = clientWith((req) => {

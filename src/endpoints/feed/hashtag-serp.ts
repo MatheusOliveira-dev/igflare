@@ -1,9 +1,9 @@
 import type { PrivateClient } from '../../core/http/private-client';
-import { pandoRequest } from '../../core/http/pando';
+import { pandoRequest, pandoRoot } from '../../core/http/pando';
 import type { Page } from '../../core/pagination';
 import { isRecord } from '../../core/guards';
 import { mediaSchema, type Media } from '../../schemas/media';
-import { ClientSchemaError, IgApiError } from '../../errors/api-errors';
+import { ClientSchemaError } from '../../errors/api-errors';
 import { IgError } from '../../errors/ig-error';
 import { randomUUID } from 'node:crypto';
 
@@ -148,13 +148,6 @@ function serpVariables(
   };
 }
 
-/** The response keys the root field as `1$xdt_fbsearch__top_serp_graphql(request_data:...)`. */
-function findRoot(data: Record<string, unknown>): Record<string, unknown> | undefined {
-  const key = Object.keys(data).find((name) => /^\d+\$xdt_fbsearch__top_serp_graphql/.test(name));
-  const root = key !== undefined ? data[key] : undefined;
-  return isRecord(root) ? root : undefined;
-}
-
 /**
  * The results carry the author with an id under `strong_id__` rather than `pk`; copy it
  * over so the shared `User` model has its usual id.
@@ -227,13 +220,9 @@ export async function getHashtagSerpPage(
     variables: serpVariables(name, session, cursorValue !== undefined),
   });
 
-  const data = json['data'];
-  const root = isRecord(data) ? findRoot(data) : undefined;
-  if (root === undefined) {
-    const errors = json['errors'];
-    const first = Array.isArray(errors) && isRecord(errors[0]) ? errors[0]['message'] : undefined;
-    const reason = typeof first === 'string' ? ': ' + first : '';
-    throw new IgApiError('The hashtag search was refused' + reason, 200, { raw: json });
+  const root = pandoRoot(json, ROOT_FIELD, 'hashtag search');
+  if (!isRecord(root)) {
+    throw new ClientSchemaError('the hashtag search answered with no results object', json);
   }
 
   const items = gridMedias(root);

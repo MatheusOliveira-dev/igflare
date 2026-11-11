@@ -1,5 +1,7 @@
 import type { PrivateClient } from './private-client';
 import { API_DOMAIN } from './request-builder';
+import { isRecord } from '../guards';
+import { IgApiError } from '../../errors/api-errors';
 
 /** One persisted ("pando") GraphQL query, as the Android app sends it. */
 export interface PandoQuery {
@@ -54,4 +56,23 @@ export function pandoRequest(
       'X-Graphql-Client-Library': 'pando',
     },
   });
+}
+
+/**
+ * The value a persisted query answered at its root field. The response keys it as
+ * `1$<rootField>(<arguments>)`, so the key is found by its prefix. When the query was
+ * refused (`errors` and no `data`), this throws with the server's first message.
+ */
+export function pandoRoot(json: Record<string, unknown>, rootField: string, what: string): unknown {
+  const data = json['data'];
+  if (isRecord(data)) {
+    const key = Object.keys(data).find((name) => name.startsWith(`1$${rootField}`));
+    if (key !== undefined) {
+      return data[key];
+    }
+  }
+  const errors = json['errors'];
+  const first = Array.isArray(errors) && isRecord(errors[0]) ? errors[0]['message'] : undefined;
+  const reason = typeof first === 'string' ? ': ' + first : '';
+  throw new IgApiError(`The ${what} was refused${reason}`, 200, { raw: json });
 }

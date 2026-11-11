@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { pandoRequest } from './pando';
+import { pandoRequest, pandoRoot } from './pando';
+import { IgApiError } from '../../errors/api-errors';
 import { PrivateClient } from './private-client';
 import { FakeTransport } from '../transport/adapters/fake';
 import { createSession } from '../session/session';
@@ -52,5 +53,30 @@ describe('pandoRequest', () => {
       data: null,
       errors: [{ message: 'nope' }],
     });
+  });
+});
+
+describe('pandoRoot', () => {
+  it('finds the value at the root field by the key prefix', () => {
+    const json = { data: { '1$example_root(arg:$arg)': { ok: true }, other: 1 } };
+    expect(pandoRoot(json, 'example_root', 'thing')).toEqual({ ok: true });
+  });
+
+  it('returns a root that is not an object as it is', () => {
+    expect(pandoRoot({ data: { '1$example_root': true } }, 'example_root', 'thing')).toBe(true);
+  });
+
+  it('throws with the server message when the query was refused', () => {
+    const json = { data: null, errors: [{ message: 'missing_required_variable_value' }] };
+    expect(() => pandoRoot(json, 'example_root', 'thing')).toThrow(IgApiError);
+    expect(() => pandoRoot(json, 'example_root', 'thing')).toThrow(
+      'The thing was refused: missing_required_variable_value',
+    );
+  });
+
+  it('throws when the root field is not in the answer and there is no message', () => {
+    expect(() => pandoRoot({ data: { '1$other': {} } }, 'example_root', 'thing')).toThrow(
+      'The thing was refused',
+    );
   });
 });

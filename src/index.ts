@@ -94,6 +94,7 @@ export type {
   HashtagApi,
   LocationApi,
   ReelsApi,
+  NotesApi,
 } from './client/ig-client';
 export {
   getMediaInfo,
@@ -247,6 +248,10 @@ export {
   getFriendsReels,
 } from './endpoints/reels/reels';
 export type { ReelsPageOptions, UserReelsOptions } from './endpoints/reels/reels';
+export { getNotes, createNote, deleteNote } from './endpoints/notes/notes';
+export type { CreateNoteOptions, NoteAudience } from './endpoints/notes/notes';
+export { noteSchema } from './schemas/note';
+export type { Note } from './schemas/note';
 export { highlightSchema } from './schemas/highlight';
 export type { Highlight } from './schemas/highlight';
 export { bioLinkSchema } from './schemas/bio-link';

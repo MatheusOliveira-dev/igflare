@@ -339,6 +339,14 @@ export interface CreateHighlightOptions {
     readonly coverStoryId?: string;
 }
 
+// @public
+export function createNote(client: PrivateClient, text: string, options?: CreateNoteOptions): Promise<Note>;
+
+// @public (undocumented)
+export interface CreateNoteOptions {
+    readonly audience?: NoteAudience;
+}
+
 // @public (undocumented)
 export function createSession(options?: CreateSessionOptions): SessionData;
 
@@ -385,6 +393,9 @@ export function deleteMedia(client: PrivateClient, mediaId: string, mediaType?: 
 
 // @public
 export function deleteMessage(client: PrivateClient, threadId: string, itemId: string): Promise<void>;
+
+// @public
+export function deleteNote(client: PrivateClient, noteId: string): Promise<void>;
 
 // @public
 export function denyRequest(client: PrivateClient, pk: string): Promise<FriendshipStatus>;
@@ -778,6 +789,9 @@ export function getLocationInfo(client: PrivateClient, locationId: string): Prom
 export function getMediaInfo(client: PrivateClient, mediaId: string): Promise<Media>;
 
 // @public
+export function getNotes(client: PrivateClient): Promise<Note[]>;
+
+// @public
 export function getPendingInbox(client: PrivateClient, options?: CursorOptions): Promise<Page<Thread>>;
 
 // @public
@@ -1000,6 +1014,8 @@ export class IgFlare {
     login(credentials: IgFlareLogin): Promise<PrivateResponseJson>;
     // (undocumented)
     readonly media: MediaApi;
+    // (undocumented)
+    readonly notes: NotesApi;
     // (undocumented)
     readonly reels: ReelsApi;
     resolveTwoFactor(error: CaaTwoFactorRequiredError, code: string | TwoFactorSource): Promise<PrivateResponseJson>;
@@ -1268,6 +1284,44 @@ export function muteThread(client: PrivateClient, threadId: string): Promise<voi
 
 // @public
 export function muteUser(client: PrivateClient, pk: string, options?: MuteOptions): Promise<void>;
+
+// @public (undocumented)
+export type Note = z.infer<typeof noteSchema>;
+
+// @public
+export type NoteAudience = 'mutual' | 'closeFriends';
+
+// @public
+export interface NotesApi {
+    create(text: string, options?: CreateNoteOptions): Promise<Note>;
+    delete(noteId: string): Promise<void>;
+    list(): Promise<Note[]>;
+}
+
+// @public
+export const noteSchema: z.ZodObject<{
+    note_id: z.ZodCoercedString<unknown>;
+    text: z.ZodOptional<z.ZodString>;
+    audience: z.ZodOptional<z.ZodNumber>;
+    note_style: z.ZodOptional<z.ZodNumber>;
+    author_id: z.ZodOptional<z.ZodCoercedString<unknown>>;
+    author: z.ZodOptional<z.ZodObject<{
+        pk: z.ZodOptional<z.ZodCoercedString<unknown>>;
+        username: z.ZodOptional<z.ZodString>;
+        full_name: z.ZodOptional<z.ZodString>;
+        is_private: z.ZodOptional<z.ZodBoolean>;
+        is_verified: z.ZodOptional<z.ZodBoolean>;
+        profile_pic_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        follower_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        following_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        media_count: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        biography: z.ZodOptional<z.ZodString>;
+        external_url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    }, z.core.$loose>>;
+    created_at: z.ZodOptional<z.ZodNumber>;
+    expires_at: z.ZodOptional<z.ZodNumber>;
+    is_emoji_only: z.ZodOptional<z.ZodBoolean>;
+}, z.core.$loose>;
 
 // @public
 export interface Page<T> {

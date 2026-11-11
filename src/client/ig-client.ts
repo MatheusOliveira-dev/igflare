@@ -72,6 +72,9 @@ import type { BioLink } from '../schemas/bio-link';
 import type { Activity } from '../schemas/activity';
 import type { Collection } from '../schemas/collection';
 import type { Highlight } from '../schemas/highlight';
+import type { Note } from '../schemas/note';
+import { createNote, deleteNote, getNotes } from '../endpoints/notes/notes';
+import type { CreateNoteOptions } from '../endpoints/notes/notes';
 import {
   getExploreReels,
   getFriendsReels,
@@ -396,6 +399,16 @@ export interface ReelsApi {
   friends(options?: ReelsPageOptions): Promise<Page<Media>>;
 }
 
+/** Notes: the short text over a profile picture in the inbox. */
+export interface NotesApi {
+  /** The notes in the inbox tray: the account's own and those of followed accounts. */
+  list(): Promise<Note[]>;
+  /** Posts a note (1 to 60 characters), for mutual followers or close friends. */
+  create(text: string, options?: CreateNoteOptions): Promise<Note>;
+  /** Deletes a note by its id. */
+  delete(noteId: string): Promise<void>;
+}
+
 /** Stories. */
 export interface StoryApi {
   tray(): Promise<Reel[]>;
@@ -449,6 +462,7 @@ export class IgFlare {
   readonly collection: CollectionApi;
   readonly highlight: HighlightApi;
   readonly reels: ReelsApi;
+  readonly notes: NotesApi;
   readonly hashtag: HashtagApi;
   readonly location: LocationApi;
 
@@ -475,6 +489,11 @@ export class IgFlare {
     this.story = this.#buildStoryApi();
     this.collection = this.#buildCollectionApi();
     this.highlight = this.#buildHighlightApi();
+    this.notes = {
+      list: () => getNotes(this.#client),
+      create: (text, options) => createNote(this.#client, text, options),
+      delete: (noteId) => deleteNote(this.#client, noteId),
+    };
     this.reels = {
       user: (userId, options) => getUserReels(this.#client, userId, options),
       paginateUser: (userId) => paginateUserReels(this.#client, userId),
