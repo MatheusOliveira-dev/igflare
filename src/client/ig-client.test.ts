@@ -456,6 +456,20 @@ describe('IgFlare facade', () => {
     await ig.notes.delete('5');
   });
 
+  it('delegates the Explore feed', async () => {
+    const { ig, transport } = clientWith(() =>
+      json({
+        status: 'ok',
+        sectional_items: [{ layout_content: { full_item: { media: { pk: 1, code: 'ex' } } } }],
+      }),
+    );
+    expect((await ig.explore.feed()).items[0]?.code).toBe('ex');
+    const codes: (string | undefined)[] = [];
+    for await (const media of ig.explore.paginateFeed()) codes.push(media.code);
+    expect(codes).toEqual(['ex']);
+    expect(transport.requests[0]?.url).toContain('/api/v1/discover/topical_explore/');
+  });
+
   it('delegates stories: tray, user stories and story upload', async () => {
     const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90]);
     const { ig } = clientWith((req) => {

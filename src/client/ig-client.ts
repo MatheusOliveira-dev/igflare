@@ -73,6 +73,8 @@ import type { Activity } from '../schemas/activity';
 import type { Collection } from '../schemas/collection';
 import type { Highlight } from '../schemas/highlight';
 import type { Note } from '../schemas/note';
+import { getExploreFeed, paginateExploreFeed } from '../endpoints/explore/explore';
+import type { ExploreOptions } from '../endpoints/explore/explore';
 import { createNote, deleteNote, getNotes } from '../endpoints/notes/notes';
 import type { CreateNoteOptions } from '../endpoints/notes/notes';
 import {
@@ -409,6 +411,13 @@ export interface NotesApi {
   delete(noteId: string): Promise<void>;
 }
 
+/** The Explore tab. */
+export interface ExploreApi {
+  /** One page of the Explore feed. */
+  feed(options?: ExploreOptions): Promise<Page<Media>>;
+  paginateFeed(): AsyncGenerator<Media>;
+}
+
 /** Stories. */
 export interface StoryApi {
   tray(): Promise<Reel[]>;
@@ -463,6 +472,7 @@ export class IgFlare {
   readonly highlight: HighlightApi;
   readonly reels: ReelsApi;
   readonly notes: NotesApi;
+  readonly explore: ExploreApi;
   readonly hashtag: HashtagApi;
   readonly location: LocationApi;
 
@@ -489,6 +499,10 @@ export class IgFlare {
     this.story = this.#buildStoryApi();
     this.collection = this.#buildCollectionApi();
     this.highlight = this.#buildHighlightApi();
+    this.explore = {
+      feed: (options) => getExploreFeed(this.#client, options),
+      paginateFeed: () => paginateExploreFeed(this.#client),
+    };
     this.notes = {
       list: () => getNotes(this.#client),
       create: (text, options) => createNote(this.#client, text, options),

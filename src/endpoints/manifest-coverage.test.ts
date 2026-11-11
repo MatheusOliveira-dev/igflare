@@ -61,6 +61,10 @@ describe('manifest coverage of the hand-written endpoints', () => {
     expect(endpoints.clipsDiscoverSocial.path).toBe('/api/v1/clips/discover/social/');
     expect(endpoints.clipsConnected.path).toBe('/api/v1/clips/connected/');
     expect(endpoints.mediaConfigureToClips.path).toBe('/api/v1/media/configure_to_clips/');
+    expect(endpoints.discoverTopicalExplore).toEqual({
+      method: 'GET',
+      path: '/api/v1/discover/topical_explore/',
+    });
     expect(endpoints.attestationCreateAndroidKeystore).toEqual({
       method: 'POST',
       path: '/api/v1/attestation/create_android_keystore/',

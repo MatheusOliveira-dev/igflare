@@ -84,6 +84,7 @@ const checks = [
       await ig.notes.list();
     },
   ],
+  ['explore.feed', async () => some((await ig.explore.feed()).items, 'explore posts')],
   [
     'account.links',
     async () => {

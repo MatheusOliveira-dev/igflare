@@ -207,6 +207,11 @@
       "path": "/api/v1/direct_v2/threads/{thread_id}/update_title/"
     },
     {
+      "name": "discoverTopicalExplore",
+      "method": "GET",
+      "path": "/api/v1/discover/topical_explore/"
+    },
+    {
       "name": "fbsearchPlaces",
       "method": "GET",
       "path": "/api/v1/fbsearch/places/"
