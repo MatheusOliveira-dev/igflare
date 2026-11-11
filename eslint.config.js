@@ -11,6 +11,9 @@ export default tseslint.config(
       'dist',
       'coverage',
       'docs-site',
+      'website/api',
+      'website/.vitepress/cache',
+      'website/.vitepress/dist',
       'reports',
       '.stryker-tmp',
       'src/generated',
@@ -71,6 +74,14 @@ export default tseslint.config(
   {
     files: ['*.config.{ts,js,mjs}', 'tsup.config.ts', 'vitest.config.ts'],
     rules: { 'import-x/no-default-export': 'off' },
+  },
+  {
+    // VitePress loads its config and theme from default exports.
+    files: ['website/.vitepress/**/*.{ts,mts}'],
+    rules: {
+      'import-x/no-default-export': 'off',
+      '@typescript-eslint/naming-convention': 'off',
+    },
   },
   {
     files: ['tests/**/*.ts', 'src/**/*.test.ts'],

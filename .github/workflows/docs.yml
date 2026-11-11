@@ -19,6 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The site shows when each page was last changed, which needs the history.
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -27,7 +30,7 @@ jobs:
       - run: npm run docs
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: docs-site
+          path: website/.vitepress/dist
 
   deploy:
     needs: build

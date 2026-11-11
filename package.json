@@ -66,7 +66,10 @@
     "ci": "npm run typecheck && npm run format:check && npm run lint && npm run prose && npm run guard && npm run deps && npm run dup && npm run deadcode && npm run gen:check && npm run coverage && npm run build && npm run api && npm run docs:check",
     "live-check": "node scripts/live-check.mjs",
     "app-build": "node scripts/app-build.ts",
-    "docs": "typedoc",
+    "docs:api": "typedoc --options typedoc.website.json",
+    "docs:dev": "npm run docs:api && vitepress dev website",
+    "docs": "npm run docs:api && vitepress build website",
+    "docs:preview": "vitepress preview website",
     "docs:check": "typedoc --emit none",
     "prepublishOnly": "npm run ci"
   },
@@ -94,8 +97,11 @@
     "prettier": "3.9.10",
     "tsup": "9.0.0",
     "typedoc": "0.28.20",
+    "typedoc-plugin-markdown": "4.14.1",
+    "typedoc-vitepress-theme": "1.1.4",
     "typescript": "5.9.3",
     "typescript-eslint": "8.72.1",
+    "vitepress": "1.6.4",
     "vitest": "5.1.0"
   },
   "dependencies": {

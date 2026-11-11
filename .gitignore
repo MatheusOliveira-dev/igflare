@@ -2,6 +2,9 @@ node_modules/
 dist/
 coverage/
 docs-site/
+website/api/
+website/.vitepress/cache/
+website/.vitepress/dist/
 .stryker-tmp/
 reports/
 temp/

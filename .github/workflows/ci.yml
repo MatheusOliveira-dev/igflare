@@ -33,3 +33,6 @@ jobs:
       - run: npm run build
       - run: npm run api
       - run: npm run docs:check
+      - name: Documentation site builds
+        if: matrix.node == 22
+        run: npm run docs

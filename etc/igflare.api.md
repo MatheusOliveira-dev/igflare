@@ -103,7 +103,7 @@ export const accountInsightsSchema: z.ZodObject<{
     }, z.core.$loose>>>;
 }, z.core.$loose>;
 
-// @public (undocumented)
+// @public
 export class AccountSuspendedError extends IgApiError {
 }
 
@@ -264,7 +264,7 @@ export interface AuthState {
     readonly wwwClaim?: string;
 }
 
-// @public (undocumented)
+// @public
 export class BadPasswordError extends IgApiError {
 }
 
@@ -382,11 +382,11 @@ export const CHALLENGE_EMAIL = 1;
 // @public
 export const CHALLENGE_SMS = 0;
 
-// @public (undocumented)
+// @public
 export class ChallengeRequiredError extends IgApiError {
 }
 
-// @public (undocumented)
+// @public
 export class ClientForbiddenError extends IgApiError {
 }
 
@@ -782,7 +782,7 @@ export interface FeedApi {
     user(pk: string, options?: FeedOptions): Promise<Page<Media>>;
 }
 
-// @public (undocumented)
+// @public
 export class FeedbackRequiredError extends IgApiError {
 }
 
@@ -1351,7 +1351,7 @@ export interface LoginCredentials {
     readonly username: string;
 }
 
-// @public (undocumented)
+// @public
 export class LoginRequiredError extends IgApiError {
 }
 
@@ -1668,7 +1668,7 @@ export function pinComment(client: PrivateClient, mediaId: string, commentId: st
 // @public
 export function pinMedia(client: PrivateClient, mediaId: string): Promise<void>;
 
-// @public (undocumented)
+// @public
 export class PleaseWaitError extends IgApiError {
 }
 
@@ -1750,7 +1750,7 @@ export interface PrivateResponseJson {
 // @public
 export function quotePlus(value: string): string;
 
-// @public (undocumented)
+// @public
 export class RateLimitError extends IgApiError {
 }
 
@@ -1976,7 +1976,7 @@ export function sendVideo(client: PrivateClient, mp4: Uint8Array, target: SendTa
 // @public
 export function sendVoice(client: PrivateClient, m4a: Uint8Array, target: SendTarget, options?: VoiceOptions): Promise<DirectSendResult>;
 
-// @public (undocumented)
+// @public
 export class SentryBlockError extends IgApiError {
 }
 
@@ -2107,7 +2107,7 @@ export interface TwoFactorOptions {
     readonly verificationMethod?: string;
 }
 
-// @public (undocumented)
+// @public
 export class TwoFactorRequiredError extends IgApiError {
 }
 

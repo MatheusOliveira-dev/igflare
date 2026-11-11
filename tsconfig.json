@@ -31,6 +31,20 @@
     // The examples import the package by name, as a user would.
     "paths": { "igflare": ["./src/index.ts"] }
   },
-  "include": ["src", "scripts", "tests", "examples", "*.config.ts"],
-  "exclude": ["node_modules", "dist", "coverage"]
+  "include": [
+    "src",
+    "scripts",
+    "tests",
+    "examples",
+    "website/.vitepress/config.mts",
+    "website/.vitepress/theme/index.ts",
+    "*.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "website/.vitepress/cache",
+    "website/.vitepress/dist"
+  ]
 }

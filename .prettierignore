@@ -8,3 +8,6 @@ package-lock.json
 src/core/http/__fixtures__
 .local
 docs-site
+website/api
+website/.vitepress/cache
+website/.vitepress/dist

@@ -1,5 +1,8 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "entry": ["scripts/*.mjs", "scripts/*.ts", "*.config.ts"],
-  "project": ["src/**/*.ts", "scripts/**/*.mjs", "scripts/**/*.ts"]
+  "project": ["src/**/*.ts", "scripts/**/*.mjs", "scripts/**/*.ts"],
+  "typedoc": {
+    "config": ["typedoc.json", "typedoc.website.json"]
+  }
 }

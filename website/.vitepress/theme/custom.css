@@ -1,0 +1,56 @@
+/* The flare palette: a warm orange that runs into rose, the colors of the logo. */
+:root {
+  --flare-orange: #ff8a1f;
+  --flare-rose: #f43f6b;
+
+  --vp-c-brand-1: #e8521f;
+  --vp-c-brand-2: #f4613a;
+  --vp-c-brand-3: #f97a3d;
+  --vp-c-brand-soft: rgba(244, 97, 58, 0.14);
+
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(
+    120deg,
+    var(--flare-orange) 20%,
+    var(--flare-rose)
+  );
+  --vp-home-hero-image-background-image: linear-gradient(
+    135deg,
+    rgba(255, 138, 31, 0.45) 30%,
+    rgba(244, 63, 107, 0.45)
+  );
+  --vp-home-hero-image-filter: blur(56px);
+
+  --vp-button-brand-bg: var(--vp-c-brand-2);
+  --vp-button-brand-hover-bg: var(--vp-c-brand-1);
+}
+
+.dark {
+  --vp-c-brand-1: #ff9a5c;
+  --vp-c-brand-2: #ff8547;
+  --vp-c-brand-3: #f4613a;
+  --vp-c-brand-soft: rgba(255, 133, 71, 0.16);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --vp-home-hero-image-filter: blur(72px);
+  }
+}
+
+/* The home page sections under the features. */
+.home-section {
+  max-width: 1152px;
+  margin: 64px auto 0;
+  padding: 0 24px;
+}
+
+.home-section h2 {
+  border-top: none;
+  margin-top: 0;
+}
+
+.vp-doc .home-section table {
+  display: table;
+  width: 100%;
+}
