@@ -7,6 +7,11 @@
       "path": "/api/v1/accounts/current_user/"
     },
     {
+      "name": "accountsEditProfile",
+      "method": "POST",
+      "path": "/api/v1/accounts/edit_profile/"
+    },
+    {
       "name": "accountsLogin",
       "method": "POST",
       "path": "/api/v1/accounts/login/"

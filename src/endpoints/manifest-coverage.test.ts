@@ -21,6 +21,10 @@ describe('manifest coverage of the hand-written endpoints', () => {
       method: 'GET',
       path: '/api/v1/accounts/current_user/',
     });
+    expect(endpoints.accountsEditProfile).toEqual({
+      method: 'POST',
+      path: '/api/v1/accounts/edit_profile/',
+    });
     expect(endpoints.attestationCreateAndroidKeystore).toEqual({
       method: 'POST',
       path: '/api/v1/attestation/create_android_keystore/',

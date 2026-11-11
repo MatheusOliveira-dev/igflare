@@ -60,7 +60,7 @@ import {
   getSavedPosts,
   paginateSavedPosts,
 } from '../endpoints/media/media';
-import { setBiography } from '../endpoints/account/account';
+import { setBiography, setName } from '../endpoints/account/account';
 import type { CommentListOptions, CommentOptions } from '../endpoints/media/media';
 import {
   likeComment,
@@ -133,6 +133,8 @@ export interface AccountApi {
   me(): Promise<Record<string, unknown>>;
   /** Sets the account's biography, returning the updated profile. */
   setBiography(text: string): Promise<User>;
+  /** Changes the display name (Instagram limits this to a couple of changes per 14 days). */
+  setName(name: string): Promise<User>;
 }
 
 /** Reads about any user. */
@@ -394,6 +396,7 @@ export class IgFlare {
     return {
       me: () => getCurrentUser(client),
       setBiography: (text) => setBiography(client, text),
+      setName: (name) => setName(client, name),
     };
   }
 
