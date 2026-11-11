@@ -90,8 +90,18 @@ import {
 } from '../endpoints/media/media-manage';
 import type { EditMediaOptions } from '../endpoints/media/media-manage';
 import { searchUsers, searchHashtags, searchPlaces } from '../endpoints/search/search';
-import { uploadPhoto, uploadVideo, uploadStoryPhoto } from '../endpoints/upload/upload';
-import type { PhotoUploadOptions, VideoUploadOptions } from '../endpoints/upload/upload';
+import {
+  uploadAlbum,
+  uploadPhoto,
+  uploadVideo,
+  uploadStoryPhoto,
+} from '../endpoints/upload/upload';
+import type {
+  AlbumItem,
+  AlbumUploadOptions,
+  PhotoUploadOptions,
+  VideoUploadOptions,
+} from '../endpoints/upload/upload';
 import { getReelsTray, getUserStories, markStoriesSeen } from '../endpoints/story/story';
 import {
   getInbox,
@@ -277,6 +287,8 @@ export interface UploadApi {
   photo(jpeg: Uint8Array, options?: PhotoUploadOptions): Promise<Media>;
   video(mp4: Uint8Array, coverJpeg: Uint8Array, options?: VideoUploadOptions): Promise<Media>;
   story(jpeg: Uint8Array): Promise<Media>;
+  /** Publishes 2 to 10 photos and videos as one carousel post. */
+  album(items: readonly AlbumItem[], options?: AlbumUploadOptions): Promise<Media>;
 }
 
 /** Stories. */
@@ -514,6 +526,7 @@ export class IgFlare {
       photo: (jpeg, options) => uploadPhoto(client, jpeg, options),
       video: (mp4, coverJpeg, options) => uploadVideo(client, mp4, coverJpeg, options),
       story: (jpeg) => uploadStoryPhoto(client, jpeg),
+      album: (items, options) => uploadAlbum(client, items, options),
     };
   }
 

@@ -37,6 +37,7 @@ describe('manifest coverage of the hand-written endpoints', () => {
     expect(endpoints.directBroadcastStoryShare.path).toBe(
       '/api/v1/direct_v2/threads/broadcast/story_share/',
     );
+    expect(endpoints.mediaConfigureSidecar.path).toBe('/api/v1/media/configure_sidecar/');
     expect(endpoints.attestationCreateAndroidKeystore).toEqual({
       method: 'POST',
       path: '/api/v1/attestation/create_android_keystore/',

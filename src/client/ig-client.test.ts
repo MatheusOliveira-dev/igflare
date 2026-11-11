@@ -327,6 +327,20 @@ describe('IgFlare facade', () => {
     ).toBe(true);
   });
 
+  it('delegates album upload', async () => {
+    const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90]);
+    const { ig, transport } = clientWith((req) =>
+      req.url.includes('rupload')
+        ? json({ upload_id: 'A1', status: 'ok' })
+        : json({ status: 'ok', media: { pk: 1, code: 'al', media_type: 8 } }),
+    );
+
+    const media = await ig.upload.album([{ photo: jpeg }, { photo: jpeg }], { caption: 'c' });
+
+    expect(media.code).toBe('al');
+    expect(transport.requests.at(-1)?.url).toContain('/media/configure_sidecar/');
+  });
+
   it('delegates stories: tray, user stories and story upload', async () => {
     const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90]);
     const { ig } = clientWith((req) => {

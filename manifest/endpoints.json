@@ -342,6 +342,11 @@
       "path": "/api/v1/media/configure_to_story/"
     },
     {
+      "name": "mediaConfigureSidecar",
+      "method": "POST",
+      "path": "/api/v1/media/configure_sidecar/"
+    },
+    {
       "name": "mediaDelete",
       "method": "POST",
       "path": "/api/v1/media/{id}/delete/"

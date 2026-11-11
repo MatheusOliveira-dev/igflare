@@ -4,6 +4,7 @@ import { endpoints } from '../../generated/endpoints';
 import { parseJpegSize } from '../../core/media/jpeg';
 import { parseMp4Meta } from '../../core/media/mp4';
 import { mediaSchema, type Media } from '../../schemas/media';
+import { IgError } from '../../errors/ig-error';
 import {
   ClientSchemaError,
   IgApiError,
@@ -55,6 +56,7 @@ async function rupload(
   bytes: Uint8Array,
   entityType: string,
   ruploadParams: Record<string, string>,
+  extraHeaders: Record<string, string> = {},
 ): Promise<string> {
   const name = entityName(uploadId);
   const json = await client.request({
@@ -73,6 +75,7 @@ async function rupload(
       'Content-Type': 'application/octet-stream',
       Offset: '0',
       'X-FB-Photo-Waterfall-ID': randomUUID(),
+      ...extraHeaders,
     },
   });
   return typeof json['upload_id'] === 'string' ? json['upload_id'] : uploadId;
@@ -84,6 +87,7 @@ function ruploadPhoto(
   jpeg: Uint8Array,
   uploadId: string,
   mediaType: '1' | '2',
+  sidecar = false,
 ): Promise<string> {
   return rupload(client, 'igphoto', uploadId, jpeg, 'image/jpeg', {
     retry_context: RETRY_CONTEXT,
@@ -91,6 +95,7 @@ function ruploadPhoto(
     xsharing_user_ids: '[]',
     upload_id: uploadId,
     image_compression: JSON.stringify({ lib_name: 'moz', lib_version: '3.1.m', quality: '80' }),
+    ...(sidecar ? { is_sidecar: '1' } : {}),
   });
 }
 
@@ -99,16 +104,26 @@ function ruploadVideo(
   mp4: Uint8Array,
   uploadId: string,
   meta: { durationMs: number; width: number; height: number },
+  sidecar = false,
 ): Promise<string> {
-  return rupload(client, 'igvideo', uploadId, mp4, 'video/mp4', {
-    retry_context: RETRY_CONTEXT,
-    media_type: '2',
-    xsharing_user_ids: '[]',
-    upload_id: uploadId,
-    upload_media_duration_ms: String(meta.durationMs),
-    upload_media_width: String(meta.width),
-    upload_media_height: String(meta.height),
-  });
+  return rupload(
+    client,
+    'igvideo',
+    uploadId,
+    mp4,
+    'video/mp4',
+    {
+      retry_context: RETRY_CONTEXT,
+      media_type: '2',
+      xsharing_user_ids: '[]',
+      upload_id: uploadId,
+      upload_media_duration_ms: String(meta.durationMs),
+      upload_media_width: String(meta.width),
+      upload_media_height: String(meta.height),
+      ...(sidecar ? { is_sidecar: '1' } : {}),
+    },
+    sidecar ? { 'Segment-Start-Offset': '0', 'Segment-Type': '3' } : {},
+  );
 }
 
 function parseConfiguredMedia(json: Record<string, unknown>): Media {
@@ -301,4 +316,154 @@ export async function uploadStoryPhoto(client: PrivateClient, jpeg: Uint8Array):
   const { width, height } = parseJpegSize(jpeg);
   const uploadId = await ruploadPhoto(client, jpeg, newUploadId(), '1');
   return configureStory(client, uploadId, width, height);
+}
+
+/** One picture of an album: a photo, or a video with its cover. */
+export type AlbumItem =
+  | { readonly photo: Uint8Array }
+  | {
+      readonly video: Uint8Array;
+      readonly cover: Uint8Array;
+      /** Overrides what is read from the MP4. */
+      readonly durationMs?: number;
+      readonly width?: number;
+      readonly height?: number;
+    };
+
+export interface AlbumUploadOptions {
+  readonly caption?: string;
+}
+
+/** Instagram takes 2 to 10 pictures in one carousel post. */
+const ALBUM_MIN = 2;
+const ALBUM_MAX = 10;
+
+/** The time a picture was taken, in the `YYYYMMDDTHHMMSS.000Z` form the app sends. */
+function takenAt(now: Date): string {
+  const pad = (value: number): string => String(value).padStart(2, '0');
+  return (
+    String(now.getFullYear()) +
+    pad(now.getMonth() + 1) +
+    pad(now.getDate()) +
+    'T' +
+    pad(now.getHours()) +
+    pad(now.getMinutes()) +
+    pad(now.getSeconds()) +
+    '.000Z'
+  );
+}
+
+/** Uploads one album item and returns the metadata its place in the post needs. */
+async function uploadAlbumChild(
+  client: PrivateClient,
+  item: AlbumItem,
+  uploadId: string,
+): Promise<Record<string, unknown>> {
+  if ('photo' in item) {
+    const { width, height } = parseJpegSize(item.photo);
+    const serverId = await ruploadPhoto(client, item.photo, uploadId, '1', true);
+    return {
+      upload_id: serverId,
+      edits: JSON.stringify({
+        crop_original_size: [width, height],
+        crop_center: [0, 0],
+        crop_zoom: 1,
+      }),
+      extra: JSON.stringify({ source_width: width, source_height: height }),
+      scene_capture_type: '',
+      scene_type: null,
+    };
+  }
+  const complete =
+    item.durationMs !== undefined && item.width !== undefined && item.height !== undefined;
+  const read = complete ? undefined : parseMp4Meta(item.video);
+  const meta = {
+    durationMs: item.durationMs ?? read?.durationMs ?? 0,
+    width: item.width ?? read?.width ?? 0,
+    height: item.height ?? read?.height ?? 0,
+  };
+  const serverId = await ruploadVideo(client, item.video, uploadId, meta, true);
+  await ruploadPhoto(client, item.cover, serverId, '2');
+  const seconds = meta.durationMs / 1000;
+  return {
+    upload_id: serverId,
+    clips: JSON.stringify([{ length: seconds, source_type: '4' }]),
+    extra: JSON.stringify({ source_width: meta.width, source_height: meta.height }),
+    length: seconds,
+    poster_frame_index: '0',
+    filter_type: '0',
+    video_result: '',
+    date_time_original: takenAt(new Date()),
+    audio_muted: 'false',
+  };
+}
+
+/**
+ * Publishes 2 to 10 photos and videos as one carousel post. Every item is uploaded
+ * first, then one configure call publishes them together; that call is retried while
+ * a video is still being transcoded.
+ */
+export async function uploadAlbum(
+  client: PrivateClient,
+  items: readonly AlbumItem[],
+  options: AlbumUploadOptions = {},
+): Promise<Media> {
+  if (items.length < ALBUM_MIN || items.length > ALBUM_MAX) {
+    throw new IgError(
+      `An album takes ${String(ALBUM_MIN)} to ${String(ALBUM_MAX)} items, not ${String(items.length)}`,
+    );
+  }
+  // Read every file first so a bad one fails before anything is uploaded.
+  for (const item of items) {
+    if ('photo' in item) {
+      parseJpegSize(item.photo);
+    } else {
+      parseJpegSize(item.cover);
+    }
+  }
+
+  const base = Date.now();
+  const children: Record<string, unknown>[] = [];
+  for (const [index, item] of items.entries()) {
+    // One id per picture; the timestamp alone would repeat within a millisecond.
+    children.push(await uploadAlbumChild(client, item, String(base + index)));
+  }
+
+  const albumId = String(Date.now());
+  const device = deviceBlock(client);
+  const payload = {
+    timezone_offset: '0',
+    source_type: '4',
+    creation_logger_session_id: randomUUID(),
+    location: '{}',
+    caption: options.caption ?? '',
+    client_sidecar_id: albumId,
+    upload_id: albumId,
+    suggested_venue_position: -1,
+    device,
+    is_suggested_venue: false,
+    children_metadata: children.map((child) => ({
+      source_type: '4',
+      timezone_offset: '0',
+      device: JSON.stringify(device),
+      ...child,
+    })),
+    ...(client.session.auth.userId !== undefined ? { _uid: client.session.auth.userId } : {}),
+  };
+
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      const json = await client.request({
+        method: endpoints.mediaConfigureSidecar.method,
+        endpoint: endpoints.mediaConfigureSidecar.path,
+        payload,
+      });
+      return parseConfiguredMedia(json);
+    } catch (error) {
+      if (attempt >= TRANSCODE_RETRIES || !isTranscodePending(error)) {
+        throw error;
+      }
+      await sleep(TRANSCODE_DELAY_MS);
+    }
+  }
 }

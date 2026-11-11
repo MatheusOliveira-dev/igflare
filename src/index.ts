@@ -129,7 +129,12 @@ export { uploadPhoto, uploadVideo, uploadStoryPhoto } from './endpoints/upload/u
 export { getReelsTray, getUserStories, markStoriesSeen } from './endpoints/story/story';
 export { reelSchema } from './schemas/reel';
 export type { Reel } from './schemas/reel';
-export type { PhotoUploadOptions, VideoUploadOptions } from './endpoints/upload/upload';
+export type {
+  AlbumItem,
+  AlbumUploadOptions,
+  PhotoUploadOptions,
+  VideoUploadOptions,
+} from './endpoints/upload/upload';
 export { parseJpegSize } from './core/media/jpeg';
 export type { ImageSize } from './core/media/jpeg';
 export { parseMp4Meta } from './core/media/mp4';
