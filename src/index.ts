@@ -56,6 +56,7 @@ export type {
   HttpMethod,
 } from './core/transport/http-transport';
 export { HttpsTransport } from './core/transport/adapters/https';
+export type { HttpsTransportOptions } from './core/transport/adapters/https';
 export { FetchTransport } from './core/transport/adapters/fetch';
 export { FakeTransport } from './core/transport/adapters/fake';
 export type { FakeHandler } from './core/transport/adapters/fake';

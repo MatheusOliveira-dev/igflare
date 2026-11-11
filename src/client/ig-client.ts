@@ -1,6 +1,7 @@
 import { PrivateClient } from '../core/http/private-client';
 import type { PrivateClientOptions } from '../core/http/private-client';
 import { HttpsTransport } from '../core/transport/adapters/https';
+import { IgError } from '../errors/ig-error';
 import { RetryTransport } from '../core/transport/adapters/retry';
 import type { RetryOptions } from '../core/transport/adapters/retry';
 import type { SessionStore, SessionData } from '../core/session/session';
@@ -468,6 +469,11 @@ export interface IgFlareOptions extends PrivateClientOptions {
    */
   readonly retry?: false | RetryOptions;
   /**
+   * An HTTP or HTTPS proxy for every request, as `http://user:password@host:port`. It
+   * configures the default transport, so it cannot be combined with `transport`.
+   */
+  readonly proxy?: string;
+  /**
    * Re-authenticate automatically when the session expires: the credentials (and
    * second-factor source) of the last `login()` are kept in this process's memory
    * and replayed, then the rejected request is repeated once. Ignored when
@@ -506,8 +512,12 @@ export class IgFlare {
   readonly location: LocationApi;
 
   constructor(options: IgFlareOptions = {}) {
-    const { retry, autoRelogin, ...clientOptions } = options;
-    const base = clientOptions.transport ?? new HttpsTransport();
+    const { retry, autoRelogin, proxy, ...clientOptions } = options;
+    if (proxy !== undefined && clientOptions.transport !== undefined) {
+      throw new IgError('Pass either a proxy or a transport, not both');
+    }
+    const base =
+      clientOptions.transport ?? new HttpsTransport(proxy !== undefined ? { proxy } : {});
     const transport = retry === false ? base : new RetryTransport(base, retry);
     this.#rememberLogin = autoRelogin === true && clientOptions.onSessionExpired === undefined;
     this.#client = new PrivateClient({

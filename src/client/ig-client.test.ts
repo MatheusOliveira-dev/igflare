@@ -500,6 +500,20 @@ describe('IgFlare facade', () => {
     ]);
   });
 
+  it('takes a proxy for the default transport, but not together with a transport', () => {
+    expect(() => new IgFlare({ proxy: 'http://127.0.0.1:8080' })).not.toThrow();
+    expect(() => new IgFlare({ proxy: 'socks5://127.0.0.1:1080' })).toThrow(
+      'Only http and https proxies are supported',
+    );
+    expect(
+      () =>
+        new IgFlare({
+          proxy: 'http://127.0.0.1:8080',
+          transport: new FakeTransport(() => json({})),
+        }),
+    ).toThrow('Pass either a proxy or a transport, not both');
+  });
+
   it('delegates the Explore feed', async () => {
     const { ig, transport } = clientWith(() =>
       json({

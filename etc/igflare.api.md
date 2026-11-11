@@ -1193,8 +1193,14 @@ export interface HttpResponse {
 
 // @public
 export class HttpsTransport implements HttpTransport {
+    constructor(options?: HttpsTransportOptions);
     // (undocumented)
     request(req: HttpRequest): Promise<HttpResponse>;
+}
+
+// @public (undocumented)
+export interface HttpsTransportOptions {
+    readonly proxy?: string;
 }
 
 // @public
@@ -1267,6 +1273,7 @@ export type IgFlareLogin = CaaLoginCredentials & {
 // @public
 export interface IgFlareOptions extends PrivateClientOptions {
     readonly autoRelogin?: boolean;
+    readonly proxy?: string;
     readonly retry?: false | RetryOptions;
 }
 
