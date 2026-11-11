@@ -15,6 +15,7 @@ core/session     session/state port + adapters (memory, file)
 core/http        orchestrates transport + signing + session: lossless JSON, typed error mapping
 core/media       dependency-free JPEG/MP4 metadata parsers (upload)
 core/pagination  the Page<T> contract and the paginate() iterator
+core/ids         checkedId/checkedMediaId: every id placed in a URL path goes through these (numeric only)
 schemas          hand-written zod schemas for API responses (User, Media, Thread, ...)
 endpoints/*      hand-written feature modules (auth, user, friendship, feed, media, direct, upload, search)
 client           public, ergonomic facade (IgFlare), retry-wrapped by default
