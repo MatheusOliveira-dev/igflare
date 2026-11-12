@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { defineConfig, type DefaultTheme } from 'vitepress';
 
 const repo = 'https://github.com/MatheusOliveira-dev/igflare';
+const site = 'https://matheusoliveira-dev.github.io/igflare';
 const { version } = JSON.parse(
   readFileSync(new URL('../../package.json', import.meta.url), 'utf8'),
 ) as {
@@ -57,16 +58,28 @@ const guide: DefaultTheme.SidebarItem[] = [
 
 export default defineConfig({
   title: 'igflare',
+  titleTemplate: ':title | igflare, Instagram private API for TypeScript',
   description:
     "A TypeScript client for Instagram's mobile private API, with typed results and typed errors.",
   base: '/igflare/',
   lang: 'en-US',
   cleanUrls: true,
   lastUpdated: true,
+  sitemap: { hostname: `${site}/` },
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/igflare/favicon.svg' }],
     ['meta', { name: 'theme-color', content: '#f4613a' }],
-    ['meta', { property: 'og:title', content: 'igflare' }],
+    [
+      'meta',
+      {
+        name: 'keywords',
+        content:
+          'instagram api, instagram private api, instagram sdk, typescript, node.js, instagram client, instagram insights, instagram direct messages',
+      },
+    ],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:site_name', content: 'igflare' }],
+    ['meta', { property: 'og:title', content: "igflare: Instagram's private API, typed" }],
     [
       'meta',
       {
@@ -74,7 +87,20 @@ export default defineConfig({
         content: "A TypeScript client for Instagram's mobile private API.",
       },
     ],
+    ['meta', { property: 'og:url', content: `${site}/` }],
+    ['meta', { property: 'og:image', content: `${site}/og.png` }],
+    ['meta', { property: 'og:image:width', content: '1280' }],
+    ['meta', { property: 'og:image:height', content: '640' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:image', content: `${site}/og.png` }],
   ],
+  // One canonical link per page, so the GitHub Pages host and any mirror do not split ranking.
+  transformPageData(pageData) {
+    const path = pageData.relativePath.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '');
+    const head = (pageData.frontmatter['head'] ?? []) as unknown[];
+    head.push(['link', { rel: 'canonical', href: `${site}/${path}` }]);
+    pageData.frontmatter['head'] = head;
+  },
   themeConfig: {
     logo: '/logo.svg',
     nav: [

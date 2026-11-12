@@ -1,16 +1,22 @@
 {
   "name": "igflare",
   "version": "0.1.0",
-  "description": "TypeScript client for the Instagram mobile private API",
+  "description": "TypeScript client for the Instagram private API: login, feeds, publishing, direct messages and insights, with typed results and errors",
   "keywords": [
     "instagram",
     "instagram-api",
     "instagram-private-api",
+    "instagram-sdk",
+    "instagram-client",
+    "instagram-insights",
+    "instagram-direct",
     "private-api",
     "sdk",
-    "typescript"
+    "api-client",
+    "typescript",
+    "nodejs"
   ],
-  "homepage": "https://github.com/MatheusOliveira-dev/igflare#readme",
+  "homepage": "https://matheusoliveira-dev.github.io/igflare/",
   "bugs": {
     "url": "https://github.com/MatheusOliveira-dev/igflare/issues"
   },
