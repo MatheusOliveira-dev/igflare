@@ -44,7 +44,7 @@ function signed(request: HttpRequest | undefined): Record<string, unknown> {
 /** The upload host answers the offset question with 0 and the upload with a media id. */
 function uploadHost(offset = 0): (req: HttpRequest) => HttpResponse {
   return (req) => {
-    if (req.url.includes('rupload.facebook.com')) {
+    if (new URL(req.url).hostname === 'rupload.facebook.com') {
       return req.method === 'GET'
         ? json({ offset })
         : { status: 200, headers: {}, body: '{"media_id":1234567890123456789}' };
@@ -148,7 +148,7 @@ describe('sendVideo', () => {
 
   it('throws a typed error when the upload returns no media id', async () => {
     const { client } = clientWith((req) =>
-      req.url.includes('rupload.facebook.com') ? json({ offset: 0 }) : json(SENT),
+      new URL(req.url).hostname === 'rupload.facebook.com' ? json({ offset: 0 }) : json(SENT),
     );
     await expect(sendVideo(client, MP4, { threadId: THREAD })).rejects.toBeInstanceOf(
       ClientSchemaError,

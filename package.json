@@ -112,5 +112,35 @@
   },
   "dependencies": {
     "zod": "4.6.7"
+  },
+  "overrides": {
+    "qs": "^6.16.1",
+    "vitepress": {
+      "vite": "^6.4.4",
+      "@vitejs/plugin-vue": {
+        "vite": "^6.4.4"
+      }
+    },
+    "@microsoft/api-extractor": {
+      "minimatch": "^11.0.1"
+    },
+    "@stryker-mutator/core": {
+      "minimatch": "^11.0.1"
+    },
+    "eslint-plugin-import-x": {
+      "minimatch": "^11.0.1"
+    },
+    "eslint-plugin-sonarjs": {
+      "minimatch": "^11.0.1"
+    },
+    "eslint": {
+      "minimatch": "^11.0.1"
+    },
+    "@eslint/config-array": {
+      "minimatch": "^11.0.1"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.1"
+    }
   }
 }
