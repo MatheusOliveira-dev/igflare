@@ -1,8 +1,9 @@
 name: release
 
-# Publishes to npm when a version tag is pushed. The tag must match package.json, the full
-# check runs first, and the package is published with provenance, which npm only accepts
-# from a CI run like this one.
+# Stages a release on npm when a version tag is pushed. The tag must match package.json and
+# the full check runs first. npm trusts this workflow through OIDC, so no token is stored,
+# and a staged version goes live only after the maintainer approves it on npmjs.com with
+# two-factor authentication.
 on:
   push:
     tags: ['v*']
@@ -24,6 +25,8 @@ jobs:
           node-version: 22
           cache: npm
           registry-url: https://registry.npmjs.org
+      # Trusted publishing and staged releases need a newer npm than the one Node 22 ships.
+      - run: npm install -g npm@12.2.2
       - run: npm ci
       - name: Tag matches package.json
         run: |
@@ -33,6 +36,4 @@ jobs:
             exit 1
           fi
       - run: npm run ci
-      - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm stage publish . --provenance --access public
