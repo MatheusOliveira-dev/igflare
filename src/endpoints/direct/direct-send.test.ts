@@ -155,7 +155,7 @@ describe('shareMedia and shareProfile', () => {
 describe('sendPhoto', () => {
   it('uploads the bytes to the messenger host, then attaches them to the thread', async () => {
     const { client, transport } = clientWith((req) =>
-      req.url.includes('rupload.facebook.com')
+      new URL(req.url).hostname === 'rupload.facebook.com'
         ? // The raw body, as the server sends it: a JS number literal would round first.
           { status: 200, headers: {}, body: '{"media_id":1234567890123456789}' }
         : json(SENT),
@@ -185,7 +185,7 @@ describe('sendPhoto', () => {
     const { client, transport } = clientWith((req) => {
       if (req.url.includes('get_by_participants'))
         return json({ status: 'ok', thread: { thread_id: '77' } });
-      if (req.url.includes('rupload.facebook.com')) return json({ media_id: '55' });
+      if (new URL(req.url).hostname === 'rupload.facebook.com') return json({ media_id: '55' });
       return json(SENT);
     });
 
@@ -210,7 +210,7 @@ describe('sendPhoto', () => {
 
   it('throws a typed error when the upload returns no media id', async () => {
     const { client } = clientWith((req) =>
-      req.url.includes('rupload.facebook.com') ? json({ status: 'ok' }) : json(SENT),
+      new URL(req.url).hostname === 'rupload.facebook.com' ? json({ status: 'ok' }) : json(SENT),
     );
     await expect(sendPhoto(client, JPEG, { threadId: THREAD })).rejects.toBeInstanceOf(
       ClientSchemaError,

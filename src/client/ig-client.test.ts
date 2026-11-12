@@ -809,7 +809,7 @@ describe('IgFlare facade', () => {
       0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90, 0x03,
     ]);
     const { ig, transport } = clientWith((req) => {
-      if (req.url.includes('rupload.facebook.com'))
+      if (new URL(req.url).hostname === 'rupload.facebook.com')
         return req.method === 'GET' ? json({ offset: 0 }) : json({ media_id: '55' });
       if (req.url.includes('/broadcast/reaction/')) return json({ status: 'ok' });
       return json({ status: 'ok', payload: { item_id: 'i1', thread_id: '9' } });

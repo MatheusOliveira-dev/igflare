@@ -83,6 +83,7 @@ describe('HttpsTransport through a proxy', () => {
   beforeAll(async () => {
     proxy = createServer((req, res) => {
       seen.push({ method: req.method, url: req.url, auth: req.headers['proxy-authorization'] });
+      res.writeHead(200, { 'content-type': 'application/json' });
       res.end(JSON.stringify({ forwarded: req.url }));
     });
     proxy.on('connect', (req: IncomingMessage, socket: Socket) => {
