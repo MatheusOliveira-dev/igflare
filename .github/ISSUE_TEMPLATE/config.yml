@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or help
+    url: https://github.com/MatheusOliveira-dev/igflare/discussions
+    about: Ask how to do something. Issues are for bugs and missing features.
+  - name: Documentation
+    url: https://matheusoliveira-dev.github.io/igflare/
+    about: The guide and the API reference.
+  - name: Security problem
+    url: https://github.com/MatheusOliveira-dev/igflare/security/advisories/new
+    about: Report it privately. Do not open a public issue.

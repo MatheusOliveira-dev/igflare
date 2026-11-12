@@ -1,0 +1,23 @@
+name: Feature request
+description: An endpoint or option the app has that igflare does not.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What is missing
+      description: The feature, and where it appears in the Instagram app.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Intended use
+    validations:
+      required: true
+  - type: textarea
+    id: api
+    attributes:
+      label: Suggested call
+      description: Optional. The shape of the call.
+      render: ts
