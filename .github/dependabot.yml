@@ -8,7 +8,16 @@ updates:
     commit-message:
       prefix: chore
       include: scope
+    ignore:
+      # typedoc, API Extractor and typescript-eslint pin TypeScript 5. Move by hand once
+      # they support the next major.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
     groups:
+      # eslint and @eslint/js only install at the same major, so they have to move in
+      # one pull request.
+      eslint:
+        patterns: [eslint, '@eslint/*']
       # Tooling moves together; one pull request a week instead of one per package.
       dev-dependencies:
         dependency-type: development
