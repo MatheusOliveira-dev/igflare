@@ -8,7 +8,8 @@
 <p align="center">
   <a href="https://matheusoliveira-dev.github.io/igflare/"><img src="https://img.shields.io/badge/docs-guide%20%26%20API-f4613a" alt="docs"></a>
   <a href="https://github.com/MatheusOliveira-dev/igflare/actions/workflows/ci.yml"><img src="https://github.com/MatheusOliveira-dev/igflare/actions/workflows/ci.yml/badge.svg" alt="ci"></a>
-  <a href="package.json"><img src="https://img.shields.io/github/package-json/v/MatheusOliveira-dev/igflare?label=version&color=f4613a" alt="version"></a>
+  <a href="https://www.npmjs.com/package/igflare"><img src="https://img.shields.io/npm/v/igflare?color=f4613a" alt="npm"></a>
+  <a href="https://www.npmjs.com/package/igflare"><img src="https://img.shields.io/npm/dm/igflare?color=f4613a" alt="downloads"></a>
   <img src="https://img.shields.io/badge/types-TypeScript-3178c6" alt="TypeScript">
   <img src="https://img.shields.io/badge/node-%E2%89%A522-339933" alt="Node 22 or newer">
   <a href="LICENSE"><img src="https://img.shields.io/github/license/MatheusOliveira-dev/igflare?color=59636e" alt="MIT license"></a>
