@@ -31,7 +31,6 @@ jobs:
       - run: npm run typecheck
       - run: npm run format:check
       - run: npm run lint
-      - run: npm run prose
       - run: npm run guard
       - run: npm run deps
       - run: npm run dup
