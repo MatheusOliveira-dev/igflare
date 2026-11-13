@@ -1,8 +1,8 @@
 # Migrating from instagram-private-api
 
 This page maps the calls of [instagram-private-api](https://github.com/dilame/instagram-private-api)
-(`IgApiClient`) to igflare. Both packages talk to the same private API of the Instagram app;
-the request flows, models and errors differ, and the sections below cover each of them.
+(`IgApiClient`) to igflare. Both packages talk to the same private API of the Instagram app.
+The request flows, models and errors differ, and the sections below cover each of them.
 
 The old calls were checked against instagram-private-api 1.46.1, the latest release on npm.
 
@@ -18,12 +18,12 @@ The old calls were checked against instagram-private-api 1.46.1, the latest rele
   no `d` flag, no options object for a single value.
 - **Checked models.** Each call returns the model, checked at runtime, instead of the raw
   body. See [Results and errors](./errors).
-- **Lists are pages or iterators.** A page call takes a cursor and returns `nextCursor`; an
+- **Lists are pages or iterators.** A page call takes a cursor and returns `nextCursor`. An
   iterator walks every page. Feed objects with `items()` and `isMoreAvailable()` are gone.
 - **One error class per failure.** The Instagram answer is in `error.payload.raw`, the
   status in `error.statusCode`.
-- **Node 22 or newer.** ESM and CommonJS builds with type declarations; `zod` is the only
-  runtime dependency.
+- **Node 22 or newer.** ESM and CommonJS builds with type declarations, and `zod` is the
+  only runtime dependency.
 
 ## Setup and session
 
@@ -128,8 +128,8 @@ await ig.login({
 
 :::
 
-The channel is the one Instagram picks for the account; there is no `verificationMethod`
-to pass. Without `twoFactor`, `login` throws `CaaTwoFactorRequiredError`, and
+The channel is the one Instagram picks for the account, so there is no
+`verificationMethod` to pass. Without `twoFactor`, `login` throws `CaaTwoFactorRequiredError`, and
 `ig.resolveTwoFactor(error, code)` finishes it.
 
 ### Checkpoints
@@ -525,13 +525,13 @@ failure to the same typed errors.
 
 - **Logout, password, private or public profile, username and email changes.** Not
   covered.
-- **Location and people tags on upload.** People are tagged afterwards with `media.edit`;
-  a location has no call.
+- **Location and people tags on upload.** People are tagged afterwards with `media.edit`.
+  A location has no call.
 - **Story videos.** Stories take a photo.
 - **IGTV.** Instagram retired it. Videos post with `ig.upload.video` or `ig.upload.reel`.
 - **Live, music, story stickers and their votes, the blocked users list, usertag feeds.**
   Not covered. The full list is in [Limitations](./limitations).
-- **Realtime direct messages.** Not covered; the inbox and threads are read by request.
+- **Realtime direct messages.** Not covered. The inbox and threads are read by request.
 
 ## Credits
 

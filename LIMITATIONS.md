@@ -32,7 +32,7 @@ Every endpoint was exercised against the live service on test accounts in Novemb
 on one app profile, and the results were read back where the API allows it. That is a
 point-in-time check, not a guarantee. The automated suite does not talk to Instagram: it
 uses fakes plus a few captured real responses, so a change on Instagram's side will not
-fail the build; it shows up only against the live service.
+fail the build. It shows up only against the live service.
 
 Known gaps from that testing:
 
@@ -68,7 +68,7 @@ credentials are also kept in the memory of the process.
 
 ## Network
 
-- Requests go out through Node's `https`. HTTP and HTTPS proxies are built in; SOCKS needs
+- Requests go out through Node's `https`. HTTP and HTTPS proxies are built in. SOCKS needs
   a custom `transport`.
 - The client does not imitate the app's TLS fingerprint. The reference client reports
   that this can lead to an empty 429 on login. It was not seen here, but it is not

@@ -36,8 +36,8 @@ new IgFlare({ retry: { maxRetries: 5, baseDelayMs: 2000, maxDelayMs: 60_000 } })
 | `baseDelayMs` | `1000`  | The first wait, doubled on each retry |
 | `maxDelayMs`  | `30000` | The longest wait                      |
 
-Retries are for blips, not for pacing. igflare does not queue calls; pacing a large volume
-is up to the caller.
+Retries are for blips, not for pacing. igflare does not queue calls, so pacing a large
+volume is up to the caller.
 
 ## Custom transport
 

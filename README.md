@@ -333,8 +333,8 @@ await ig.upload.photo(await readFile('photo.jpg'), { caption: 'hello' });
 await ig.upload.reel(await readFile('clip.mp4'), await readFile('cover.jpg'));
 ```
 
-Photos and covers are JPEG. Videos take a separate JPEG cover; duration and size are read
-from the MP4.
+Photos and covers are JPEG. Videos take a separate JPEG cover, and duration and size are
+read from the MP4.
 
 </details>
 
