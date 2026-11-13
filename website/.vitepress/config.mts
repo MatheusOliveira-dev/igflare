@@ -25,6 +25,7 @@ const guide: DefaultTheme.SidebarItem[] = [
     items: [
       { text: 'What is igflare', link: '/guide/' },
       { text: 'Getting started', link: '/guide/getting-started' },
+      { text: 'Migrating from instagram-private-api', link: '/guide/migrating' },
     ],
   },
   {
