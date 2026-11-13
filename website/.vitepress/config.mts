@@ -72,6 +72,13 @@ export default defineConfig({
     [
       'meta',
       {
+        name: 'google-site-verification',
+        content: 'd2QQU9iDnq3Jhb7v5rnBlyPby26b_6d_Igm6GckM11c',
+      },
+    ],
+    [
+      'meta',
+      {
         name: 'keywords',
         content:
           'instagram api, instagram private api, instagram sdk, typescript, node.js, instagram client, instagram insights, instagram direct messages',
