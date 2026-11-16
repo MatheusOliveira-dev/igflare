@@ -76,6 +76,10 @@
 > API can break Instagram's Terms of Use and lead to account restrictions. Known limits are in
 > [LIMITATIONS.md](LIMITATIONS.md).
 
+> [!NOTE]
+> Last verified against the live service on 2026-11-12, as Instagram for Android
+> 454.0.0.54.77.
+
 ## Install
 
 ```sh
