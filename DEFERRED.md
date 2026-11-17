@@ -5,6 +5,7 @@ Read this file before `npm publish` or cutting a release tag.
 Also run `npm run live-check` (a read-only pass against the live service with a test
 account's saved session, see `scripts/live-check.mjs`) before a release: the automated suite
 never talks to Instagram, so this is the only thing that notices when the service changed.
+After it passes, the date in the README's "Last verified" note moves to the day of the check.
 
 | Item                                                                                                                                                                                                                                                                                                                      | Trigger                                                           |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
