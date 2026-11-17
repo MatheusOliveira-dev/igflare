@@ -445,7 +445,8 @@ npm run gen
 IGFLARE_SESSION=session.json npm run live-check -- --professional
 ```
 
-The device profile's app version changes by hand in the same commit.
+The device profile's app version changes by hand in the same commit, together with the build
+and date in the "Last verified" note at the top.
 
 </details>
 

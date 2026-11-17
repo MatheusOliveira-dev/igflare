@@ -26,7 +26,8 @@ npm run gen
 IGFLARE_SESSION=session.json npm run live-check -- --professional
 ```
 
-The device profile's app version and version code change by hand in the same commit.
+The device profile's app version and version code change by hand in the same commit, and so
+does the build named in the README's "Last verified" note. A test fails while the two differ.
 
 A query reported as **missing** needs a look at the APK: the screen may have moved to
 another query. A **pinned** query is kept as it is on purpose, and its `note` in the
